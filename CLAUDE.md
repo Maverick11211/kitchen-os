@@ -7,6 +7,7 @@ Single user, one iPad. Not a product — a tool for one person.
 - `npm run dev` — start dev server
 - `npm run build` — production build
 - `npm run lint` — ESLint
+- `npm test` — run tests. ALWAYS run before saying work is complete.
 
 ## Architecture rules (do not violate)
 - NO backend, ever. All data lives in the browser via IndexedDB (Dexie).
