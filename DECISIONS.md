@@ -70,10 +70,14 @@ neither. `densityGPerMl` is populated for true liquids only.
 
 | Example | tracked | perishable |
 |---|---|---|
-| Salt, dried spices | ✗ | ✗ |
-| Flour, oil, rice, canned goods | ✓ | ✗ |
+| Salt, pepper | ✗ | ✗ |
+| Flour, oil, rice, canned goods, most dried spices | ✓ | ✗ |
 | Fresh basil, lemon, cilantro | ✓ | ✓ |
 | Chicken, milk, cheese | ✓ | ✓ |
+
+**Superseded 2026-08-14:** this row originally read "Salt, dried spices."
+See the dated entry near the bottom of this file — most dried spices are
+now tracked, only salt and pepper remain assumed-on-hand.
 
 A single flag conflated two different things. Flour never expires but is a
 major calorie contributor you genuinely run out of — it must be tracked while
@@ -227,5 +231,125 @@ Not blocking, revisit when relevant:
 
 - Expiry warning threshold in days — currently unset, likely 3 and 7 day tiers
 - Whether `interchangeableWith` should be auto-derived within a canonical
-  family or maintained by hand
+  family or maintained by hand. Related: produce format variants (e.g.
+  whole carrots vs. baby carrots, whole onion vs. diced/frozen) would need
+  a second canonical entry each, linked via `interchangeableWith`, since
+  `trackBy` can't represent two measurement modes on one entry. Deferred —
+  ontology currently has one whole/count-or-bagged/mass entry per produce
+  item. Revisit once `interchangeableWith` is actually wired up.
 - Reconcile screen interaction detail
+- `defaultShelfLifeDays` has no frozen/fresh distinction. Ontology entries
+  (Phase 1) use fridge/fresh shelf life as the default — e.g. raw chicken
+  breast is 2 days. Anything frozen will trip expiry warnings sooner than
+  actually necessary. Revisit if this becomes annoying in practice; possible
+  fixes are a per-lot "frozen" flag or a second shelf-life field.
+
+---
+
+## 2026-08-14 — Fallback unitWeightG on high-variance mass ingredients
+
+`trackBy` says how an ingredient is tracked in inventory (grams remaining in
+a lot). It does not by itself say how a recipe is allowed to specify
+quantity — a recipe could still reasonably say "2 chicken breasts" even
+though breasts are tracked by mass, not count.
+
+Most `trackBy: 'mass'` ingredients (ground beef, steaks, chops, deli meat,
+bacon) do NOT get a `unitWeightG`, because piece size varies too much for
+one number to mean anything — a deli turkey slice can be 3-4x thicker
+depending on how the counter cut it.
+
+Exception: chicken breast and chicken thighs got a `unitWeightG` anyway
+(170g and 130g respectively) as a fallback, so recipes written as "2
+chicken breasts" don't fail to import in Phase 2. This is a rough average,
+not a measurement — it inherits its own error on top of the ±15% macro
+tolerance already accepted project-wide. Apply this fallback selectively to
+future ingredients that are both high-variance in size AND commonly
+referenced by count in recipes — not automatically to every mass-tracked
+ingredient.
+
+---
+
+## 2026-08-14 — defaultShelfLifeDays represents sealed/best-by, not opened
+
+Same root cause as the frozen/fresh open item above: `Lot` only has one
+`acquiredOn` timestamp and one derived expiry. There's no `openedOn` field,
+so a single `defaultShelfLifeDays` per canonical ingredient can't represent
+something whose spoilage clock resets once you break the seal — mayonnaise
+and ranch dressing are good for months sealed, weeks once opened.
+
+Decision: `defaultShelfLifeDays` represents the sealed/best-by shelf life
+(matches the printed date, verifiable, and is what you'd check when adding
+a fresh lot), not the shorter opened/in-use life. Consequence: the app will
+under-warn about something that's been open in the fridge for a while — the
+Reconcile screen is the accepted mitigation for that drift, same as
+everywhere else quantity/freshness gets fuzzy.
+
+Fixed under this convention: `mayonnaise` (60→180 days), `ranch-dressing`
+(30→150 days). Also flipped `salsa` from perishable:true (14 days) to
+perishable:false, on the theory that jarred shelf-stable salsa is the same
+"long sealed best-by, low tracking value" bucket as ketchup/mustard — not
+explicitly confirmed with the User, worth a second look if the User means
+fresh refrigerated salsa instead.
+
+If this becomes a real problem in practice, the fix is adding `openedOn` to
+`Lot` in a later phase — not something to solve by picking cleverer
+defaults now.
+
+---
+
+## 2026-08-14 — Most dried spices are tracked, not assumed-on-hand
+
+Supersedes the "Salt, dried spices" row in the tracked/perishable table
+above. The original assumption — every spice is a universal pantry item,
+not worth checking ownership for — doesn't hold in practice. The User
+doesn't own every spice in the ontology (turmeric, curry powder, etc.),
+and `tracked: false` was silently making the app assume otherwise, which
+would have shown recipes as fully makeable when a real ingredient was
+missing.
+
+`tracked` is a canonical-level default, not a per-user pantry flag — the
+actual "do I own this" answer already comes from whether a `Lot` exists for
+it, exactly as it does for every other tracked ingredient. So the fix isn't
+a new mechanism, it's just applying the existing one: 20 of the 22 spice
+entries moved from `tracked: false` into the same bucket as flour/oil/rice
+(tracked, not perishable). Only salt and black pepper stay assumed-on-hand,
+as the two genuine universals.
+
+Consequence: those 20 entries also needed `cupWeightG` added, since recipes
+reference spices by tsp/tbsp and that conversion didn't exist while they
+were untracked. Values are rough (ground-spice density estimates, not
+measured), same tolerance as every other cupWeightG in this file.
+
+`bay-leaves` also switched from `mass`/`cupWeightG` to `count`/`unitWeightG`
+in the same pass — "1 cup of bay leaves" isn't a real recipe measurement;
+recipes count leaves.
+
+---
+
+## 2026-08-14 — Phase 1 closed at 193 entries; no way to grow the ontology post-launch
+
+`ontology.json` shipped with 193 canonical ingredients across all 10
+categories. Before closing Phase 1, did a gap-check against common home
+ingredients and added 15 more (water, feta, Swiss, ground chicken, cod,
+green onion, red onion, kale, green beans, hamburger buns, refried beans,
+apple cider vinegar, white vinegar, marinara sauce, canned corn).
+
+Open item: there is currently no way for the User to add a new canonical
+ingredient once the app is built and deployed. Neither Phase 4 (Inventory
+UI) nor Phase 6 (Recipe UI) currently scopes a screen for it — both
+assume the canonical ingredient a product or recipe line needs already
+exists. Two paths, not mutually exclusive:
+
+1. `AppMeta.seedVersion` already exists in the schema for exactly this —
+   tracking which version of the bundled seed data (ontology + recipes)
+   has been merged into local IndexedDB, so a future `ontology.json`
+   update can add entries without duplicating what's there or touching
+   existing products/lots. The merge logic itself isn't built (Phase 3+
+   engine work) — the field is just a hook.
+2. An in-app "add ingredient" form, writing straight to IndexedDB at
+   runtime, no redeploy needed. Not currently scoped anywhere — would
+   most naturally sit in Phase 4 next to add-product/add-lot.
+
+Flagged in ROADMAP.md under Phase 4. Needs a decision before Phase 4
+starts, not before Phase 2 or 3 — recipe import and the engine don't
+depend on this.

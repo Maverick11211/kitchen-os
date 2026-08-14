@@ -1,8 +1,8 @@
 # Kitchen OS — Roadmap
 
 ## Current status
-Phase 0 complete. Phase 1 not started.
-Last updated: 2026-08-10
+Phase 0 complete. Phase 1 complete. Phase 2 not started.
+Last updated: 2026-08-14
 
 ## Environment (done)
 - Repo: github.com/Maverick11211/kitchen-os
@@ -14,13 +14,15 @@ Last updated: 2026-08-10
 Locked data model in src/types/schema.ts.
 All decisions recorded in DECISIONS.md.
 
-## Phase 1 — Ingredient ontology — NEXT
-Build the canonical ingredient table: ~150-200 entries.
-Each needs trackBy, tracked, perishable, cupWeightG or unitWeightG,
-aliases, category.
+## Phase 1 — Ingredient ontology — DONE
+Canonical ingredient table built: 193 entries across all 10 categories
+(dairy, protein, produce, grain, legume, fat-oil, condiment, spice,
+baking, beverage, other).
 Output: src/data/ontology.json
-Recommended model: Sonnet. Work in category chunks (dairy, protein,
-produce, grains, pantry, condiments).
+Judgment calls and conventions from this phase are recorded in
+DECISIONS.md (fallback unitWeightG on high-variance mass ingredients,
+sealed/best-by shelf-life convention, spice tracked/perishable split,
+canned-goods net-weight convention, produce format-variant deferral).
 
 ## Phase 2 — Recipe seed set
 100-150 recipes from TheMealDB, normalized against the Phase 1 ontology.
@@ -37,6 +39,12 @@ Recommended model: Opus or opusplan.
 Two-pane landscape layout. Add product, add lot, category view,
 expiry warnings, quantity adjustment, reconcile screen.
 Export/import ships here — not later.
+Needs scoping: an "add canonical ingredient" screen. The ontology built
+in Phase 1 has no in-app way to grow after launch — see the open item
+in DECISIONS.md (`AppMeta.seedVersion` exists for merging future
+ontology.json updates, but nothing lets the User add a one-off ingredient
+without a redeploy). Decide whether this ships in Phase 4 alongside
+add-product/add-lot, or later.
 
 ## Phase 5 — Nutrition UI
 Daily totals (calories, carbs, fat, protein), browse past days,
