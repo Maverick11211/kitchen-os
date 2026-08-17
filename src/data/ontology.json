@@ -7,7 +7,11 @@
     "tracked": true,
     "perishable": true,
     "densityGPerMl": 1.03,
-    "aliases": ["whole milk", "milk", "3% milk"],
+    "aliases": [
+      "whole milk",
+      "milk",
+      "3% milk"
+    ],
     "defaultShelfLifeDays": 7
   },
   {
@@ -18,7 +22,11 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 113,
-    "aliases": ["shredded cheddar", "cheddar cheese", "shredded cheese"],
+    "aliases": [
+      "shredded cheddar",
+      "cheddar cheese",
+      "shredded cheese"
+    ],
     "defaultShelfLifeDays": 21
   },
   {
@@ -29,7 +37,11 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 245,
-    "aliases": ["plain greek yogurt", "greek yogurt", "yogurt"],
+    "aliases": [
+      "plain greek yogurt",
+      "greek yogurt",
+      "yogurt"
+    ],
     "defaultShelfLifeDays": 14
   },
   {
@@ -40,7 +52,11 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 227,
-    "aliases": ["butter", "unsalted butter", "sweet cream butter"],
+    "aliases": [
+      "butter",
+      "unsalted butter",
+      "sweet cream butter"
+    ],
     "defaultShelfLifeDays": 60
   },
   {
@@ -51,7 +67,11 @@
     "tracked": true,
     "perishable": true,
     "densityGPerMl": 0.994,
-    "aliases": ["heavy cream", "heavy whipping cream", "whipping cream"],
+    "aliases": [
+      "heavy cream",
+      "heavy whipping cream",
+      "whipping cream"
+    ],
     "defaultShelfLifeDays": 10
   },
   {
@@ -62,7 +82,10 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 230,
-    "aliases": ["sour cream"],
+    "aliases": [
+      "sour cream",
+      "creme fraiche"
+    ],
     "defaultShelfLifeDays": 14
   },
   {
@@ -73,7 +96,10 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 232,
-    "aliases": ["cream cheese", "philadelphia cream cheese"],
+    "aliases": [
+      "cream cheese",
+      "philadelphia cream cheese"
+    ],
     "defaultShelfLifeDays": 14
   },
   {
@@ -84,7 +110,13 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 100,
-    "aliases": ["parmesan", "grated parmesan", "parmesan cheese"],
+    "aliases": [
+      "parmesan",
+      "grated parmesan",
+      "parmesan cheese",
+      "pecorino",
+      "parmigiano-reggiano"
+    ],
     "defaultShelfLifeDays": 30
   },
   {
@@ -95,7 +127,11 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 113,
-    "aliases": ["shredded mozzarella", "mozzarella cheese", "mozzarella"],
+    "aliases": [
+      "shredded mozzarella",
+      "mozzarella cheese",
+      "mozzarella"
+    ],
     "defaultShelfLifeDays": 21
   },
   {
@@ -106,7 +142,9 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 225,
-    "aliases": ["cottage cheese"],
+    "aliases": [
+      "cottage cheese"
+    ],
     "defaultShelfLifeDays": 10
   },
   {
@@ -117,7 +155,11 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 245,
-    "aliases": ["plain yogurt", "regular yogurt", "whole milk yogurt"],
+    "aliases": [
+      "plain yogurt",
+      "regular yogurt",
+      "whole milk yogurt"
+    ],
     "defaultShelfLifeDays": 14
   },
   {
@@ -128,7 +170,11 @@
     "tracked": true,
     "perishable": true,
     "densityGPerMl": 1.01,
-    "aliases": ["half and half", "half-and-half"],
+    "aliases": [
+      "half and half",
+      "half-and-half",
+      "single cream"
+    ],
     "defaultShelfLifeDays": 10
   },
   {
@@ -139,7 +185,10 @@
     "tracked": true,
     "perishable": true,
     "densityGPerMl": 1.03,
-    "aliases": ["buttermilk", "cultured buttermilk"],
+    "aliases": [
+      "buttermilk",
+      "cultured buttermilk"
+    ],
     "defaultShelfLifeDays": 14
   },
   {
@@ -150,7 +199,14 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 50,
-    "aliases": ["eggs", "large egg", "whole egg"],
+    "aliases": [
+      "eggs",
+      "large egg",
+      "whole egg",
+      "egg",
+      "free-range egg, beaten",
+      "free-range eggs, beaten"
+    ],
     "defaultShelfLifeDays": 35
   },
   {
@@ -161,7 +217,12 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 170,
-    "aliases": ["chicken breast", "boneless chicken breast", "skinless chicken breast", "chicken breasts"],
+    "aliases": [
+      "chicken breast",
+      "boneless chicken breast",
+      "skinless chicken breast",
+      "chicken breasts"
+    ],
     "defaultShelfLifeDays": 2
   },
   {
@@ -172,7 +233,11 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 130,
-    "aliases": ["chicken thighs", "boneless chicken thighs", "skinless chicken thighs"],
+    "aliases": [
+      "chicken thighs",
+      "boneless chicken thighs",
+      "skinless chicken thighs"
+    ],
     "defaultShelfLifeDays": 2
   },
   {
@@ -182,7 +247,12 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
-    "aliases": ["ground beef", "80/20 ground beef", "regular ground beef", "ground chuck"],
+    "aliases": [
+      "ground beef",
+      "80/20 ground beef",
+      "regular ground beef",
+      "ground chuck"
+    ],
     "defaultShelfLifeDays": 2
   },
   {
@@ -192,7 +262,12 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
-    "aliases": ["lean ground beef", "93/7 ground beef", "extra lean ground beef"],
+    "aliases": [
+      "lean ground beef",
+      "93/7 ground beef",
+      "extra lean ground beef",
+      "lean minced beef"
+    ],
     "defaultShelfLifeDays": 2
   },
   {
@@ -202,7 +277,10 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
-    "aliases": ["ground turkey", "93% lean ground turkey"],
+    "aliases": [
+      "ground turkey",
+      "93% lean ground turkey"
+    ],
     "defaultShelfLifeDays": 2
   },
   {
@@ -212,8 +290,13 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
-    "aliases": ["bacon", "bacon slices", "pork bacon"],
-    "defaultShelfLifeDays": 7
+    "aliases": [
+      "bacon",
+      "bacon slices",
+      "pork bacon"
+    ],
+    "defaultShelfLifeDays": 7,
+    "unitWeightG": 8
   },
   {
     "id": "pork-chop-boneless",
@@ -222,8 +305,13 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
-    "aliases": ["pork chop", "boneless pork chops", "pork loin chop"],
-    "defaultShelfLifeDays": 3
+    "aliases": [
+      "pork chop",
+      "boneless pork chops",
+      "pork loin chop"
+    ],
+    "defaultShelfLifeDays": 3,
+    "unitWeightG": 170
   },
   {
     "id": "salmon-fillet",
@@ -232,7 +320,11 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
-    "aliases": ["salmon", "salmon fillets", "fresh salmon"],
+    "aliases": [
+      "salmon",
+      "salmon fillets",
+      "fresh salmon"
+    ],
     "defaultShelfLifeDays": 2
   },
   {
@@ -242,7 +334,15 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
-    "aliases": ["shrimp", "peeled shrimp", "deveined shrimp"],
+    "aliases": [
+      "shrimp",
+      "peeled shrimp",
+      "deveined shrimp",
+      "prawns",
+      "king prawns",
+      "raw king prawns",
+      "tiger prawns"
+    ],
     "defaultShelfLifeDays": 2
   },
   {
@@ -253,7 +353,12 @@
     "tracked": true,
     "perishable": false,
     "unitWeightG": 142,
-    "aliases": ["canned tuna", "tuna", "tuna in water", "chunk light tuna"]
+    "aliases": [
+      "canned tuna",
+      "tuna",
+      "tuna in water",
+      "chunk light tuna"
+    ]
   },
   {
     "id": "turkey-breast-deli-sliced",
@@ -262,7 +367,11 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
-    "aliases": ["deli turkey", "sliced turkey breast", "turkey lunch meat"],
+    "aliases": [
+      "deli turkey",
+      "sliced turkey breast",
+      "turkey lunch meat"
+    ],
     "defaultShelfLifeDays": 5
   },
   {
@@ -272,7 +381,12 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
-    "aliases": ["sirloin", "sirloin steak", "top sirloin"],
+    "aliases": [
+      "sirloin",
+      "sirloin steak",
+      "top sirloin",
+      "beef fillet"
+    ],
     "defaultShelfLifeDays": 3
   },
   {
@@ -283,7 +397,11 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 85,
-    "aliases": ["italian sausage", "sausage links", "sweet italian sausage"],
+    "aliases": [
+      "italian sausage",
+      "sausage links",
+      "sweet italian sausage"
+    ],
     "defaultShelfLifeDays": 2
   },
   {
@@ -293,7 +411,11 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
-    "aliases": ["tofu", "extra firm tofu", "firm tofu"],
+    "aliases": [
+      "tofu",
+      "extra firm tofu",
+      "firm tofu"
+    ],
     "defaultShelfLifeDays": 5
   },
   {
@@ -303,7 +425,11 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
-    "aliases": ["deli ham", "sliced ham", "ham lunch meat"],
+    "aliases": [
+      "deli ham",
+      "sliced ham",
+      "ham lunch meat"
+    ],
     "defaultShelfLifeDays": 5
   },
   {
@@ -314,7 +440,10 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 120,
-    "aliases": ["chicken drumsticks", "drumsticks"],
+    "aliases": [
+      "chicken drumsticks",
+      "drumsticks"
+    ],
     "defaultShelfLifeDays": 2
   },
   {
@@ -325,8 +454,13 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 110,
-    "aliases": ["onion", "yellow onion", "cooking onion"],
-    "defaultShelfLifeDays": 30
+    "aliases": [
+      "onion",
+      "yellow onion",
+      "cooking onion"
+    ],
+    "defaultShelfLifeDays": 30,
+    "cupWeightG": 160
   },
   {
     "id": "garlic-clove",
@@ -336,7 +470,11 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 5,
-    "aliases": ["garlic", "garlic cloves", "clove of garlic"],
+    "aliases": [
+      "garlic",
+      "garlic cloves",
+      "clove of garlic"
+    ],
     "defaultShelfLifeDays": 21
   },
   {
@@ -348,7 +486,10 @@
     "perishable": true,
     "cupWeightG": 128,
     "unitWeightG": 61,
-    "aliases": ["carrots", "carrot"],
+    "aliases": [
+      "carrots",
+      "carrot"
+    ],
     "defaultShelfLifeDays": 21
   },
   {
@@ -359,7 +500,11 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 30,
-    "aliases": ["spinach", "baby spinach", "fresh spinach"],
+    "aliases": [
+      "spinach",
+      "baby spinach",
+      "fresh spinach"
+    ],
     "defaultShelfLifeDays": 7
   },
   {
@@ -370,7 +515,11 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 16,
-    "aliases": ["cilantro", "fresh cilantro", "coriander leaves"],
+    "aliases": [
+      "cilantro",
+      "fresh cilantro",
+      "coriander leaves"
+    ],
     "defaultShelfLifeDays": 7
   },
   {
@@ -381,7 +530,12 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 170,
-    "aliases": ["potato", "potatoes", "russet potato", "baking potato"],
+    "aliases": [
+      "potato",
+      "potatoes",
+      "russet potato",
+      "baking potato"
+    ],
     "defaultShelfLifeDays": 21
   },
   {
@@ -392,7 +546,11 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 130,
-    "aliases": ["sweet potato", "sweet potatoes", "yam"],
+    "aliases": [
+      "sweet potato",
+      "sweet potatoes",
+      "yam"
+    ],
     "defaultShelfLifeDays": 21
   },
   {
@@ -403,7 +561,11 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 123,
-    "aliases": ["tomato", "tomatoes", "roma tomato"],
+    "aliases": [
+      "tomato",
+      "tomatoes",
+      "roma tomato"
+    ],
     "defaultShelfLifeDays": 7
   },
   {
@@ -414,7 +576,13 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 119,
-    "aliases": ["bell pepper", "green pepper", "red pepper", "peppers"],
+    "aliases": [
+      "bell pepper",
+      "green pepper",
+      "red pepper",
+      "peppers",
+      "yellow pepper"
+    ],
     "defaultShelfLifeDays": 10
   },
   {
@@ -425,7 +593,11 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 300,
-    "aliases": ["cucumber", "cucumbers", "english cucumber"],
+    "aliases": [
+      "cucumber",
+      "cucumbers",
+      "english cucumber"
+    ],
     "defaultShelfLifeDays": 7
   },
   {
@@ -436,7 +608,11 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 196,
-    "aliases": ["zucchini", "courgette"],
+    "aliases": [
+      "zucchini",
+      "courgette",
+      "courgettes"
+    ],
     "defaultShelfLifeDays": 5
   },
   {
@@ -447,7 +623,14 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 14,
-    "aliases": ["jalapeno", "jalapeno pepper", "jalapenos"],
+    "aliases": [
+      "jalapeno",
+      "jalapeno pepper",
+      "jalapenos",
+      "chilli",
+      "green chilli",
+      "red chilli"
+    ],
     "defaultShelfLifeDays": 14
   },
   {
@@ -458,7 +641,10 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 58,
-    "aliases": ["lemon", "lemons"],
+    "aliases": [
+      "lemon",
+      "lemons"
+    ],
     "defaultShelfLifeDays": 21
   },
   {
@@ -469,7 +655,10 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 67,
-    "aliases": ["lime", "limes"],
+    "aliases": [
+      "lime",
+      "limes"
+    ],
     "defaultShelfLifeDays": 21
   },
   {
@@ -480,7 +669,11 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 170,
-    "aliases": ["avocado", "avocados", "hass avocado"],
+    "aliases": [
+      "avocado",
+      "avocados",
+      "hass avocado"
+    ],
     "defaultShelfLifeDays": 5
   },
   {
@@ -491,7 +684,10 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 118,
-    "aliases": ["banana", "bananas"],
+    "aliases": [
+      "banana",
+      "bananas"
+    ],
     "defaultShelfLifeDays": 6
   },
   {
@@ -502,7 +698,10 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 182,
-    "aliases": ["apple", "apples"],
+    "aliases": [
+      "apple",
+      "apples"
+    ],
     "defaultShelfLifeDays": 28
   },
   {
@@ -513,7 +712,10 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 131,
-    "aliases": ["orange", "oranges"],
+    "aliases": [
+      "orange",
+      "oranges"
+    ],
     "defaultShelfLifeDays": 21
   },
   {
@@ -525,7 +727,11 @@
     "perishable": true,
     "cupWeightG": 101,
     "unitWeightG": 40,
-    "aliases": ["celery", "celery stalk", "stalk of celery"],
+    "aliases": [
+      "celery",
+      "celery stalk",
+      "stalk of celery"
+    ],
     "defaultShelfLifeDays": 14
   },
   {
@@ -536,7 +742,12 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 900,
-    "aliases": ["cabbage", "green cabbage", "head of cabbage"],
+    "aliases": [
+      "cabbage",
+      "green cabbage",
+      "head of cabbage",
+      "red cabbage"
+    ],
     "defaultShelfLifeDays": 21
   },
   {
@@ -547,7 +758,12 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 192,
-    "aliases": ["corn", "corn on the cob", "ear of corn", "sweet corn"],
+    "aliases": [
+      "corn",
+      "corn on the cob",
+      "ear of corn",
+      "sweet corn"
+    ],
     "defaultShelfLifeDays": 5
   },
   {
@@ -558,7 +774,11 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 91,
-    "aliases": ["broccoli", "broccoli florets", "broccoli crowns"],
+    "aliases": [
+      "broccoli",
+      "broccoli florets",
+      "broccoli crowns"
+    ],
     "defaultShelfLifeDays": 7
   },
   {
@@ -569,7 +789,10 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 107,
-    "aliases": ["cauliflower", "cauliflower florets"],
+    "aliases": [
+      "cauliflower",
+      "cauliflower florets"
+    ],
     "defaultShelfLifeDays": 7
   },
   {
@@ -580,7 +803,12 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 70,
-    "aliases": ["mushrooms", "white mushrooms", "button mushrooms", "sliced mushrooms"],
+    "aliases": [
+      "mushrooms",
+      "white mushrooms",
+      "button mushrooms",
+      "sliced mushrooms"
+    ],
     "defaultShelfLifeDays": 7
   },
   {
@@ -591,7 +819,11 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 47,
-    "aliases": ["romaine lettuce", "lettuce", "romaine"],
+    "aliases": [
+      "romaine lettuce",
+      "lettuce",
+      "romaine"
+    ],
     "defaultShelfLifeDays": 10
   },
   {
@@ -602,7 +834,10 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 152,
-    "aliases": ["strawberries", "fresh strawberries"],
+    "aliases": [
+      "strawberries",
+      "fresh strawberries"
+    ],
     "defaultShelfLifeDays": 5
   },
   {
@@ -613,7 +848,10 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 148,
-    "aliases": ["blueberries", "fresh blueberries"],
+    "aliases": [
+      "blueberries",
+      "fresh blueberries"
+    ],
     "defaultShelfLifeDays": 10
   },
   {
@@ -624,7 +862,12 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 60,
-    "aliases": ["parsley", "fresh parsley", "flat-leaf parsley", "italian parsley"],
+    "aliases": [
+      "parsley",
+      "fresh parsley",
+      "flat-leaf parsley",
+      "italian parsley"
+    ],
     "defaultShelfLifeDays": 7
   },
   {
@@ -635,7 +878,11 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 21,
-    "aliases": ["basil", "fresh basil", "sweet basil"],
+    "aliases": [
+      "basil",
+      "fresh basil",
+      "sweet basil"
+    ],
     "defaultShelfLifeDays": 5
   },
   {
@@ -646,7 +893,11 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 96,
-    "aliases": ["ginger", "fresh ginger", "ginger root"],
+    "aliases": [
+      "ginger",
+      "fresh ginger",
+      "ginger root"
+    ],
     "defaultShelfLifeDays": 21
   },
   {
@@ -657,7 +908,12 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 185,
-    "aliases": ["rice", "white rice", "long grain rice", "long-grain white rice"]
+    "aliases": [
+      "rice",
+      "white rice",
+      "long grain rice",
+      "long-grain white rice"
+    ]
   },
   {
     "id": "rice-brown",
@@ -667,7 +923,9 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 190,
-    "aliases": ["brown rice"]
+    "aliases": [
+      "brown rice"
+    ]
   },
   {
     "id": "rice-jasmine",
@@ -677,7 +935,9 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 185,
-    "aliases": ["jasmine rice"]
+    "aliases": [
+      "jasmine rice"
+    ]
   },
   {
     "id": "rice-basmati",
@@ -687,7 +947,9 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 180,
-    "aliases": ["basmati rice"]
+    "aliases": [
+      "basmati rice"
+    ]
   },
   {
     "id": "quinoa",
@@ -697,7 +959,10 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 170,
-    "aliases": ["quinoa", "quinoa grain"]
+    "aliases": [
+      "quinoa",
+      "quinoa grain"
+    ]
   },
   {
     "id": "oats-rolled",
@@ -707,7 +972,13 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 90,
-    "aliases": ["oats", "rolled oats", "old-fashioned oats", "old fashioned oats"]
+    "aliases": [
+      "oats",
+      "rolled oats",
+      "old-fashioned oats",
+      "old fashioned oats",
+      "oatmeal"
+    ]
   },
   {
     "id": "oats-steel-cut",
@@ -717,7 +988,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 170,
-    "aliases": ["steel-cut oats", "steel cut oats", "irish oats"]
+    "aliases": [
+      "steel-cut oats",
+      "steel cut oats",
+      "irish oats"
+    ]
   },
   {
     "id": "pasta-spaghetti",
@@ -726,7 +1001,10 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
-    "aliases": ["spaghetti", "pasta"]
+    "aliases": [
+      "spaghetti",
+      "pasta"
+    ]
   },
   {
     "id": "pasta-penne",
@@ -736,7 +1014,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 100,
-    "aliases": ["penne", "penne pasta"]
+    "aliases": [
+      "penne",
+      "penne pasta",
+      "penne rigate"
+    ]
   },
   {
     "id": "egg-noodles",
@@ -746,7 +1028,9 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 38,
-    "aliases": ["egg noodles"]
+    "aliases": [
+      "egg noodles"
+    ]
   },
   {
     "id": "couscous",
@@ -756,7 +1040,9 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 173,
-    "aliases": ["couscous"]
+    "aliases": [
+      "couscous"
+    ]
   },
   {
     "id": "barley-pearled",
@@ -766,7 +1052,10 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 200,
-    "aliases": ["barley", "pearled barley"]
+    "aliases": [
+      "barley",
+      "pearled barley"
+    ]
   },
   {
     "id": "farro",
@@ -776,7 +1065,9 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 190,
-    "aliases": ["farro"]
+    "aliases": [
+      "farro"
+    ]
   },
   {
     "id": "breadcrumbs-panko",
@@ -786,7 +1077,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 50,
-    "aliases": ["breadcrumbs", "panko", "panko breadcrumbs"]
+    "aliases": [
+      "breadcrumbs",
+      "panko",
+      "panko breadcrumbs"
+    ]
   },
   {
     "id": "bread-white-sliced",
@@ -796,7 +1091,12 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 28,
-    "aliases": ["bread", "sandwich bread", "white bread", "sliced bread"],
+    "aliases": [
+      "bread",
+      "sandwich bread",
+      "white bread",
+      "sliced bread"
+    ],
     "defaultShelfLifeDays": 7
   },
   {
@@ -807,7 +1107,10 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 28,
-    "aliases": ["whole wheat bread", "wheat bread"],
+    "aliases": [
+      "whole wheat bread",
+      "wheat bread"
+    ],
     "defaultShelfLifeDays": 7
   },
   {
@@ -818,7 +1121,11 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 45,
-    "aliases": ["flour tortillas", "tortillas", "burrito tortillas"],
+    "aliases": [
+      "flour tortillas",
+      "tortillas",
+      "burrito tortillas"
+    ],
     "defaultShelfLifeDays": 14
   },
   {
@@ -829,7 +1136,9 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 24,
-    "aliases": ["corn tortillas"],
+    "aliases": [
+      "corn tortillas"
+    ],
     "defaultShelfLifeDays": 10
   },
   {
@@ -840,7 +1149,10 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 95,
-    "aliases": ["bagel", "bagels"],
+    "aliases": [
+      "bagel",
+      "bagels"
+    ],
     "defaultShelfLifeDays": 5
   },
   {
@@ -851,7 +1163,10 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 57,
-    "aliases": ["english muffin", "english muffins"],
+    "aliases": [
+      "english muffin",
+      "english muffins"
+    ],
     "defaultShelfLifeDays": 7
   },
   {
@@ -862,7 +1177,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 28,
-    "aliases": ["cereal", "corn flakes", "cornflakes"]
+    "aliases": [
+      "cereal",
+      "corn flakes",
+      "cornflakes"
+    ]
   },
   {
     "id": "granola",
@@ -872,7 +1191,9 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 120,
-    "aliases": ["granola"]
+    "aliases": [
+      "granola"
+    ]
   },
   {
     "id": "black-beans-canned",
@@ -882,7 +1203,10 @@
     "tracked": true,
     "perishable": false,
     "unitWeightG": 425,
-    "aliases": ["black beans", "canned black beans"]
+    "aliases": [
+      "black beans",
+      "canned black beans"
+    ]
   },
   {
     "id": "kidney-beans-canned",
@@ -892,7 +1216,12 @@
     "tracked": true,
     "perishable": false,
     "unitWeightG": 425,
-    "aliases": ["kidney beans", "canned kidney beans", "red kidney beans"]
+    "aliases": [
+      "kidney beans",
+      "canned kidney beans",
+      "red kidney beans",
+      "borlotti beans"
+    ]
   },
   {
     "id": "chickpeas-canned",
@@ -902,7 +1231,11 @@
     "tracked": true,
     "perishable": false,
     "unitWeightG": 425,
-    "aliases": ["chickpeas", "garbanzo beans", "canned chickpeas"]
+    "aliases": [
+      "chickpeas",
+      "garbanzo beans",
+      "canned chickpeas"
+    ]
   },
   {
     "id": "pinto-beans-canned",
@@ -912,7 +1245,10 @@
     "tracked": true,
     "perishable": false,
     "unitWeightG": 425,
-    "aliases": ["pinto beans", "canned pinto beans"]
+    "aliases": [
+      "pinto beans",
+      "canned pinto beans"
+    ]
   },
   {
     "id": "white-beans-canned",
@@ -922,7 +1258,14 @@
     "tracked": true,
     "perishable": false,
     "unitWeightG": 425,
-    "aliases": ["white beans", "cannellini beans", "canned cannellini beans", "great northern beans"]
+    "aliases": [
+      "white beans",
+      "cannellini beans",
+      "canned cannellini beans",
+      "great northern beans",
+      "haricot beans",
+      "butter beans"
+    ]
   },
   {
     "id": "lentils-green",
@@ -932,7 +1275,12 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 192,
-    "aliases": ["lentils", "green lentils", "brown lentils", "dry lentils"]
+    "aliases": [
+      "lentils",
+      "green lentils",
+      "brown lentils",
+      "dry lentils"
+    ]
   },
   {
     "id": "lentils-red",
@@ -942,7 +1290,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 200,
-    "aliases": ["red lentils", "split red lentils"]
+    "aliases": [
+      "red lentils",
+      "split red lentils",
+      "french lentils"
+    ]
   },
   {
     "id": "edamame-frozen",
@@ -952,7 +1304,11 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 155,
-    "aliases": ["edamame", "frozen edamame", "shelled edamame"],
+    "aliases": [
+      "edamame",
+      "frozen edamame",
+      "shelled edamame"
+    ],
     "defaultShelfLifeDays": 270
   },
   {
@@ -963,7 +1319,12 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 200,
-    "aliases": ["split peas", "dried split peas", "yellow split peas"]
+    "aliases": [
+      "split peas",
+      "dried split peas",
+      "yellow split peas",
+      "toor dal"
+    ]
   },
   {
     "id": "olive-oil",
@@ -973,7 +1334,11 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 0.92,
-    "aliases": ["olive oil", "extra virgin olive oil", "evoo"]
+    "aliases": [
+      "olive oil",
+      "extra virgin olive oil",
+      "evoo"
+    ]
   },
   {
     "id": "vegetable-oil",
@@ -983,7 +1348,14 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 0.92,
-    "aliases": ["vegetable oil", "canola oil", "cooking oil"]
+    "aliases": [
+      "vegetable oil",
+      "canola oil",
+      "cooking oil",
+      "sunflower oil",
+      "rapeseed oil",
+      "peanut oil"
+    ]
   },
   {
     "id": "avocado-oil",
@@ -993,7 +1365,9 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 0.91,
-    "aliases": ["avocado oil"]
+    "aliases": [
+      "avocado oil"
+    ]
   },
   {
     "id": "sesame-oil",
@@ -1003,7 +1377,11 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 0.92,
-    "aliases": ["sesame oil", "toasted sesame oil"]
+    "aliases": [
+      "sesame oil",
+      "toasted sesame oil",
+      "sesame seed oil"
+    ]
   },
   {
     "id": "coconut-oil",
@@ -1013,7 +1391,9 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 218,
-    "aliases": ["coconut oil"]
+    "aliases": [
+      "coconut oil"
+    ]
   },
   {
     "id": "shortening",
@@ -1023,7 +1403,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 205,
-    "aliases": ["shortening", "vegetable shortening", "crisco"]
+    "aliases": [
+      "shortening",
+      "vegetable shortening",
+      "crisco"
+    ]
   },
   {
     "id": "lard",
@@ -1033,7 +1417,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 205,
-    "aliases": ["lard", "pork fat", "rendered pork fat"]
+    "aliases": [
+      "lard",
+      "pork fat",
+      "rendered pork fat"
+    ]
   },
   {
     "id": "ghee",
@@ -1043,7 +1431,10 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 218,
-    "aliases": ["ghee", "clarified butter"]
+    "aliases": [
+      "ghee",
+      "clarified butter"
+    ]
   },
   {
     "id": "cooking-spray",
@@ -1052,7 +1443,12 @@
     "trackBy": "volume",
     "tracked": false,
     "perishable": false,
-    "aliases": ["cooking spray", "nonstick spray", "pam"]
+    "aliases": [
+      "cooking spray",
+      "nonstick spray",
+      "pam"
+    ],
+    "densityGPerMl": 0.92
   },
   {
     "id": "ketchup",
@@ -1062,7 +1458,10 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 1.15,
-    "aliases": ["ketchup", "catsup"]
+    "aliases": [
+      "ketchup",
+      "catsup"
+    ]
   },
   {
     "id": "mustard-yellow",
@@ -1072,7 +1471,11 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 1.0,
-    "aliases": ["mustard", "yellow mustard"]
+    "aliases": [
+      "mustard",
+      "yellow mustard",
+      "english mustard"
+    ]
   },
   {
     "id": "mustard-dijon",
@@ -1082,7 +1485,10 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 1.05,
-    "aliases": ["dijon mustard", "dijon"]
+    "aliases": [
+      "dijon mustard",
+      "dijon"
+    ]
   },
   {
     "id": "mayonnaise",
@@ -1092,7 +1498,10 @@
     "tracked": true,
     "perishable": true,
     "densityGPerMl": 0.92,
-    "aliases": ["mayonnaise", "mayo"],
+    "aliases": [
+      "mayonnaise",
+      "mayo"
+    ],
     "defaultShelfLifeDays": 180
   },
   {
@@ -1103,7 +1512,10 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 1.1,
-    "aliases": ["soy sauce", "tamari"]
+    "aliases": [
+      "soy sauce",
+      "tamari"
+    ]
   },
   {
     "id": "hot-sauce",
@@ -1113,7 +1525,11 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 1.0,
-    "aliases": ["hot sauce", "tabasco", "frank's redhot"]
+    "aliases": [
+      "hot sauce",
+      "tabasco",
+      "frank's redhot"
+    ]
   },
   {
     "id": "sriracha",
@@ -1123,7 +1539,10 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 1.1,
-    "aliases": ["sriracha", "sriracha sauce"]
+    "aliases": [
+      "sriracha",
+      "sriracha sauce"
+    ]
   },
   {
     "id": "bbq-sauce",
@@ -1133,7 +1552,10 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 1.15,
-    "aliases": ["bbq sauce", "barbecue sauce"]
+    "aliases": [
+      "bbq sauce",
+      "barbecue sauce"
+    ]
   },
   {
     "id": "ranch-dressing",
@@ -1143,7 +1565,10 @@
     "tracked": true,
     "perishable": true,
     "densityGPerMl": 1.0,
-    "aliases": ["ranch dressing", "ranch"],
+    "aliases": [
+      "ranch dressing",
+      "ranch"
+    ],
     "defaultShelfLifeDays": 150
   },
   {
@@ -1154,7 +1579,10 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 1.1,
-    "aliases": ["worcestershire sauce", "worcestershire"]
+    "aliases": [
+      "worcestershire sauce",
+      "worcestershire"
+    ]
   },
   {
     "id": "honey",
@@ -1164,7 +1592,9 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 1.42,
-    "aliases": ["honey"]
+    "aliases": [
+      "honey"
+    ]
   },
   {
     "id": "maple-syrup",
@@ -1174,7 +1604,10 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 1.33,
-    "aliases": ["maple syrup", "pure maple syrup"]
+    "aliases": [
+      "maple syrup",
+      "pure maple syrup"
+    ]
   },
   {
     "id": "balsamic-vinegar",
@@ -1184,7 +1617,10 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 1.02,
-    "aliases": ["balsamic vinegar", "balsamic"]
+    "aliases": [
+      "balsamic vinegar",
+      "balsamic"
+    ]
   },
   {
     "id": "rice-vinegar",
@@ -1194,7 +1630,10 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 1.01,
-    "aliases": ["rice vinegar", "rice wine vinegar"]
+    "aliases": [
+      "rice vinegar",
+      "rice wine vinegar"
+    ]
   },
   {
     "id": "peanut-butter",
@@ -1204,7 +1643,10 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 258,
-    "aliases": ["peanut butter", "creamy peanut butter"]
+    "aliases": [
+      "peanut butter",
+      "creamy peanut butter"
+    ]
   },
   {
     "id": "salsa",
@@ -1214,7 +1656,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 245,
-    "aliases": ["salsa", "tomato salsa", "jarred salsa"]
+    "aliases": [
+      "salsa",
+      "tomato salsa",
+      "jarred salsa"
+    ]
   },
   {
     "id": "salt",
@@ -1223,7 +1669,13 @@
     "trackBy": "mass",
     "tracked": false,
     "perishable": false,
-    "aliases": ["salt", "table salt", "kosher salt", "sea salt"]
+    "aliases": [
+      "salt",
+      "table salt",
+      "kosher salt",
+      "sea salt"
+    ],
+    "cupWeightG": 288
   },
   {
     "id": "black-pepper",
@@ -1232,7 +1684,12 @@
     "trackBy": "mass",
     "tracked": false,
     "perishable": false,
-    "aliases": ["black pepper", "ground black pepper", "pepper"]
+    "aliases": [
+      "black pepper",
+      "ground black pepper",
+      "pepper"
+    ],
+    "cupWeightG": 110
   },
   {
     "id": "garlic-powder",
@@ -1242,7 +1699,9 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 136,
-    "aliases": ["garlic powder"]
+    "aliases": [
+      "garlic powder"
+    ]
   },
   {
     "id": "onion-powder",
@@ -1252,7 +1711,9 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 130,
-    "aliases": ["onion powder"]
+    "aliases": [
+      "onion powder"
+    ]
   },
   {
     "id": "paprika",
@@ -1262,7 +1723,10 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 120,
-    "aliases": ["paprika", "sweet paprika"]
+    "aliases": [
+      "paprika",
+      "sweet paprika"
+    ]
   },
   {
     "id": "smoked-paprika",
@@ -1272,7 +1736,9 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 120,
-    "aliases": ["smoked paprika"]
+    "aliases": [
+      "smoked paprika"
+    ]
   },
   {
     "id": "cumin-ground",
@@ -1282,7 +1748,10 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 112,
-    "aliases": ["cumin", "ground cumin"]
+    "aliases": [
+      "cumin",
+      "ground cumin"
+    ]
   },
   {
     "id": "chili-powder",
@@ -1292,7 +1761,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 118,
-    "aliases": ["chili powder", "chile powder"]
+    "aliases": [
+      "chili powder",
+      "chile powder",
+      "chilli powder"
+    ]
   },
   {
     "id": "cayenne-pepper",
@@ -1302,7 +1775,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 90,
-    "aliases": ["cayenne pepper", "cayenne", "ground cayenne"]
+    "aliases": [
+      "cayenne pepper",
+      "cayenne",
+      "ground cayenne"
+    ]
   },
   {
     "id": "red-pepper-flakes",
@@ -1312,7 +1789,12 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 80,
-    "aliases": ["red pepper flakes", "crushed red pepper", "chili flakes"]
+    "aliases": [
+      "red pepper flakes",
+      "crushed red pepper",
+      "chili flakes",
+      "red chilli flakes"
+    ]
   },
   {
     "id": "cinnamon-ground",
@@ -1322,7 +1804,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 118,
-    "aliases": ["cinnamon", "ground cinnamon"]
+    "aliases": [
+      "cinnamon",
+      "ground cinnamon",
+      "cinnamon stick"
+    ]
   },
   {
     "id": "nutmeg-ground",
@@ -1332,7 +1818,10 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 113,
-    "aliases": ["nutmeg", "ground nutmeg"]
+    "aliases": [
+      "nutmeg",
+      "ground nutmeg"
+    ]
   },
   {
     "id": "oregano-dried",
@@ -1342,7 +1831,10 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 30,
-    "aliases": ["oregano", "dried oregano"]
+    "aliases": [
+      "oregano",
+      "dried oregano"
+    ]
   },
   {
     "id": "basil-dried",
@@ -1352,7 +1844,9 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 30,
-    "aliases": ["dried basil"]
+    "aliases": [
+      "dried basil"
+    ]
   },
   {
     "id": "thyme-dried",
@@ -1362,7 +1856,10 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 32,
-    "aliases": ["thyme", "dried thyme"]
+    "aliases": [
+      "thyme",
+      "dried thyme"
+    ]
   },
   {
     "id": "rosemary-dried",
@@ -1372,7 +1869,10 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 35,
-    "aliases": ["rosemary", "dried rosemary"]
+    "aliases": [
+      "rosemary",
+      "dried rosemary"
+    ]
   },
   {
     "id": "bay-leaves",
@@ -1382,7 +1882,10 @@
     "tracked": true,
     "perishable": false,
     "unitWeightG": 0.1,
-    "aliases": ["bay leaves", "bay leaf"]
+    "aliases": [
+      "bay leaves",
+      "bay leaf"
+    ]
   },
   {
     "id": "turmeric-ground",
@@ -1392,7 +1895,10 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 133,
-    "aliases": ["turmeric", "ground turmeric"]
+    "aliases": [
+      "turmeric",
+      "ground turmeric"
+    ]
   },
   {
     "id": "ginger-ground",
@@ -1402,7 +1908,10 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 96,
-    "aliases": ["ground ginger", "ginger powder"]
+    "aliases": [
+      "ground ginger",
+      "ginger powder"
+    ]
   },
   {
     "id": "curry-powder",
@@ -1412,7 +1921,9 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 112,
-    "aliases": ["curry powder"]
+    "aliases": [
+      "curry powder"
+    ]
   },
   {
     "id": "coriander-ground",
@@ -1422,7 +1933,10 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 90,
-    "aliases": ["ground coriander", "coriander seed"]
+    "aliases": [
+      "ground coriander",
+      "coriander seed"
+    ]
   },
   {
     "id": "italian-seasoning",
@@ -1432,7 +1946,9 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 40,
-    "aliases": ["italian seasoning"]
+    "aliases": [
+      "italian seasoning"
+    ]
   },
   {
     "id": "flour-all-purpose",
@@ -1442,7 +1958,13 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 120,
-    "aliases": ["flour", "all-purpose flour", "all purpose flour", "ap flour"]
+    "aliases": [
+      "flour",
+      "all-purpose flour",
+      "all purpose flour",
+      "ap flour",
+      "plain flour"
+    ]
   },
   {
     "id": "flour-bread",
@@ -1452,7 +1974,9 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 127,
-    "aliases": ["bread flour"]
+    "aliases": [
+      "bread flour"
+    ]
   },
   {
     "id": "flour-whole-wheat",
@@ -1462,7 +1986,9 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 113,
-    "aliases": ["whole wheat flour"]
+    "aliases": [
+      "whole wheat flour"
+    ]
   },
   {
     "id": "flour-cake",
@@ -1472,7 +1998,9 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 114,
-    "aliases": ["cake flour"]
+    "aliases": [
+      "cake flour"
+    ]
   },
   {
     "id": "sugar-granulated",
@@ -1482,7 +2010,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 200,
-    "aliases": ["sugar", "granulated sugar", "white sugar"]
+    "aliases": [
+      "sugar",
+      "granulated sugar",
+      "white sugar"
+    ]
   },
   {
     "id": "sugar-brown",
@@ -1492,7 +2024,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 220,
-    "aliases": ["brown sugar", "light brown sugar", "packed brown sugar"]
+    "aliases": [
+      "brown sugar",
+      "light brown sugar",
+      "packed brown sugar"
+    ]
   },
   {
     "id": "sugar-powdered",
@@ -1502,7 +2038,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 120,
-    "aliases": ["powdered sugar", "confectioners sugar", "icing sugar"]
+    "aliases": [
+      "powdered sugar",
+      "confectioners sugar",
+      "icing sugar"
+    ]
   },
   {
     "id": "baking-powder",
@@ -1511,7 +2051,10 @@
     "trackBy": "mass",
     "tracked": false,
     "perishable": false,
-    "aliases": ["baking powder"]
+    "aliases": [
+      "baking powder"
+    ],
+    "cupWeightG": 222
   },
   {
     "id": "baking-soda",
@@ -1520,7 +2063,12 @@
     "trackBy": "mass",
     "tracked": false,
     "perishable": false,
-    "aliases": ["baking soda", "sodium bicarbonate"]
+    "aliases": [
+      "baking soda",
+      "sodium bicarbonate",
+      "bicarbonate of soda"
+    ],
+    "cupWeightG": 230
   },
   {
     "id": "vanilla-extract",
@@ -1529,7 +2077,12 @@
     "trackBy": "volume",
     "tracked": false,
     "perishable": false,
-    "aliases": ["vanilla extract", "pure vanilla extract", "vanilla"]
+    "aliases": [
+      "vanilla extract",
+      "pure vanilla extract",
+      "vanilla"
+    ],
+    "densityGPerMl": 0.88
   },
   {
     "id": "cocoa-powder",
@@ -1539,7 +2092,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 86,
-    "aliases": ["cocoa powder", "unsweetened cocoa powder", "cacao powder"]
+    "aliases": [
+      "cocoa powder",
+      "unsweetened cocoa powder",
+      "cacao powder"
+    ]
   },
   {
     "id": "cornstarch",
@@ -1549,7 +2106,10 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 128,
-    "aliases": ["cornstarch", "corn starch"]
+    "aliases": [
+      "cornstarch",
+      "corn starch"
+    ]
   },
   {
     "id": "yeast-active-dry",
@@ -1559,7 +2119,11 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 7,
-    "aliases": ["yeast", "active dry yeast", "instant yeast"],
+    "aliases": [
+      "yeast",
+      "active dry yeast",
+      "instant yeast"
+    ],
     "defaultShelfLifeDays": 365
   },
   {
@@ -1570,7 +2134,10 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 170,
-    "aliases": ["chocolate chips", "semisweet chocolate chips"]
+    "aliases": [
+      "chocolate chips",
+      "semisweet chocolate chips"
+    ]
   },
   {
     "id": "coffee-ground",
@@ -1580,7 +2147,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 113,
-    "aliases": ["coffee", "ground coffee", "coffee grounds"]
+    "aliases": [
+      "coffee",
+      "ground coffee",
+      "coffee grounds"
+    ]
   },
   {
     "id": "tea-bags",
@@ -1590,7 +2161,11 @@
     "tracked": true,
     "perishable": false,
     "unitWeightG": 2,
-    "aliases": ["tea", "tea bags", "black tea"]
+    "aliases": [
+      "tea",
+      "tea bags",
+      "black tea"
+    ]
   },
   {
     "id": "orange-juice",
@@ -1600,7 +2175,10 @@
     "tracked": true,
     "perishable": true,
     "densityGPerMl": 1.04,
-    "aliases": ["orange juice", "oj"],
+    "aliases": [
+      "orange juice",
+      "oj"
+    ],
     "defaultShelfLifeDays": 10
   },
   {
@@ -1611,7 +2189,9 @@
     "tracked": true,
     "perishable": true,
     "densityGPerMl": 1.05,
-    "aliases": ["apple juice"],
+    "aliases": [
+      "apple juice"
+    ],
     "defaultShelfLifeDays": 270
   },
   {
@@ -1622,7 +2202,12 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 1.04,
-    "aliases": ["soda", "cola", "coke", "pop"]
+    "aliases": [
+      "soda",
+      "cola",
+      "coke",
+      "pop"
+    ]
   },
   {
     "id": "sparkling-water",
@@ -1632,7 +2217,11 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 1.0,
-    "aliases": ["sparkling water", "seltzer", "club soda"]
+    "aliases": [
+      "sparkling water",
+      "seltzer",
+      "club soda"
+    ]
   },
   {
     "id": "beer",
@@ -1642,7 +2231,11 @@
     "tracked": true,
     "perishable": false,
     "unitWeightG": 355,
-    "aliases": ["beer", "beer can", "canned beer"]
+    "aliases": [
+      "beer",
+      "beer can",
+      "canned beer"
+    ]
   },
   {
     "id": "wine-red",
@@ -1652,7 +2245,11 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 0.99,
-    "aliases": ["wine", "red wine", "table wine"]
+    "aliases": [
+      "wine",
+      "red wine",
+      "table wine"
+    ]
   },
   {
     "id": "protein-powder",
@@ -1662,7 +2259,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 113,
-    "aliases": ["protein powder", "whey protein", "protein shake powder"]
+    "aliases": [
+      "protein powder",
+      "whey protein",
+      "protein shake powder"
+    ]
   },
   {
     "id": "almond-milk",
@@ -1672,7 +2273,10 @@
     "tracked": true,
     "perishable": true,
     "densityGPerMl": 1.03,
-    "aliases": ["almond milk", "unsweetened almond milk"],
+    "aliases": [
+      "almond milk",
+      "unsweetened almond milk"
+    ],
     "defaultShelfLifeDays": 10
   },
   {
@@ -1683,7 +2287,11 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 1.03,
-    "aliases": ["gatorade", "sports drink", "electrolyte drink"]
+    "aliases": [
+      "gatorade",
+      "sports drink",
+      "electrolyte drink"
+    ]
   },
   {
     "id": "almonds-raw",
@@ -1693,7 +2301,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 143,
-    "aliases": ["almonds", "raw almonds", "whole almonds"]
+    "aliases": [
+      "almonds",
+      "raw almonds",
+      "whole almonds"
+    ]
   },
   {
     "id": "walnuts",
@@ -1703,7 +2315,10 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 100,
-    "aliases": ["walnuts", "walnut halves"]
+    "aliases": [
+      "walnuts",
+      "walnut halves"
+    ]
   },
   {
     "id": "peanuts-raw",
@@ -1713,7 +2328,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 146,
-    "aliases": ["peanuts", "raw peanuts", "roasted peanuts"]
+    "aliases": [
+      "peanuts",
+      "raw peanuts",
+      "roasted peanuts"
+    ]
   },
   {
     "id": "cashews",
@@ -1723,7 +2342,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 137,
-    "aliases": ["cashews", "raw cashews", "roasted cashews"]
+    "aliases": [
+      "cashews",
+      "raw cashews",
+      "roasted cashews"
+    ]
   },
   {
     "id": "sunflower-seeds",
@@ -1733,7 +2356,10 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 140,
-    "aliases": ["sunflower seeds", "shelled sunflower seeds"]
+    "aliases": [
+      "sunflower seeds",
+      "shelled sunflower seeds"
+    ]
   },
   {
     "id": "chia-seeds",
@@ -1743,7 +2369,9 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 170,
-    "aliases": ["chia seeds"]
+    "aliases": [
+      "chia seeds"
+    ]
   },
   {
     "id": "flax-seed-ground",
@@ -1753,7 +2381,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 112,
-    "aliases": ["ground flaxseed", "flax seed", "flaxseed meal"]
+    "aliases": [
+      "ground flaxseed",
+      "flax seed",
+      "flaxseed meal"
+    ]
   },
   {
     "id": "chicken-broth",
@@ -1763,7 +2395,10 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 1.0,
-    "aliases": ["chicken broth", "chicken stock"]
+    "aliases": [
+      "chicken broth",
+      "chicken stock"
+    ]
   },
   {
     "id": "vegetable-broth",
@@ -1773,7 +2408,11 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 1.0,
-    "aliases": ["vegetable broth", "vegetable stock", "veggie broth"]
+    "aliases": [
+      "vegetable broth",
+      "vegetable stock",
+      "veggie broth"
+    ]
   },
   {
     "id": "beef-broth",
@@ -1783,7 +2422,10 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 1.0,
-    "aliases": ["beef broth", "beef stock"]
+    "aliases": [
+      "beef broth",
+      "beef stock"
+    ]
   },
   {
     "id": "tomatoes-crushed-canned",
@@ -1793,7 +2435,11 @@
     "tracked": true,
     "perishable": false,
     "unitWeightG": 794,
-    "aliases": ["crushed tomatoes", "canned crushed tomatoes"]
+    "aliases": [
+      "crushed tomatoes",
+      "canned crushed tomatoes",
+      "passata"
+    ]
   },
   {
     "id": "tomatoes-diced-canned",
@@ -1803,7 +2449,13 @@
     "tracked": true,
     "perishable": false,
     "unitWeightG": 411,
-    "aliases": ["diced tomatoes", "canned diced tomatoes"]
+    "aliases": [
+      "diced tomatoes",
+      "canned diced tomatoes",
+      "tinned tomatoes",
+      "tinned tomatos",
+      "chopped tomatoes"
+    ]
   },
   {
     "id": "tomato-paste",
@@ -1813,7 +2465,11 @@
     "tracked": true,
     "perishable": false,
     "unitWeightG": 170,
-    "aliases": ["tomato paste", "canned tomato paste"]
+    "aliases": [
+      "tomato paste",
+      "canned tomato paste"
+    ],
+    "cupWeightG": 262
   },
   {
     "id": "coconut-milk-canned",
@@ -1823,7 +2479,10 @@
     "tracked": true,
     "perishable": false,
     "unitWeightG": 400,
-    "aliases": ["coconut milk", "canned coconut milk"]
+    "aliases": [
+      "coconut milk",
+      "canned coconut milk"
+    ]
   },
   {
     "id": "nutritional-yeast",
@@ -1833,7 +2492,10 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 60,
-    "aliases": ["nutritional yeast", "nooch"]
+    "aliases": [
+      "nutritional yeast",
+      "nooch"
+    ]
   },
   {
     "id": "water",
@@ -1843,7 +2505,10 @@
     "tracked": false,
     "perishable": false,
     "densityGPerMl": 1.0,
-    "aliases": ["water", "tap water"]
+    "aliases": [
+      "water",
+      "tap water"
+    ]
   },
   {
     "id": "feta-cheese",
@@ -1853,7 +2518,11 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 150,
-    "aliases": ["feta", "feta cheese", "crumbled feta"],
+    "aliases": [
+      "feta",
+      "feta cheese",
+      "crumbled feta"
+    ],
     "defaultShelfLifeDays": 14
   },
   {
@@ -1864,7 +2533,10 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 20,
-    "aliases": ["swiss cheese", "sliced swiss"],
+    "aliases": [
+      "swiss cheese",
+      "sliced swiss"
+    ],
     "defaultShelfLifeDays": 14
   },
   {
@@ -1874,7 +2546,9 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
-    "aliases": ["ground chicken"],
+    "aliases": [
+      "ground chicken"
+    ],
     "defaultShelfLifeDays": 2
   },
   {
@@ -1884,7 +2558,13 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
-    "aliases": ["cod", "cod fillet", "white fish", "tilapia"],
+    "aliases": [
+      "cod",
+      "cod fillet",
+      "white fish",
+      "tilapia",
+      "haddock"
+    ],
     "defaultShelfLifeDays": 2
   },
   {
@@ -1895,8 +2575,14 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 15,
-    "aliases": ["green onion", "scallion", "green onions", "scallions"],
-    "defaultShelfLifeDays": 7
+    "aliases": [
+      "green onion",
+      "scallion",
+      "green onions",
+      "scallions"
+    ],
+    "defaultShelfLifeDays": 7,
+    "cupWeightG": 25
   },
   {
     "id": "onion-red",
@@ -1906,7 +2592,9 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 150,
-    "aliases": ["red onion"],
+    "aliases": [
+      "red onion"
+    ],
     "defaultShelfLifeDays": 30
   },
   {
@@ -1917,7 +2605,9 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 67,
-    "aliases": ["kale"],
+    "aliases": [
+      "kale"
+    ],
     "defaultShelfLifeDays": 7
   },
   {
@@ -1928,7 +2618,10 @@
     "tracked": true,
     "perishable": true,
     "cupWeightG": 100,
-    "aliases": ["green beans", "string beans"],
+    "aliases": [
+      "green beans",
+      "string beans"
+    ],
     "defaultShelfLifeDays": 7
   },
   {
@@ -1939,7 +2632,11 @@
     "tracked": true,
     "perishable": true,
     "unitWeightG": 45,
-    "aliases": ["hamburger buns", "burger buns", "buns"],
+    "aliases": [
+      "hamburger buns",
+      "burger buns",
+      "buns"
+    ],
     "defaultShelfLifeDays": 7
   },
   {
@@ -1950,7 +2647,10 @@
     "tracked": true,
     "perishable": false,
     "unitWeightG": 453,
-    "aliases": ["refried beans", "canned refried beans"]
+    "aliases": [
+      "refried beans",
+      "canned refried beans"
+    ]
   },
   {
     "id": "vinegar-apple-cider",
@@ -1960,7 +2660,10 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 1.01,
-    "aliases": ["apple cider vinegar", "acv"]
+    "aliases": [
+      "apple cider vinegar",
+      "acv"
+    ]
   },
   {
     "id": "vinegar-white",
@@ -1970,7 +2673,10 @@
     "tracked": true,
     "perishable": false,
     "densityGPerMl": 1.01,
-    "aliases": ["white vinegar", "distilled vinegar"]
+    "aliases": [
+      "white vinegar",
+      "distilled vinegar"
+    ]
   },
   {
     "id": "marinara-sauce",
@@ -1980,7 +2686,11 @@
     "tracked": true,
     "perishable": false,
     "cupWeightG": 250,
-    "aliases": ["marinara sauce", "pasta sauce", "spaghetti sauce"]
+    "aliases": [
+      "marinara sauce",
+      "pasta sauce",
+      "spaghetti sauce"
+    ]
   },
   {
     "id": "corn-canned",
@@ -1990,6 +2700,1380 @@
     "tracked": true,
     "perishable": false,
     "unitWeightG": 411,
-    "aliases": ["canned corn", "corn kernels canned", "sweet corn canned"]
+    "aliases": [
+      "canned corn",
+      "corn kernels canned",
+      "sweet corn canned",
+      "sweetcorn"
+    ]
+  },
+  {
+    "id": "ground-lamb",
+    "name": "Ground lamb",
+    "category": "protein",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "aliases": [
+      "ground lamb",
+      "lamb mince",
+      "minced lamb"
+    ],
+    "defaultShelfLifeDays": 2
+  },
+  {
+    "id": "lamb-leg",
+    "name": "Lamb leg / shoulder",
+    "category": "protein",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "aliases": [
+      "lamb",
+      "lamb leg",
+      "leg of lamb",
+      "lamb shoulder",
+      "lamb loin chops",
+      "lamb chops"
+    ],
+    "defaultShelfLifeDays": 3
+  },
+  {
+    "id": "duck-breast",
+    "name": "Duck breast",
+    "category": "protein",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "aliases": [
+      "duck",
+      "duck breast",
+      "duck breasts"
+    ],
+    "defaultShelfLifeDays": 2
+  },
+  {
+    "id": "mussels",
+    "name": "Mussels",
+    "category": "protein",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "aliases": [
+      "mussels"
+    ],
+    "defaultShelfLifeDays": 2
+  },
+  {
+    "id": "clams",
+    "name": "Clams",
+    "category": "protein",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "aliases": [
+      "clams"
+    ],
+    "defaultShelfLifeDays": 2
+  },
+  {
+    "id": "squid",
+    "name": "Squid",
+    "category": "protein",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "aliases": [
+      "squid",
+      "baby squid",
+      "calamari"
+    ],
+    "defaultShelfLifeDays": 2
+  },
+  {
+    "id": "oysters",
+    "name": "Oysters",
+    "category": "protein",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 50,
+    "aliases": [
+      "oysters"
+    ],
+    "defaultShelfLifeDays": 3
+  },
+  {
+    "id": "mackerel",
+    "name": "Mackerel",
+    "category": "protein",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "aliases": [
+      "mackerel"
+    ],
+    "defaultShelfLifeDays": 2
+  },
+  {
+    "id": "chorizo",
+    "name": "Chorizo",
+    "category": "protein",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "aliases": [
+      "chorizo"
+    ],
+    "defaultShelfLifeDays": 14,
+    "cupWeightG": 150
+  },
+  {
+    "id": "prosciutto",
+    "name": "Prosciutto",
+    "category": "protein",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "aliases": [
+      "prosciutto",
+      "parma ham"
+    ],
+    "defaultShelfLifeDays": 14
+  },
+  {
+    "id": "egg-white",
+    "name": "Egg white",
+    "category": "protein",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 33,
+    "aliases": [
+      "egg white",
+      "egg whites"
+    ],
+    "defaultShelfLifeDays": 35
+  },
+  {
+    "id": "egg-yolk",
+    "name": "Egg yolk",
+    "category": "protein",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 17,
+    "aliases": [
+      "egg yolk",
+      "egg yolks"
+    ],
+    "defaultShelfLifeDays": 35
+  },
+  {
+    "id": "asparagus",
+    "name": "Asparagus",
+    "category": "produce",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 134,
+    "aliases": [
+      "asparagus"
+    ],
+    "defaultShelfLifeDays": 4
+  },
+  {
+    "id": "leek",
+    "name": "Leek",
+    "category": "produce",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 89,
+    "aliases": [
+      "leek",
+      "leeks"
+    ],
+    "defaultShelfLifeDays": 10
+  },
+  {
+    "id": "shallot",
+    "name": "Shallot",
+    "category": "produce",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 25,
+    "aliases": [
+      "shallot",
+      "shallots",
+      "challots"
+    ],
+    "defaultShelfLifeDays": 30
+  },
+  {
+    "id": "celeriac",
+    "name": "Celeriac",
+    "category": "produce",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 700,
+    "aliases": [
+      "celeriac",
+      "celery root"
+    ],
+    "defaultShelfLifeDays": 21
+  },
+  {
+    "id": "fennel-bulb",
+    "name": "Fennel bulb",
+    "category": "produce",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 234,
+    "aliases": [
+      "fennel",
+      "fennel bulb"
+    ],
+    "defaultShelfLifeDays": 7
+  },
+  {
+    "id": "brussels-sprouts",
+    "name": "Brussels sprouts",
+    "category": "produce",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 88,
+    "aliases": [
+      "brussels sprouts"
+    ],
+    "defaultShelfLifeDays": 7
+  },
+  {
+    "id": "turnip",
+    "name": "Turnip",
+    "category": "produce",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 122,
+    "aliases": [
+      "turnip",
+      "turnips",
+      "swede",
+      "rutabaga"
+    ],
+    "defaultShelfLifeDays": 14
+  },
+  {
+    "id": "eggplant",
+    "name": "Eggplant",
+    "category": "produce",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 548,
+    "aliases": [
+      "eggplant",
+      "aubergine",
+      "egg plants"
+    ],
+    "defaultShelfLifeDays": 5
+  },
+  {
+    "id": "pumpkin",
+    "name": "Pumpkin",
+    "category": "produce",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 245,
+    "aliases": [
+      "pumpkin",
+      "pumpkin puree"
+    ],
+    "defaultShelfLifeDays": 7
+  },
+  {
+    "id": "peach",
+    "name": "Peach",
+    "category": "produce",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 150,
+    "aliases": [
+      "peach",
+      "peaches"
+    ],
+    "defaultShelfLifeDays": 5
+  },
+  {
+    "id": "pear",
+    "name": "Pear",
+    "category": "produce",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 178,
+    "aliases": [
+      "pear",
+      "pears"
+    ],
+    "defaultShelfLifeDays": 7
+  },
+  {
+    "id": "dates-medjool",
+    "name": "Medjool dates",
+    "category": "produce",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": false,
+    "unitWeightG": 24,
+    "aliases": [
+      "dates",
+      "medjool dates"
+    ]
+  },
+  {
+    "id": "butternut-squash",
+    "name": "Butternut squash",
+    "category": "produce",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 140,
+    "aliases": [
+      "squash",
+      "butternut squash"
+    ],
+    "defaultShelfLifeDays": 30,
+    "unitWeightG": 900
+  },
+  {
+    "id": "olives",
+    "name": "Olives",
+    "category": "condiment",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 134,
+    "aliases": [
+      "olives",
+      "black olives",
+      "pitted black olives",
+      "green olives"
+    ]
+  },
+  {
+    "id": "dill",
+    "name": "Dill",
+    "category": "spice",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 9,
+    "aliases": [
+      "dill",
+      "fresh dill"
+    ],
+    "defaultShelfLifeDays": 7
+  },
+  {
+    "id": "mint",
+    "name": "Mint",
+    "category": "spice",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 24,
+    "aliases": [
+      "mint",
+      "fresh mint",
+      "mint leaves"
+    ],
+    "defaultShelfLifeDays": 7
+  },
+  {
+    "id": "sage-dried",
+    "name": "Dried sage",
+    "category": "spice",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 40,
+    "aliases": [
+      "sage",
+      "dried sage"
+    ]
+  },
+  {
+    "id": "cardamom-ground",
+    "name": "Ground cardamom",
+    "category": "spice",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 102,
+    "aliases": [
+      "cardamom",
+      "ground cardamom"
+    ]
+  },
+  {
+    "id": "saffron",
+    "name": "Saffron",
+    "category": "spice",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 2,
+    "aliases": [
+      "saffron",
+      "saffron threads"
+    ]
+  },
+  {
+    "id": "marjoram-dried",
+    "name": "Dried marjoram",
+    "category": "spice",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 40,
+    "aliases": [
+      "marjoram",
+      "dried marjoram"
+    ]
+  },
+  {
+    "id": "fenugreek-ground",
+    "name": "Ground fenugreek",
+    "category": "spice",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 103,
+    "aliases": [
+      "fenugreek",
+      "ground fenugreek"
+    ]
+  },
+  {
+    "id": "garam-masala",
+    "name": "Garam masala",
+    "category": "spice",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 112,
+    "aliases": [
+      "garam masala",
+      "biryani masala"
+    ]
+  },
+  {
+    "id": "curry-paste",
+    "name": "Curry paste",
+    "category": "condiment",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 245,
+    "aliases": [
+      "curry paste",
+      "massaman curry paste",
+      "thai green curry paste",
+      "thai red curry paste",
+      "madras paste",
+      "green curry paste",
+      "red curry paste"
+    ]
+  },
+  {
+    "id": "harissa",
+    "name": "Harissa",
+    "category": "condiment",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 245,
+    "aliases": [
+      "harissa",
+      "harissa spice",
+      "harissa paste"
+    ]
+  },
+  {
+    "id": "fajita-seasoning",
+    "name": "Fajita seasoning",
+    "category": "spice",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 120,
+    "aliases": [
+      "fajita seasoning"
+    ]
+  },
+  {
+    "id": "tamarind-paste",
+    "name": "Tamarind paste",
+    "category": "condiment",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 240,
+    "aliases": [
+      "tamarind paste",
+      "tamarind ball",
+      "tamarind"
+    ]
+  },
+  {
+    "id": "horseradish-prepared",
+    "name": "Prepared horseradish",
+    "category": "condiment",
+    "trackBy": "volume",
+    "tracked": true,
+    "perishable": true,
+    "densityGPerMl": 1.0,
+    "aliases": [
+      "horseradish",
+      "prepared horseradish"
+    ],
+    "defaultShelfLifeDays": 90
+  },
+  {
+    "id": "star-anise",
+    "name": "Star anise",
+    "category": "spice",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": false,
+    "unitWeightG": 0.5,
+    "aliases": [
+      "star anise"
+    ]
+  },
+  {
+    "id": "cloves-whole",
+    "name": "Whole cloves",
+    "category": "spice",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": false,
+    "unitWeightG": 0.1,
+    "aliases": [
+      "cloves",
+      "whole cloves"
+    ]
+  },
+  {
+    "id": "mirin",
+    "name": "Mirin",
+    "category": "condiment",
+    "trackBy": "volume",
+    "tracked": true,
+    "perishable": false,
+    "densityGPerMl": 1.15,
+    "aliases": [
+      "mirin"
+    ]
+  },
+  {
+    "id": "sesame-seeds",
+    "name": "Sesame seeds",
+    "category": "other",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 144,
+    "aliases": [
+      "sesame seed",
+      "sesame seeds"
+    ]
+  },
+  {
+    "id": "gouda-cheese",
+    "name": "Gouda cheese",
+    "category": "dairy",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 113,
+    "aliases": [
+      "gouda",
+      "gouda cheese"
+    ],
+    "defaultShelfLifeDays": 21
+  },
+  {
+    "id": "brie",
+    "name": "Brie",
+    "category": "dairy",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 150,
+    "aliases": [
+      "brie"
+    ],
+    "defaultShelfLifeDays": 14
+  },
+  {
+    "id": "ricotta",
+    "name": "Ricotta",
+    "category": "dairy",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 246,
+    "aliases": [
+      "ricotta",
+      "ricotta cheese"
+    ],
+    "defaultShelfLifeDays": 10
+  },
+  {
+    "id": "mascarpone",
+    "name": "Mascarpone",
+    "category": "dairy",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 226,
+    "aliases": [
+      "mascarpone"
+    ],
+    "defaultShelfLifeDays": 14
+  },
+  {
+    "id": "monterey-jack-cheese",
+    "name": "Monterey Jack cheese",
+    "category": "dairy",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 113,
+    "aliases": [
+      "monterey jack cheese",
+      "monterey jack",
+      "colby jack cheese",
+      "shredded monterey jack cheese",
+      "shredded mexican cheese"
+    ],
+    "defaultShelfLifeDays": 21
+  },
+  {
+    "id": "gruyere",
+    "name": "Gruy\u00e8re",
+    "category": "dairy",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 108,
+    "aliases": [
+      "gruyere",
+      "gruy\u00e8re"
+    ],
+    "defaultShelfLifeDays": 30
+  },
+  {
+    "id": "goat-cheese",
+    "name": "Goat cheese",
+    "category": "dairy",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 150,
+    "aliases": [
+      "goat cheese",
+      "goats cheese"
+    ],
+    "defaultShelfLifeDays": 14
+  },
+  {
+    "id": "double-cream",
+    "name": "Double cream",
+    "category": "dairy",
+    "trackBy": "volume",
+    "tracked": true,
+    "perishable": true,
+    "densityGPerMl": 0.995,
+    "aliases": [
+      "double cream"
+    ],
+    "defaultShelfLifeDays": 10
+  },
+  {
+    "id": "condensed-milk-sweetened",
+    "name": "Sweetened condensed milk",
+    "category": "dairy",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": false,
+    "unitWeightG": 306,
+    "aliases": [
+      "condensed milk",
+      "sweetened condensed milk"
+    ]
+  },
+  {
+    "id": "coconut-cream",
+    "name": "Coconut cream",
+    "category": "other",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": false,
+    "unitWeightG": 400,
+    "aliases": [
+      "coconut cream"
+    ]
+  },
+  {
+    "id": "paneer",
+    "name": "Paneer",
+    "category": "dairy",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 150,
+    "aliases": [
+      "paneer"
+    ],
+    "defaultShelfLifeDays": 10
+  },
+  {
+    "id": "pine-nuts",
+    "name": "Pine nuts",
+    "category": "other",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 135,
+    "aliases": [
+      "pine nuts"
+    ]
+  },
+  {
+    "id": "capers",
+    "name": "Capers",
+    "category": "other",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 108,
+    "aliases": [
+      "capers"
+    ]
+  },
+  {
+    "id": "tahini",
+    "name": "Tahini",
+    "category": "condiment",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 240,
+    "aliases": [
+      "tahini"
+    ]
+  },
+  {
+    "id": "puff-pastry",
+    "name": "Puff pastry",
+    "category": "baking",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 225,
+    "aliases": [
+      "puff pastry",
+      "puff pastry sheet"
+    ],
+    "defaultShelfLifeDays": 5
+  },
+  {
+    "id": "raisins",
+    "name": "Raisins",
+    "category": "other",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 165,
+    "aliases": [
+      "raisins",
+      "sultanas",
+      "currants"
+    ]
+  },
+  {
+    "id": "pecans",
+    "name": "Pecans",
+    "category": "other",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 99,
+    "aliases": [
+      "pecans",
+      "pecan nuts"
+    ]
+  },
+  {
+    "id": "baguette",
+    "name": "Baguette",
+    "category": "grain",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 250,
+    "aliases": [
+      "baguette",
+      "crusty bread"
+    ],
+    "defaultShelfLifeDays": 2
+  },
+  {
+    "id": "pasta-other-dry",
+    "name": "Dry pasta, other shapes",
+    "category": "grain",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "aliases": [
+      "macaroni",
+      "farfalle",
+      "bowtie pasta",
+      "rigatoni",
+      "tagliatelle",
+      "fettuccine",
+      "lasagne sheets",
+      "paccheri pasta",
+      "pappardelle pasta",
+      "linguine pasta",
+      "udon noodles"
+    ]
+  },
+  {
+    "id": "rice-noodles",
+    "name": "Rice noodles",
+    "category": "grain",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "aliases": [
+      "rice noodles",
+      "rice stick noodles",
+      "rice vermicelli",
+      "vermicelli pasta",
+      "fideo"
+    ]
+  },
+  {
+    "id": "naan-bread",
+    "name": "Naan bread",
+    "category": "grain",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 90,
+    "aliases": [
+      "naan",
+      "naan bread"
+    ],
+    "defaultShelfLifeDays": 5
+  },
+  {
+    "id": "baked-beans-canned",
+    "name": "Canned baked beans",
+    "category": "legume",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": false,
+    "unitWeightG": 415,
+    "aliases": [
+      "baked beans",
+      "canned baked beans"
+    ]
+  },
+  {
+    "id": "peas-frozen",
+    "name": "Frozen green peas",
+    "category": "produce",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 145,
+    "aliases": [
+      "peas",
+      "green peas",
+      "frozen peas"
+    ],
+    "defaultShelfLifeDays": 270
+  },
+  {
+    "id": "five-spice-powder",
+    "name": "Five spice powder",
+    "category": "spice",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 112,
+    "aliases": [
+      "five spice powder",
+      "chinese five spice powder",
+      "five-spice"
+    ]
+  },
+  {
+    "id": "enchilada-sauce",
+    "name": "Enchilada sauce",
+    "category": "condiment",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 245,
+    "aliases": [
+      "enchilada sauce"
+    ]
+  },
+  {
+    "id": "whole-chicken",
+    "name": "Whole chicken",
+    "category": "protein",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 1500,
+    "aliases": [
+      "chicken",
+      "whole chicken"
+    ],
+    "defaultShelfLifeDays": 2
+  },
+  {
+    "id": "allspice-ground",
+    "name": "Ground allspice",
+    "category": "spice",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 112,
+    "aliases": [
+      "allspice",
+      "pimento",
+      "ground allspice"
+    ]
+  },
+  {
+    "id": "beef-brisket",
+    "name": "Beef brisket",
+    "category": "protein",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "aliases": [
+      "beef brisket",
+      "corned beef brisket",
+      "corned beef joint"
+    ],
+    "defaultShelfLifeDays": 10
+  },
+  {
+    "id": "red-wine-vinegar",
+    "name": "Red wine vinegar",
+    "category": "condiment",
+    "trackBy": "volume",
+    "tracked": true,
+    "perishable": false,
+    "densityGPerMl": 1.01,
+    "aliases": [
+      "red wine vinegar"
+    ]
+  },
+  {
+    "id": "pork-tenderloin",
+    "name": "Pork tenderloin",
+    "category": "protein",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "aliases": [
+      "pork",
+      "pork tenderloin",
+      "pork loin",
+      "pork strips"
+    ],
+    "defaultShelfLifeDays": 3
+  },
+  {
+    "id": "chicken-legs",
+    "name": "Chicken leg quarters",
+    "category": "protein",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 340,
+    "aliases": [
+      "chicken legs",
+      "chicken leg quarters"
+    ],
+    "defaultShelfLifeDays": 2
+  },
+  {
+    "id": "dried-apricots",
+    "name": "Dried apricots",
+    "category": "other",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 130,
+    "aliases": [
+      "apricot",
+      "apricots",
+      "dried apricots"
+    ]
+  },
+  {
+    "id": "bouillon-cube",
+    "name": "Bouillon / stock cube",
+    "category": "condiment",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": false,
+    "unitWeightG": 10,
+    "aliases": [
+      "vegetable stock cube",
+      "vegetable bouillon cube",
+      "stock cube",
+      "chicken stock cube",
+      "bouillon cube"
+    ]
+  },
+  {
+    "id": "chives",
+    "name": "Chives",
+    "category": "spice",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 34,
+    "aliases": [
+      "chives"
+    ],
+    "defaultShelfLifeDays": 7
+  },
+  {
+    "id": "radish",
+    "name": "Radish",
+    "category": "produce",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 4.5,
+    "aliases": [
+      "radish",
+      "radishes"
+    ],
+    "defaultShelfLifeDays": 14
+  },
+  {
+    "id": "fish-sauce",
+    "name": "Fish sauce",
+    "category": "condiment",
+    "trackBy": "volume",
+    "tracked": true,
+    "perishable": false,
+    "densityGPerMl": 1.2,
+    "aliases": [
+      "fish sauce",
+      "thai fish sauce",
+      "nam pla"
+    ]
+  },
+  {
+    "id": "pita-bread",
+    "name": "Pita bread",
+    "category": "grain",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 60,
+    "aliases": [
+      "pita bread",
+      "pitta bread",
+      "pita",
+      "flatbread"
+    ],
+    "defaultShelfLifeDays": 5
+  },
+  {
+    "id": "sardines",
+    "name": "Sardines, fresh",
+    "category": "protein",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 50,
+    "aliases": [
+      "sardines",
+      "fresh sardines"
+    ],
+    "defaultShelfLifeDays": 2
+  },
+  {
+    "id": "wine-white-dry",
+    "name": "Dry white wine",
+    "category": "beverage",
+    "trackBy": "volume",
+    "tracked": true,
+    "perishable": false,
+    "densityGPerMl": 0.99,
+    "aliases": [
+      "dry white wine",
+      "white wine"
+    ]
+  },
+  {
+    "id": "sake",
+    "name": "Sake",
+    "category": "beverage",
+    "trackBy": "volume",
+    "tracked": true,
+    "perishable": false,
+    "densityGPerMl": 0.99,
+    "aliases": [
+      "sake",
+      "rice wine"
+    ]
+  },
+  {
+    "id": "corned-beef",
+    "name": "Corned beef",
+    "category": "protein",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 220,
+    "aliases": [
+      "corned beef",
+      "canned corned beef"
+    ],
+    "defaultShelfLifeDays": 5
+  },
+  {
+    "id": "chicken-wings",
+    "name": "Chicken wings",
+    "category": "protein",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 90,
+    "aliases": [
+      "chicken wings",
+      "chicken wing"
+    ],
+    "defaultShelfLifeDays": 2
+  },
+  {
+    "id": "oyster-sauce",
+    "name": "Oyster sauce",
+    "category": "condiment",
+    "trackBy": "volume",
+    "tracked": true,
+    "perishable": false,
+    "densityGPerMl": 1.2,
+    "aliases": [
+      "oyster sauce"
+    ]
+  },
+  {
+    "id": "sherry",
+    "name": "Sherry",
+    "category": "beverage",
+    "trackBy": "volume",
+    "tracked": true,
+    "perishable": false,
+    "densityGPerMl": 0.99,
+    "aliases": [
+      "sherry",
+      "dry sherry",
+      "chinese rice wine",
+      "shaoxing wine"
+    ]
+  },
+  {
+    "id": "lemongrass",
+    "name": "Lemongrass",
+    "category": "produce",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 15,
+    "aliases": [
+      "lemongrass",
+      "lemon grass"
+    ],
+    "defaultShelfLifeDays": 14
+  },
+  {
+    "id": "sun-dried-tomatoes",
+    "name": "Sun-dried tomatoes",
+    "category": "other",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 54,
+    "aliases": [
+      "sun-dried tomatoes",
+      "sundried tomatoes"
+    ]
+  },
+  {
+    "id": "creamed-corn",
+    "name": "Creamed corn",
+    "category": "other",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 256,
+    "aliases": [
+      "creamed corn",
+      "cream-style corn"
+    ]
+  },
+  {
+    "id": "broad-beans",
+    "name": "Broad beans (fava beans)",
+    "category": "produce",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 155,
+    "aliases": [
+      "broad beans",
+      "fava beans",
+      "shelled fava beans"
+    ],
+    "defaultShelfLifeDays": 7
+  },
+  {
+    "id": "beetroot",
+    "name": "Cooked beetroot",
+    "category": "produce",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 150,
+    "aliases": [
+      "beetroot",
+      "beets",
+      "cooked beetroot",
+      "cooked beets"
+    ],
+    "defaultShelfLifeDays": 10
+  },
+  {
+    "id": "arugula",
+    "name": "Arugula (rocket)",
+    "category": "produce",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 20,
+    "aliases": [
+      "arugula",
+      "rocket"
+    ],
+    "defaultShelfLifeDays": 5
+  },
+  {
+    "id": "red-pepper-paste",
+    "name": "Red pepper paste (biber salcasi)",
+    "category": "condiment",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 275,
+    "aliases": [
+      "red pepper paste",
+      "biber salcasi",
+      "pepper paste"
+    ],
+    "defaultShelfLifeDays": 60
+  },
+  {
+    "id": "red-snapper",
+    "name": "Red snapper",
+    "category": "protein",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "aliases": [
+      "red snapper",
+      "snapper"
+    ],
+    "defaultShelfLifeDays": 2
+  },
+  {
+    "id": "scotch-bonnet",
+    "name": "Scotch bonnet pepper",
+    "category": "produce",
+    "trackBy": "count",
+    "tracked": true,
+    "perishable": true,
+    "unitWeightG": 10,
+    "aliases": [
+      "scotch bonnet",
+      "scotch bonnet pepper"
+    ],
+    "defaultShelfLifeDays": 10
+  },
+  {
+    "id": "pak-choi",
+    "name": "Pak choi (bok choy)",
+    "category": "produce",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 70,
+    "aliases": [
+      "pak choi",
+      "bok choy",
+      "pak choy"
+    ],
+    "defaultShelfLifeDays": 7
+  },
+  {
+    "id": "hoisin-sauce",
+    "name": "Hoisin sauce",
+    "category": "condiment",
+    "trackBy": "volume",
+    "tracked": true,
+    "perishable": false,
+    "densityGPerMl": 1.25,
+    "aliases": [
+      "hoisin sauce",
+      "hoisin"
+    ]
+  },
+  {
+    "id": "ground-pork",
+    "name": "Ground pork",
+    "category": "protein",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "aliases": [
+      "ground pork",
+      "minced pork",
+      "pork mince"
+    ],
+    "defaultShelfLifeDays": 2
   }
 ]
