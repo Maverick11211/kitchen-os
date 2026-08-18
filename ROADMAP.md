@@ -1,8 +1,8 @@
 # Kitchen OS — Roadmap
 
 ## Current status
-Phase 0 complete. Phase 1 complete. Phase 2 not started.
-Last updated: 2026-08-14
+Phase 0 complete. Phase 1 complete. Phase 2 complete. Phase 3 not started.
+Last updated: 2026-08-18
 
 ## Environment (done)
 - Repo: github.com/Maverick11211/kitchen-os
@@ -24,11 +24,23 @@ DECISIONS.md (fallback unitWeightG on high-variance mass ingredients,
 sealed/best-by shelf-life convention, spice tracked/perishable split,
 canned-goods net-weight convention, produce format-variant deferral).
 
-## Phase 2 — Recipe seed set
-100-150 recipes from TheMealDB, normalized against the Phase 1 ontology.
-Every ingredient line must resolve to a canonical ID with a numeric quantity.
-Output: src/data/recipes.json
-Recommended model: Sonnet.
+## Phase 2 — Recipe seed set — DONE
+150 recipes from TheMealDB (top of the 100-150 target range), normalized
+against the Phase 1 ontology. Every ingredient line resolves to a
+canonical ID with a numeric quantity; `qa/seed-data.validate.test.ts`
+enforces this and passes clean (6017 assertions).
+Output: src/data/recipes.json (150 recipes). Ontology grew 193 -> 310
+entries to cover them (`src/data/ontology.json`).
+30 cuisines represented; British capped at 8/150 (~5%), under the ~10%
+ceiling set to avoid skewing the set toward familiar/easy sourcing.
+Judgment calls and conventions from this phase are recorded in
+DECISIONS.md (dated entries per batch) — notably: alcohol is included
+(not excluded as originally assumed), fried dishes record absorbed oil
+rather than full frying volume, and a substitution-over-new-entry rule
+(reuse the closest existing canonical with a documented `preparation`
+note rather than adding a one-off ontology entry for a single recipe).
+A pre-Phase-3 review of this output is recorded in DECISIONS.md
+(2026-08-18 entry) — read it before starting Phase 3.
 
 ## Phase 3 — Core engine (headless, tested)
 Unit conversion, FEFO deduction, macro computation, ownership ranking.

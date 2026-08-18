@@ -1010,3 +1010,124 @@ that recurred in batches 13, 14, and 15.
 **Final running total: 150 recipes seeded — target reached.** 310
 ontology entries total (was 193 before Phase 2 began, unchanged this
 specific batch).
+
+## 2026-08-18 — Pre-Phase-3 review
+
+Full review of `ontology.json`, `recipes.json`, `calorie-reference.json`,
+`ROADMAP.md`, and this file before starting Phase 3, at Jack's request.
+Verified fresh (not just trusting the last batch's green run): re-ran
+`npm test && npm run lint && npm run build` from scratch (6017 tests,
+clean), and byte-diffed the working copy against what's actually on
+Jack's machine — identical, nothing drifted.
+
+**Ontology (310 entries):** no duplicate ids, no alias collisions, no
+duplicate names, no ontology-level invariant violations (every
+`trackBy: 'count'` entry has `unitWeightG`, every `trackBy: 'volume'`
+entry has `densityGPerMl`, no non-volume entry carries `densityGPerMl`),
+no implausible numeric conversion values. 89 of the 310 entries are
+never referenced by any of the 150 seed recipes — expected, not a bug:
+Phase 1 built a general pantry ontology, not a recipes-only one, so
+those entries (oats, quinoa, various canned beans, several cheeses,
+etc.) are simply unused by this particular recipe set and ready for
+Phase 3+ to reference directly (e.g. logged-but-not-cooked ingredients)
+or for future recipe batches.
+
+One real gap found and fixed: 5 ingredients that recipes actually use
+(`cashews`, `ketchup`, `onion-powder`, `orange-juice`, `puff-pastry`)
+had no `qa/calorie-reference.json` entry despite the batch-17/18
+backfill passes — the calorie check silently skips rather than fails,
+so this slipped through twice. Added all 5. Recipe calorie-plausibility
+is now checked for all 150 recipes with zero skips, and none are
+anywhere near the 15-600 kcal/100g band edges (closest low: egg-drop-soup
+at 24.9; closest high: fried-calamari at 503.4) — comfortable margin on
+both sides.
+
+Noted but not changed: 7 ontology entries beyond the two documented
+exceptions (`chicken-breast-boneless-skinless`, `chicken-thighs-boneless-skinless`)
+carry both `trackBy: 'mass'` and a `unitWeightG` fallback — `bacon`,
+`pork-chop-boneless`, `carrot`, `celery`, `butternut-squash`,
+`whole-chicken`, `chicken-legs`. The 2026-08-14 decision said to apply
+this "selectively... not automatically to every mass-tracked ingredient."
+These look like reasonable applications of the same underlying logic
+(high-variance-by-weight but commonly referenced by count in a recipe —
+"1 carrot", "2 celery stalks", "1 whole chicken"), not a violation, but
+it's worth a conscious acknowledgment that the fallback ended up broader
+in practice than the original note implied. No action needed unless it
+becomes a real problem.
+
+**Recipes (150 entries):** no duplicate ids or names, every recipe has
+non-empty ingredients/steps/cuisines, `isSeed: true` and a valid
+`createdAt` on all 150, `requiredAppliances` vocabulary is exactly 4
+clean values (`oven`, `stovetop`, `grill-bbq`, `grill-broiler`) with no
+casing/naming drift. No protein ingredient over 100g is ever marked
+`optional` (spot-checked, zero hits). Yield range spans 194.5g
+(Ramen Noodles with Boiled Egg, a single-serving soup) to 9656.4g
+(Rappie Pie, an intentionally large multi-serving Canadian casserole) —
+both trace back to their source recipe's actual stated quantities, not
+errors.
+
+One documented-but-worth-flagging convention drift: recipes from before
+this window's batches (roughly the first ~75) put substitution/sourcing
+detail in the recipe-level `note` field; recipes from batch 12 onward
+(especially 16-18) moved that detail into each ingredient's own
+`preparation` field instead — which is arguably more correct per the
+schema's own doc comment ("Display-only preparation note") — and
+narrowed `note` to mostly just alcohol-inclusion flags. 62 recipes carry
+at least one substitution-flavored `preparation` note with no
+recipe-level `note` summarizing it. This is intentional, not an
+oversight, and per-ingredient is the right place for it — flagging only
+so a future session doesn't "fix" it by back-filling 62 `note` fields
+that don't need it.
+
+Trivial cosmetic issue, not fixed: every Phase-2 recipe's `createdAt`
+reads `2026-08-19T00:00:00.000Z`, one calendar day ahead of the actual
+authoring date (2026-08-18) — inherited from a `NOW` constant set once
+early on and reused verbatim in every batch script since. Doesn't affect
+any logic (`createdAt` is informational only) and touching all 150
+records to shave off one day isn't worth the diff noise. Worth using the
+real date in future batches, nothing more.
+
+**Cross-file consistency:** the working copy used for every batch this
+session (`/tmp/kos/repo` in the cloud sandbox) is byte-identical to what
+was committed to Jack's machine — confirmed by diff, not assumption.
+`ROADMAP.md` was stale (still said "Phase 2 not started", last updated
+2026-08-14) despite Phase 2 having been fully committed batch by batch
+all session — it was never touched because the established per-batch
+commit routine only ever pushed `ontology.json` / `recipes.json` /
+`calorie-reference.json` / `DECISIONS.md`. Fixed as part of this review;
+`ROADMAP.md` now reflects Phase 2 as done with real final numbers.
+Lesson for future phases: the per-batch commit file list should include
+`ROADMAP.md` whenever a phase actually completes, not just at the very
+end.
+
+**Instruction-following check:** 150/150 target hit exactly; British
+finished at 8/150 (~5%), comfortably under the ~10% cap; alcohol
+included per the standing decision, with `note` flags on every recipe
+that uses it; git-push instructions were given in full at least once
+per extended pause and only repeated in full at the very end (final
+wrap-up), matching Jack's "don't repeat unless something changed"
+instruction; project memory (`MEMORY.md` /
+`phase2-recipe-seed-progress.md`) was kept current after every batch.
+No files outside the intended Phase 2 scope
+(`ontology.json`/`recipes.json`/`calorie-reference.json`/`DECISIONS.md`,
+now also `ROADMAP.md` for this review) were touched — `schema.ts`,
+`src/engine/`, and all UI/config files are untouched from Phase 0/1
+state, ready for Phase 3.
+
+**Open decisions for Jack before Phase 3** (none blocking — Phase 3 can
+start regardless, these are just things worth a conscious yes/no rather
+than a silent default):
+1. `interchangeableWith` (produce format variants, e.g. whole vs. diced
+   onion) is still fully deferred from Phase 0/1, as already documented
+   in the Open Items section above — Phase 3's ownership-ranking logic
+   needs a decision on whether it reads this field at all in v1, or
+   whether ranking works purely off exact `canonicalId` match for now.
+2. Whether to backfill `createdAt` on the 150 seed recipes to the
+   correct date — recommended: no, not worth it.
+3. Whether the substitution-heavy recipes (62 of them, see above) are
+   fine as permanent seed data, or whether a few of the more aggressive
+   substitutions (goat -> lamb-leg, veal -> beef-shin, sea bass ->
+   red-snapper, arborio -> rice-white) should eventually get their own
+   canonical entries instead. Recommended: leave as-is until it's
+   actually annoying in practice — this is exactly the kind of premature
+   precision CLAUDE.md's macro-tolerance gotcha warns against.
