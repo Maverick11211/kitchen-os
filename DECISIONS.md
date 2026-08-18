@@ -756,3 +756,257 @@ the lesson from batch 10.
 
 Running total: 75 recipes seeded (out of the 150 target), 292 ontology
 entries (was 286 before this batch).
+
+## 2026-08-18 — 7 more recipes; Chinese/Italian/Thai (TheMealDB lookup.php outage)
+
+Hit a TheMealDB service issue this session: `lookup.php?i=<id>` on the v1
+API started returning stale/wrong cached recipe data regardless of the
+id requested (confirmed by cross-checking `strMeal` in the response
+against the requested id — it kept returning whichever recipe had been
+fetched most recently, for any id). `filter.php` continued to work
+correctly throughout. Worked around it by switching recipe-detail fetches
+to the v2 API with TheMealDB's public test key
+(`/api/json/v2/9973533/lookup.php?i=<id>`), which returned correct,
+distinct data for every id. Recording this here in case it recurs —
+try v2 with the test key first before assuming `lookup.php` itself is
+broken.
+
+Added Kung Pao Chicken, Egg Foo Young, and Beef Lo Mein (Chinese),
+Lasagne and Squash Linguine (Italian), and Pad Thai and Thai Drumsticks
+(Thai) for 3 new ontology entries (`water-chestnut`, `bean-sprouts`,
+`sweet-chili-sauce`). Egg Foo Young had been sitting on the skip list
+since early in the session waiting on exactly these — `oyster-sauce` and
+`sherry` were added in an earlier batch, `shrimp-peeled-deveined`
+already existed, and `bean-sprouts` was the last piece; it's now built.
+
+Several documented substitutions instead of one-off entries: creme
+fraiche -> `sour-cream`, lasagne sheets and linguine -> `pasta-other-dry`,
+lo mein noodles -> `egg-noodles`, muscovado sugar -> `sugar-brown`, fresh
+basil/sage -> the existing dried-herb entries at an estimated dried
+equivalent. Egg Foo Young's deep-frying oil is recorded at a reduced
+volume (2 cups vs. the 3 cups called for) per the fried-oil-absorption
+convention established earlier in the session, rather than counting the
+full frying volume as consumed.
+
+Every quantityG in this batch was computed from an ontology value looked
+up before writing the recipe, per the batch 10/11 lesson — `npm test`
+passed cleanly on the first run again.
+
+Running total: 82 recipes seeded (out of the 150 target), 295 ontology
+entries (was 292 before this batch).
+
+## 2026-08-18, later still — 12 more recipes; French/Spanish/Turkish
+
+A big batch: Beef Bourguignon, Chicken Parmentier, Tuna Niçoise, and
+French Omelette (French); Gambas al Ajillo, Easy Spanish Chicken, Pisto
+con Huevos, and Chorizo & Tomato Salad (Spanish); Kofta Burgers, Smoky
+Chicken Skewers, Turkish Rice (Vermicelli Rice), and Chilli Ginger Lamb
+Chops (Turkish) — for only 3 new ontology entries (`goose-fat`,
+`beef-shin`, `fennel-seeds`), thanks to how well-stocked the ontology
+already is after 12 prior batches.
+
+Several documented substitutions instead of new one-offs: sherry vinegar
+-> `red-wine-vinegar`, smoky aïoli -> `mayonnaise`, vermicelli pasta ->
+`egg-noodles`, lamb loin chops -> `lamb-leg`, French Omelette's tarragon
+folded into its `parsley` line (no close ontology match, small quantity,
+similar use as a chopped fresh herb). Both Beef Bourguignon and Chicken
+Parmentier use wine and carry a note pointing at DECISIONS.md.
+
+Caught 3 quantityG bugs before/during validation, all the same root
+cause as batch 10 and 11's fixes: a "half" or approximate-can quantity
+written as a whole `count` (half a cabbage, half a lemon, one 400g can
+of beans where the ontology's canned-bean unit is 425g) without updating
+the `quantity` field to match. Fixed by setting `quantity` to the actual
+fractional/rounded count so recomputation lines up — same lesson as
+before, just a variant of it (partial counts, not wrong reference
+values) that's worth calling out separately: whenever a recipe wants
+"half of" a count-tracked ingredient, the `quantity` field itself must
+carry that fraction, not just the `quantityG`.
+
+Running total: 94 recipes seeded (out of the 150 target), 298 ontology
+entries (was 295 before this batch).
+
+## 2026-08-18, later still — 8 more recipes; Canadian/Jamaican/Vietnamese
+
+Added Poutine, Molasses Baked Beans, and Jiggs Dinner (Canadian);
+Jamaican Curry Chicken and Jamaican Beef Patties (Jamaican); Bang Bang
+Prawn Salad, Salt & Pepper Squid, and Vietnamese Grilled Pork (Bun Thit
+Nuong) (Vietnamese) for 5 new ontology entries (`cheese-curds`, `gravy`,
+`navy-beans-dry`, `molasses`, `szechuan-peppercorns`). `curry-powder`,
+`turnip`, and `split-peas-dry` all turned out to already exist from
+earlier batches.
+
+Jiggs Dinner's "salt beef" uses the existing `beef-brisket` entry with a
+note — same cut/preparation family as the corned beef joint already
+modeled there. Vietnamese Grilled Pork's source recipe listed pre-made
+egg rolls as a side accompaniment; omitted with a note rather than
+force-mapped, since it's a store-bought item outside this recipe's own
+cooking process.
+
+A new variant of the "fraction of a count-tracked item" bug from batch
+13 showed up here: Bang Bang Prawn Salad measures 4 tbsp (~60g) from a
+400g can of coconut milk. Writing the fraction as `0.1` (rounded to 1
+decimal by the usual `r1` helper) produced 40g on recompute instead of
+60g — the rounding itself was the bug, not the concept. Fixed by using a
+3-decimal fraction (`0.15`) so `0.15 * 400 = 60.0` exactly. Two more
+routine half-count fixes (half a green pepper, half a cucumber) followed
+the by-now-familiar pattern from batches 10/11/13.
+
+Running total: 102 recipes seeded (out of the 150 target), 303 ontology
+entries (was 298 before this batch).
+
+## 2026-08-19 — 11 more recipes; Thai/Polish/Indian
+
+Added Pad See Ew, Thai Chicken Cakes with Sweet Chilli Sauce, Prawn
+Stir-Fry, and Thai Beef Stir-Fry (Thai); Pierogi, Polish Patties
+(Kotlety), Bigos (Hunters Stew), and Zapiekanki (Polish); Baingan
+Bharta, Chicken Handi, and Lamb Biryani (Indian) for 5 new ontology
+entries (`sauerkraut`, `kielbasa`, `caraway-seed`, `cumin-seeds`,
+`poppy-seeds`). `curry-powder`, `turnip`, `split-peas-dry`, `ghee`, and
+several spice entries all turned out to already exist.
+
+Two substitutions instead of one-offs: dark soy sauce -> `soy-sauce`,
+and Zapiekanki's Polish kabanos sausage reuses the new `kielbasa` entry
+(same category of product) instead of a second new one.
+
+Caught 4 more instances of the exact bug flagged after batch 14 —
+`quantity` left at a whole `1` while `quantityG` was computed from a
+fractional basis (5/6 of an onion for Pierogi, half an onion for Baingan
+Bharta, ~0.44 of a cabbage and ~0.59 of a can for Bigos). This confirms
+the fix from batch 14's writeup didn't actually get applied consistently
+during batch 15's authoring — worth treating as a mechanical check to
+run before `npm test`, not just a lesson to remember: for every line
+using a fractional multiplier inside `count_g(...)`, grep for it and
+confirm the `quantity` field carries the same fraction.
+
+Running total: 113 recipes seeded (out of the 150 target), 308 ontology
+entries (was 303 before this batch).
+
+## 2026-08-19 — 14 more recipes; Spanish/Chinese/French/Canadian
+
+Added Chorizo, Potato & Cheese Omelette, Fried Calamari, Chickpea,
+Chorizo & Spinach Stew, and Spanish Beans with Chicken & Chorizo
+(Spanish); General Tso's Chicken, Shrimp With Snow Peas, Ramen Noodles
+with Boiled Egg, and Chinese Orange Chicken (Chinese); Coq au Vin,
+Boulangère Potatoes, and Steak Diane (French); Classic Tourtière,
+Montreal Smoked Meat, and Rappie Pie (Canadian). Only 2 new ontology
+entries needed for all 14 recipes: `snow-peas` and `brandy` — nearly
+everything else (`chickpeas-canned`, `pinto-beans-canned`,
+`nutmeg-ground`, `onion-powder`, `puff-pastry`, `sesame-seeds`, etc.)
+already existed.
+
+Substitutions used instead of one-off entries: pinto beans ->
+`navy-beans-dry` (both dried legumes needing an overnight soak), duck
+sauce -> `sweet-chili-sauce`, gochujang -> `chili-powder` (small
+amount), celery salt -> `salt`, shortcrust pastry -> `puff-pastry`,
+ground clove folded into the `nutmeg-ground` line (Tourtière), and
+Jersey Royal potatoes -> `potato-russet`.
+
+Coq au Vin and Steak Diane both use alcohol (red wine, brandy) that's
+mostly cooked off — both carry a `note` field pointing back to the
+alcohol-inclusion decision, consistent with prior batches.
+
+Before running the build script this time, ran the mechanical grep
+check flagged after batch 15's writeup (search for every fractional
+`count_g`/`cup`/`tbsp`/`tsp` call and confirm `quantity` matches the
+fraction) — it caught 4 instances on review (potato-russet at 0.6 in
+both Chorizo Potato Cheese Omelette and Classic Tourtière, chickpeas at
+1.88 cans, potato-russet at 1.47) before the script was ever run. `npm
+test` passed clean on the first attempt for the first time since batch
+12 — the mechanical check, not just documenting the lesson, is what
+finally worked.
+
+Running total: 127 recipes seeded (out of the 150 target), 310 ontology
+entries (was 308 before this batch).
+
+## 2026-08-19 — 12 more recipes; Turkish/Jamaican/Vietnamese/Polish/Italian/British
+
+Added Kumpir and Lamb & Apricot Meatballs (Turkish); Jerk Chicken with
+Rice & Peas and Jamaican Curry Goat (Jamaican); Beef Pho and
+Vietnamese-style Caramel Pork (Vietnamese); Polskie Nalesniki (Polish
+Pancakes) and Pork & Sauerkraut Goulash (Polish); Salmon Prawn Risotto
+and Rigatoni with Fennel Sausage Sauce (Italian); Toad In The Hole and
+Fish Pie (British, bringing British to 7 — still well under the ~15
+cap). **Zero new ontology entries needed** — the 310-entry ontology
+already covered every ingredient across all 12 recipes.
+
+Substitutions used instead of one-offs: goat meat -> `lamb-leg` (very
+similar in curries, common real-world swap), red/bird's-eye chilli ->
+`jalapeno` (used 3 times across Jerk Chicken, Beef Pho, and Caramel
+Pork), pork shoulder/steaks -> `pork-chop-boneless` (used twice, Caramel
+Pork and the Goulash), arborio rice -> `rice-white`, pecorino ->
+`parmesan-grated`, anchovy fillet -> a small gram amount of `sardines`,
+Jerusalem artichokes -> `turnip`, British bangers -> `sausage-italian`,
+palm sugar -> `sugar-brown`, cinnamon stick -> `cinnamon-ground`, and
+"all-purpose seasoning" folded into the `salt` line for Curry Goat.
+
+Simplified the unit-choice approach this batch: confirmed by reading
+`qa/seed-data.validate.test.ts`'s `recomputeQuantityG` directly that
+unit `"g"`/`"ml"` always passes `quantityG` through unchanged regardless
+of the canonical's `trackBy`/`unitWeightG`/`cupWeightG` — there is no
+check anywhere that a RecipeIngredient's unit must match its
+canonical's `trackBy`. So for any ingredient given as a plain weight
+(pork shoulder, potatoes, cod fillet, etc.) rather than a natural count,
+using `"g"` directly instead of forcing a `"count"` conversion is both
+simpler and immune to the fractional-quantity bug class entirely, since
+`quantity` and `quantityG` are the same number by construction. Kept
+`"count"` only for genuinely discrete items (eggs, cloves, onions,
+canned goods rounded to the nearest can). Ran the mechanical
+fractional-quantity grep check before running the build script again —
+zero mismatches found, and `npm test` passed clean on the first attempt
+for the second batch running.
+
+Also noticed and backfilled 10 pre-existing ontology ids that had been
+used in earlier batches but never got a `qa/calorie-reference.json`
+entry (`cheddar-shredded`, `cod-fillet`, `horseradish-prepared`, `lard`,
+`nutmeg-ground`, `rice-white`, `sausage-italian`,
+`shrimp-peeled-deveined`, `smoked-paprika`, `star-anise`) — the calorie
+check silently skips recipes with a missing reference rather than
+failing, so this had gone unnoticed until this batch used them all
+directly.
+
+Running total: 139 recipes seeded (out of the 150 target), 310 ontology
+entries (unchanged this batch).
+
+## 2026-08-19 — Final 11 recipes; 150/150 target reached
+
+Added Spanish-style Slow-Cooked Lamb Shoulder & Beans (Spanish); Szechuan
+Beef (Chinese); Pork Cassoulet (French); Massaman Beef Curry (Thai);
+Nutty Chicken Curry (Indian); Turkish Lamb Pilau (Turkish); Oxtail with
+Broad Beans (Jamaican); Sea Bass with Sizzled Ginger, Chilli & Spring
+Onions (Vietnamese); Slow-Roasted Ham with Lemon, Garlic & Sage
+(Polish); Lancashire Hotpot (British); and Osso Buco alla Milanese
+(Italian). One recipe from each of 11 different cuisines, spreading the
+final push evenly rather than piling onto any single one. **Zero new
+ontology entries needed** — third batch running with none, confirming
+the ontology has converged on covering the vast majority of common
+Western/Asian home-cooking ingredients.
+
+Three new one-off substitutions worth noting: oxtail and veal shanks
+(Osso Buco) both map to `beef-shin` — all three are collagen-rich,
+slow-braising cuts, so the same canonical entry covers all of them; sea
+bass maps to `red-snapper` (closest delicate white/pink fish already in
+the ontology); and 3 lamb kidneys in the Lancashire Hotpot were folded
+directly into the `lamb-leg` quantity with a note, since there's no
+separate offal entry and it's a small fraction of the dish's protein.
+Kaffir lime leaves (Massaman Curry) were approximated with a tiny
+fraction of `lime` (0.1 count) rather than added as a new entry, similar
+to how whole spices have been folded into related lines in past batches.
+
+Backfilled 8 more pre-existing ontology ids that had been used in
+earlier batches without a `qa/calorie-reference.json` entry
+(`baguette`, `coconut-cream`, `egg-white`, `hot-sauce`, `marjoram-dried`,
+`orange`, `pine-nuts`, `tamarind-paste`) — same gap-closing pass as
+batch 17, and worth doing as a matter of course each batch going
+forward since the check silently skips rather than fails.
+
+Ran the mechanical fractional-quantity grep check before running the
+build script — zero mismatches, and `npm test` passed clean on the
+first attempt for the third batch running. The combination of the grep
+pre-check plus defaulting to unit `"g"`/`"ml"` for any plain-weight
+ingredient (established in batch 17) has fully closed out the bug class
+that recurred in batches 13, 14, and 15.
+
+**Final running total: 150 recipes seeded — target reached.** 310
+ontology entries total (was 193 before Phase 2 began, unchanged this
+specific batch).

@@ -4075,5 +4075,254 @@
       "pork mince"
     ],
     "defaultShelfLifeDays": 2
+  },
+  {
+    "id": "water-chestnut",
+    "name": "Water chestnuts (canned, sliced)",
+    "category": "produce",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 140,
+    "aliases": [
+      "water chestnut",
+      "water chestnuts",
+      "sliced water chestnuts"
+    ],
+    "defaultShelfLifeDays": 365
+  },
+  {
+    "id": "bean-sprouts",
+    "name": "Bean sprouts",
+    "category": "produce",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 104,
+    "aliases": [
+      "bean sprouts",
+      "mung bean sprouts",
+      "beansprouts"
+    ],
+    "defaultShelfLifeDays": 4
+  },
+  {
+    "id": "sweet-chili-sauce",
+    "name": "Sweet chili sauce",
+    "category": "condiment",
+    "trackBy": "volume",
+    "tracked": true,
+    "perishable": false,
+    "densityGPerMl": 1.3,
+    "aliases": [
+      "sweet chilli sauce",
+      "sweet chili sauce"
+    ]
+  },
+  {
+    "id": "goose-fat",
+    "name": "Goose fat",
+    "category": "fat-oil",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 205,
+    "aliases": [
+      "goose fat"
+    ],
+    "defaultShelfLifeDays": 365
+  },
+  {
+    "id": "beef-shin",
+    "name": "Beef shin",
+    "category": "protein",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "aliases": [
+      "beef shin",
+      "shin of beef",
+      "beef shank"
+    ],
+    "defaultShelfLifeDays": 3
+  },
+  {
+    "id": "fennel-seeds",
+    "name": "Fennel seeds",
+    "category": "spice",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 149,
+    "aliases": [
+      "fennel seeds",
+      "fennel seed"
+    ],
+    "defaultShelfLifeDays": 730
+  },
+  {
+    "id": "cheese-curds",
+    "name": "Cheese curds",
+    "category": "dairy",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 130,
+    "aliases": [
+      "cheese curds"
+    ],
+    "defaultShelfLifeDays": 10
+  },
+  {
+    "id": "gravy",
+    "name": "Gravy (beef)",
+    "category": "other",
+    "trackBy": "volume",
+    "tracked": true,
+    "perishable": true,
+    "densityGPerMl": 1.02,
+    "aliases": [
+      "gravy",
+      "beef gravy"
+    ],
+    "defaultShelfLifeDays": 5
+  },
+  {
+    "id": "navy-beans-dry",
+    "name": "Dried navy beans",
+    "category": "legume",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 184,
+    "aliases": [
+      "navy beans",
+      "dried navy beans",
+      "white navy beans"
+    ],
+    "defaultShelfLifeDays": 730
+  },
+  {
+    "id": "molasses",
+    "name": "Molasses",
+    "category": "baking",
+    "trackBy": "volume",
+    "tracked": true,
+    "perishable": false,
+    "densityGPerMl": 1.4,
+    "aliases": [
+      "molasses"
+    ]
+  },
+  {
+    "id": "szechuan-peppercorns",
+    "name": "Szechuan peppercorns",
+    "category": "spice",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 90,
+    "aliases": [
+      "szechuan peppercorns",
+      "sichuan peppercorns"
+    ]
+  },
+  {
+    "id": "sauerkraut",
+    "name": "Sauerkraut",
+    "category": "condiment",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 142,
+    "aliases": [
+      "sauerkraut"
+    ],
+    "defaultShelfLifeDays": 180
+  },
+  {
+    "id": "kielbasa",
+    "name": "Kielbasa (Polish sausage)",
+    "category": "protein",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 140,
+    "aliases": [
+      "kielbasa",
+      "polish sausage",
+      "polish kabanos",
+      "kabanos"
+    ],
+    "defaultShelfLifeDays": 14
+  },
+  {
+    "id": "caraway-seed",
+    "name": "Caraway seed",
+    "category": "spice",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 100,
+    "aliases": [
+      "caraway seed",
+      "caraway seeds"
+    ],
+    "defaultShelfLifeDays": 730
+  },
+  {
+    "id": "cumin-seeds",
+    "name": "Cumin seeds",
+    "category": "spice",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 149,
+    "aliases": [
+      "cumin seeds",
+      "whole cumin"
+    ],
+    "defaultShelfLifeDays": 730
+  },
+  {
+    "id": "poppy-seeds",
+    "name": "Poppy seeds",
+    "category": "spice",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": false,
+    "cupWeightG": 145,
+    "aliases": [
+      "poppy seeds",
+      "khus khus"
+    ],
+    "defaultShelfLifeDays": 730
+  },
+  {
+    "id": "snow-peas",
+    "name": "Snow peas",
+    "category": "produce",
+    "trackBy": "mass",
+    "tracked": true,
+    "perishable": true,
+    "cupWeightG": 63,
+    "aliases": [
+      "snow peas",
+      "sugar snap peas"
+    ],
+    "defaultShelfLifeDays": 7
+  },
+  {
+    "id": "brandy",
+    "name": "Brandy",
+    "category": "beverage",
+    "trackBy": "volume",
+    "tracked": true,
+    "perishable": false,
+    "densityGPerMl": 0.94,
+    "aliases": [
+      "brandy",
+      "cognac"
+    ]
   }
 ]
