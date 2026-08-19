@@ -4,6 +4,10 @@ Dev-only validation tooling for the Phase 2 seed data (`src/data/ontology.json`
 and `src/data/recipes.json`). Nothing in this folder is imported by the app —
 it exists purely so `npm test` can catch data problems before they ship.
 
+The dependency runs one way: this folder imports from `src/`, never the reverse.
+Since Phase 3 the conversion check calls the real engine (`src/engine/units.ts`)
+rather than keeping its own copy of the math.
+
 ## Why this lives outside `src/`
 
 `src/` is what actually ships in the app. This folder holds a reference table
@@ -33,6 +37,15 @@ separate on purpose:
      compares it to what's stored, catching copy-paste or arithmetic mistakes
      made while building a recipe by hand. Same check for `estimatedYieldG`
      against the sum of its ingredients.
+
+     This calls `toGrams` from `src/engine/units.ts`, so it runs the same rules
+     the app runs. It also works in the other direction: the 1562 seed
+     ingredient lines are a regression test on the engine, and any change to
+     `units.ts` that disagrees with the values the Phase 2 build scripts
+     computed fails here. A line the engine cannot convert is now a FAILURE
+     rather than a silent skip — before Phase 3 the private copy of this math
+     couldn't handle cup/tbsp/tsp on a liquid (no liquid carries a
+     `cupWeightG`) and quietly passed over 266 of the 1562 lines.
   4. **Calorie plausibility** — using the rough reference table above, flags
      any recipe whose overall calories-per-100g falls way outside a normal
      range for a real dish (a sign something is wrong, not proof something is

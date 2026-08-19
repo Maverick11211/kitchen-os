@@ -155,6 +155,18 @@ export interface CanonicalIngredient {
    * field when adding a lot. Only meaningful when perishable === true.
    */
   defaultShelfLifeDays?: number;
+
+  /**
+   * true for entries that came from the bundled ontology.json, false for ones
+   * the User added in the app. Same meaning as Recipe.isSeed.
+   *
+   * Added 2026-08-19 (see DECISIONS.md) when in-app ingredient creation was
+   * scoped in. The seed merge needs it: a redeployed ontology.json may safely
+   * replace a seed entry, but must never overwrite one the User created.
+   * Without this field the merge can only choose between clobbering the User's
+   * data and never updating anything.
+   */
+  isSeed: boolean;
 }
 
 // ---------------------------------------------------------------------------

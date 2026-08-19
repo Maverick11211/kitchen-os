@@ -6,6 +6,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "densityGPerMl": 1.03,
     "aliases": [
       "whole milk",
@@ -21,6 +22,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 113,
     "aliases": [
       "shredded cheddar",
@@ -36,6 +38,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 245,
     "aliases": [
       "plain greek yogurt",
@@ -51,6 +54,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 227,
     "aliases": [
       "butter",
@@ -66,6 +70,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "densityGPerMl": 0.994,
     "aliases": [
       "heavy cream",
@@ -81,6 +86,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 230,
     "aliases": [
       "sour cream",
@@ -95,6 +101,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 232,
     "aliases": [
       "cream cheese",
@@ -109,6 +116,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 100,
     "aliases": [
       "parmesan",
@@ -126,6 +134,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 113,
     "aliases": [
       "shredded mozzarella",
@@ -141,6 +150,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 225,
     "aliases": [
       "cottage cheese"
@@ -154,6 +164,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 245,
     "aliases": [
       "plain yogurt",
@@ -169,6 +180,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "densityGPerMl": 1.01,
     "aliases": [
       "half and half",
@@ -184,6 +196,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "densityGPerMl": 1.03,
     "aliases": [
       "buttermilk",
@@ -198,6 +211,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 50,
     "aliases": [
       "eggs",
@@ -216,6 +230,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 170,
     "aliases": [
       "chicken breast",
@@ -232,6 +247,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 130,
     "aliases": [
       "chicken thighs",
@@ -247,6 +263,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "ground beef",
       "80/20 ground beef",
@@ -262,6 +279,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "lean ground beef",
       "93/7 ground beef",
@@ -277,6 +295,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "ground turkey",
       "93% lean ground turkey"
@@ -290,6 +309,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "bacon",
       "bacon slices",
@@ -305,6 +325,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "pork chop",
       "boneless pork chops",
@@ -320,6 +341,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "salmon",
       "salmon fillets",
@@ -334,6 +356,8 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
+    "unitWeightG": 15,
     "aliases": [
       "shrimp",
       "peeled shrimp",
@@ -352,6 +376,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 142,
     "aliases": [
       "canned tuna",
@@ -367,6 +392,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "deli turkey",
       "sliced turkey breast",
@@ -381,6 +407,8 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
+    "unitWeightG": 170,
     "aliases": [
       "sirloin",
       "sirloin steak",
@@ -396,6 +424,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 85,
     "aliases": [
       "italian sausage",
@@ -411,6 +440,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "tofu",
       "extra firm tofu",
@@ -425,6 +455,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "deli ham",
       "sliced ham",
@@ -439,6 +470,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 120,
     "aliases": [
       "chicken drumsticks",
@@ -453,6 +485,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 110,
     "aliases": [
       "onion",
@@ -469,6 +502,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 5,
     "aliases": [
       "garlic",
@@ -484,6 +518,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 128,
     "unitWeightG": 61,
     "aliases": [
@@ -499,6 +534,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 30,
     "aliases": [
       "spinach",
@@ -514,6 +550,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 16,
     "aliases": [
       "cilantro",
@@ -529,7 +566,9 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 170,
+    "cupWeightG": 210,
     "aliases": [
       "potato",
       "potatoes",
@@ -545,6 +584,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 130,
     "aliases": [
       "sweet potato",
@@ -560,6 +600,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 123,
     "aliases": [
       "tomato",
@@ -575,6 +616,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 119,
     "aliases": [
       "bell pepper",
@@ -592,6 +634,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 300,
     "aliases": [
       "cucumber",
@@ -607,6 +650,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 196,
     "aliases": [
       "zucchini",
@@ -622,6 +666,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 14,
     "aliases": [
       "jalapeno",
@@ -640,6 +685,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 58,
     "aliases": [
       "lemon",
@@ -654,6 +700,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 67,
     "aliases": [
       "lime",
@@ -668,6 +715,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 170,
     "aliases": [
       "avocado",
@@ -683,6 +731,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 118,
     "aliases": [
       "banana",
@@ -697,6 +746,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 182,
     "aliases": [
       "apple",
@@ -711,6 +761,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 131,
     "aliases": [
       "orange",
@@ -725,6 +776,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 101,
     "unitWeightG": 40,
     "aliases": [
@@ -741,6 +793,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 900,
     "aliases": [
       "cabbage",
@@ -757,6 +810,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 192,
     "aliases": [
       "corn",
@@ -773,6 +827,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 91,
     "aliases": [
       "broccoli",
@@ -788,6 +843,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 107,
     "aliases": [
       "cauliflower",
@@ -802,6 +858,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 70,
     "aliases": [
       "mushrooms",
@@ -818,6 +875,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 47,
     "aliases": [
       "romaine lettuce",
@@ -833,6 +891,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 152,
     "aliases": [
       "strawberries",
@@ -847,6 +906,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 148,
     "aliases": [
       "blueberries",
@@ -861,6 +921,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 60,
     "aliases": [
       "parsley",
@@ -877,7 +938,9 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 21,
+    "unitWeightG": 0.5,
     "aliases": [
       "basil",
       "fresh basil",
@@ -892,6 +955,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 96,
     "aliases": [
       "ginger",
@@ -907,6 +971,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 185,
     "aliases": [
       "rice",
@@ -922,6 +987,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 190,
     "aliases": [
       "brown rice"
@@ -934,6 +1000,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 185,
     "aliases": [
       "jasmine rice"
@@ -946,6 +1013,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 180,
     "aliases": [
       "basmati rice"
@@ -958,6 +1026,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 170,
     "aliases": [
       "quinoa",
@@ -971,6 +1040,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 90,
     "aliases": [
       "oats",
@@ -987,6 +1057,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 170,
     "aliases": [
       "steel-cut oats",
@@ -1001,6 +1072,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "aliases": [
       "spaghetti",
       "pasta"
@@ -1013,6 +1085,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 100,
     "aliases": [
       "penne",
@@ -1027,6 +1100,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 38,
     "aliases": [
       "egg noodles"
@@ -1039,6 +1113,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 173,
     "aliases": [
       "couscous"
@@ -1051,6 +1126,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 200,
     "aliases": [
       "barley",
@@ -1064,6 +1140,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 190,
     "aliases": [
       "farro"
@@ -1076,6 +1153,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 50,
     "aliases": [
       "breadcrumbs",
@@ -1090,6 +1168,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 28,
     "aliases": [
       "bread",
@@ -1106,6 +1185,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 28,
     "aliases": [
       "whole wheat bread",
@@ -1120,6 +1200,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 45,
     "aliases": [
       "flour tortillas",
@@ -1135,6 +1216,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 24,
     "aliases": [
       "corn tortillas"
@@ -1148,6 +1230,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 95,
     "aliases": [
       "bagel",
@@ -1162,6 +1245,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 57,
     "aliases": [
       "english muffin",
@@ -1176,6 +1260,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 28,
     "aliases": [
       "cereal",
@@ -1190,6 +1275,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 120,
     "aliases": [
       "granola"
@@ -1202,6 +1288,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 425,
     "aliases": [
       "black beans",
@@ -1215,6 +1302,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 425,
     "aliases": [
       "kidney beans",
@@ -1230,6 +1318,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 425,
     "aliases": [
       "chickpeas",
@@ -1244,6 +1333,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 425,
     "aliases": [
       "pinto beans",
@@ -1257,6 +1347,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 425,
     "aliases": [
       "white beans",
@@ -1274,6 +1365,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 192,
     "aliases": [
       "lentils",
@@ -1289,6 +1381,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 200,
     "aliases": [
       "red lentils",
@@ -1303,6 +1396,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 155,
     "aliases": [
       "edamame",
@@ -1318,6 +1412,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 200,
     "aliases": [
       "split peas",
@@ -1333,6 +1428,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 0.92,
     "aliases": [
       "olive oil",
@@ -1347,6 +1443,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 0.92,
     "aliases": [
       "vegetable oil",
@@ -1364,6 +1461,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 0.91,
     "aliases": [
       "avocado oil"
@@ -1376,6 +1474,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 0.92,
     "aliases": [
       "sesame oil",
@@ -1390,6 +1489,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 218,
     "aliases": [
       "coconut oil"
@@ -1402,6 +1502,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 205,
     "aliases": [
       "shortening",
@@ -1416,6 +1517,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 205,
     "aliases": [
       "lard",
@@ -1430,6 +1532,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 218,
     "aliases": [
       "ghee",
@@ -1443,6 +1546,7 @@
     "trackBy": "volume",
     "tracked": false,
     "perishable": false,
+    "isSeed": true,
     "aliases": [
       "cooking spray",
       "nonstick spray",
@@ -1457,6 +1561,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.15,
     "aliases": [
       "ketchup",
@@ -1470,6 +1575,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.0,
     "aliases": [
       "mustard",
@@ -1484,6 +1590,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.05,
     "aliases": [
       "dijon mustard",
@@ -1497,6 +1604,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "densityGPerMl": 0.92,
     "aliases": [
       "mayonnaise",
@@ -1511,6 +1619,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.1,
     "aliases": [
       "soy sauce",
@@ -1524,6 +1633,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.0,
     "aliases": [
       "hot sauce",
@@ -1538,6 +1648,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.1,
     "aliases": [
       "sriracha",
@@ -1551,6 +1662,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.15,
     "aliases": [
       "bbq sauce",
@@ -1564,6 +1676,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "densityGPerMl": 1.0,
     "aliases": [
       "ranch dressing",
@@ -1578,6 +1691,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.1,
     "aliases": [
       "worcestershire sauce",
@@ -1591,6 +1705,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.42,
     "aliases": [
       "honey"
@@ -1603,6 +1718,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.33,
     "aliases": [
       "maple syrup",
@@ -1616,6 +1732,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.02,
     "aliases": [
       "balsamic vinegar",
@@ -1629,6 +1746,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.01,
     "aliases": [
       "rice vinegar",
@@ -1642,6 +1760,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 258,
     "aliases": [
       "peanut butter",
@@ -1655,6 +1774,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 245,
     "aliases": [
       "salsa",
@@ -1669,6 +1789,7 @@
     "trackBy": "mass",
     "tracked": false,
     "perishable": false,
+    "isSeed": true,
     "aliases": [
       "salt",
       "table salt",
@@ -1684,6 +1805,7 @@
     "trackBy": "mass",
     "tracked": false,
     "perishable": false,
+    "isSeed": true,
     "aliases": [
       "black pepper",
       "ground black pepper",
@@ -1698,6 +1820,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 136,
     "aliases": [
       "garlic powder"
@@ -1710,6 +1833,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 130,
     "aliases": [
       "onion powder"
@@ -1722,6 +1846,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 120,
     "aliases": [
       "paprika",
@@ -1735,6 +1860,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 120,
     "aliases": [
       "smoked paprika"
@@ -1747,6 +1873,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 112,
     "aliases": [
       "cumin",
@@ -1760,6 +1887,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 118,
     "aliases": [
       "chili powder",
@@ -1774,6 +1902,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 90,
     "aliases": [
       "cayenne pepper",
@@ -1788,6 +1917,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 80,
     "aliases": [
       "red pepper flakes",
@@ -1803,7 +1933,9 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 118,
+    "unitWeightG": 3,
     "aliases": [
       "cinnamon",
       "ground cinnamon",
@@ -1817,6 +1949,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 113,
     "aliases": [
       "nutmeg",
@@ -1830,6 +1963,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 30,
     "aliases": [
       "oregano",
@@ -1843,6 +1977,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 30,
     "aliases": [
       "dried basil"
@@ -1855,6 +1990,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 32,
     "aliases": [
       "thyme",
@@ -1868,6 +2004,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 35,
     "aliases": [
       "rosemary",
@@ -1881,6 +2018,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 0.1,
     "aliases": [
       "bay leaves",
@@ -1894,6 +2032,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 133,
     "aliases": [
       "turmeric",
@@ -1907,6 +2046,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 96,
     "aliases": [
       "ground ginger",
@@ -1920,6 +2060,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 112,
     "aliases": [
       "curry powder"
@@ -1932,6 +2073,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 90,
     "aliases": [
       "ground coriander",
@@ -1945,6 +2087,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 40,
     "aliases": [
       "italian seasoning"
@@ -1957,6 +2100,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 120,
     "aliases": [
       "flour",
@@ -1973,6 +2117,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 127,
     "aliases": [
       "bread flour"
@@ -1985,6 +2130,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 113,
     "aliases": [
       "whole wheat flour"
@@ -1997,6 +2143,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 114,
     "aliases": [
       "cake flour"
@@ -2009,6 +2156,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 200,
     "aliases": [
       "sugar",
@@ -2023,6 +2171,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 220,
     "aliases": [
       "brown sugar",
@@ -2037,6 +2186,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 120,
     "aliases": [
       "powdered sugar",
@@ -2051,6 +2201,7 @@
     "trackBy": "mass",
     "tracked": false,
     "perishable": false,
+    "isSeed": true,
     "aliases": [
       "baking powder"
     ],
@@ -2063,6 +2214,7 @@
     "trackBy": "mass",
     "tracked": false,
     "perishable": false,
+    "isSeed": true,
     "aliases": [
       "baking soda",
       "sodium bicarbonate",
@@ -2077,6 +2229,7 @@
     "trackBy": "volume",
     "tracked": false,
     "perishable": false,
+    "isSeed": true,
     "aliases": [
       "vanilla extract",
       "pure vanilla extract",
@@ -2091,6 +2244,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 86,
     "aliases": [
       "cocoa powder",
@@ -2105,6 +2259,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 128,
     "aliases": [
       "cornstarch",
@@ -2118,6 +2273,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 7,
     "aliases": [
       "yeast",
@@ -2133,6 +2289,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 170,
     "aliases": [
       "chocolate chips",
@@ -2146,6 +2303,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 113,
     "aliases": [
       "coffee",
@@ -2160,6 +2318,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 2,
     "aliases": [
       "tea",
@@ -2174,6 +2333,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "densityGPerMl": 1.04,
     "aliases": [
       "orange juice",
@@ -2188,6 +2348,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "densityGPerMl": 1.05,
     "aliases": [
       "apple juice"
@@ -2201,6 +2362,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.04,
     "aliases": [
       "soda",
@@ -2216,6 +2378,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.0,
     "aliases": [
       "sparkling water",
@@ -2230,6 +2393,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 355,
     "aliases": [
       "beer",
@@ -2244,6 +2408,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 0.99,
     "aliases": [
       "wine",
@@ -2258,6 +2423,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 113,
     "aliases": [
       "protein powder",
@@ -2272,6 +2438,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "densityGPerMl": 1.03,
     "aliases": [
       "almond milk",
@@ -2286,6 +2453,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.03,
     "aliases": [
       "gatorade",
@@ -2300,6 +2468,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 143,
     "aliases": [
       "almonds",
@@ -2314,6 +2483,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 100,
     "aliases": [
       "walnuts",
@@ -2327,6 +2497,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 146,
     "aliases": [
       "peanuts",
@@ -2341,6 +2512,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 137,
     "aliases": [
       "cashews",
@@ -2355,6 +2527,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 140,
     "aliases": [
       "sunflower seeds",
@@ -2368,6 +2541,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 170,
     "aliases": [
       "chia seeds"
@@ -2380,6 +2554,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 112,
     "aliases": [
       "ground flaxseed",
@@ -2394,6 +2569,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.0,
     "aliases": [
       "chicken broth",
@@ -2407,6 +2583,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.0,
     "aliases": [
       "vegetable broth",
@@ -2421,6 +2598,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.0,
     "aliases": [
       "beef broth",
@@ -2434,6 +2612,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 794,
     "aliases": [
       "crushed tomatoes",
@@ -2448,6 +2627,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 411,
     "aliases": [
       "diced tomatoes",
@@ -2464,6 +2644,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 170,
     "aliases": [
       "tomato paste",
@@ -2478,7 +2659,9 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 400,
+    "cupWeightG": 225,
     "aliases": [
       "coconut milk",
       "canned coconut milk"
@@ -2491,6 +2674,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 60,
     "aliases": [
       "nutritional yeast",
@@ -2504,6 +2688,7 @@
     "trackBy": "volume",
     "tracked": false,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.0,
     "aliases": [
       "water",
@@ -2517,6 +2702,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 150,
     "aliases": [
       "feta",
@@ -2532,6 +2718,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 20,
     "aliases": [
       "swiss cheese",
@@ -2546,6 +2733,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "ground chicken"
     ],
@@ -2558,6 +2746,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "cod",
       "cod fillet",
@@ -2574,6 +2763,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 15,
     "aliases": [
       "green onion",
@@ -2591,6 +2781,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 150,
     "aliases": [
       "red onion"
@@ -2604,6 +2795,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 67,
     "aliases": [
       "kale"
@@ -2617,6 +2809,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 100,
     "aliases": [
       "green beans",
@@ -2631,6 +2824,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 45,
     "aliases": [
       "hamburger buns",
@@ -2646,6 +2840,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 453,
     "aliases": [
       "refried beans",
@@ -2659,6 +2854,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.01,
     "aliases": [
       "apple cider vinegar",
@@ -2672,6 +2868,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.01,
     "aliases": [
       "white vinegar",
@@ -2685,6 +2882,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 250,
     "aliases": [
       "marinara sauce",
@@ -2699,6 +2897,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 411,
     "aliases": [
       "canned corn",
@@ -2714,6 +2913,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "ground lamb",
       "lamb mince",
@@ -2728,6 +2928,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "lamb",
       "lamb leg",
@@ -2745,6 +2946,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "duck",
       "duck breast",
@@ -2759,6 +2961,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "mussels"
     ],
@@ -2771,6 +2974,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "clams"
     ],
@@ -2783,6 +2987,8 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
+    "unitWeightG": 300,
     "aliases": [
       "squid",
       "baby squid",
@@ -2797,6 +3003,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 50,
     "aliases": [
       "oysters"
@@ -2810,6 +3017,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "mackerel"
     ],
@@ -2822,6 +3030,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "chorizo"
     ],
@@ -2835,6 +3044,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "prosciutto",
       "parma ham"
@@ -2848,6 +3058,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 33,
     "aliases": [
       "egg white",
@@ -2862,6 +3073,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 17,
     "aliases": [
       "egg yolk",
@@ -2876,6 +3088,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 134,
     "aliases": [
       "asparagus"
@@ -2889,6 +3102,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 89,
     "aliases": [
       "leek",
@@ -2903,6 +3117,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 25,
     "aliases": [
       "shallot",
@@ -2918,6 +3133,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 700,
     "aliases": [
       "celeriac",
@@ -2932,6 +3148,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 234,
     "aliases": [
       "fennel",
@@ -2946,6 +3163,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 88,
     "aliases": [
       "brussels sprouts"
@@ -2959,6 +3177,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 122,
     "aliases": [
       "turnip",
@@ -2975,6 +3194,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 548,
     "aliases": [
       "eggplant",
@@ -2990,6 +3210,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 245,
     "aliases": [
       "pumpkin",
@@ -3004,6 +3225,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 150,
     "aliases": [
       "peach",
@@ -3018,6 +3240,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 178,
     "aliases": [
       "pear",
@@ -3032,6 +3255,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 24,
     "aliases": [
       "dates",
@@ -3045,6 +3269,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 140,
     "aliases": [
       "squash",
@@ -3060,6 +3285,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 134,
     "aliases": [
       "olives",
@@ -3075,6 +3301,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 9,
     "aliases": [
       "dill",
@@ -3089,7 +3316,9 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 24,
+    "unitWeightG": 0.3,
     "aliases": [
       "mint",
       "fresh mint",
@@ -3104,6 +3333,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 40,
     "aliases": [
       "sage",
@@ -3117,7 +3347,9 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 102,
+    "unitWeightG": 0.1,
     "aliases": [
       "cardamom",
       "ground cardamom"
@@ -3130,6 +3362,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 2,
     "aliases": [
       "saffron",
@@ -3143,6 +3376,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 40,
     "aliases": [
       "marjoram",
@@ -3156,6 +3390,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 103,
     "aliases": [
       "fenugreek",
@@ -3169,6 +3404,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 112,
     "aliases": [
       "garam masala",
@@ -3182,6 +3418,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 245,
     "aliases": [
       "curry paste",
@@ -3200,6 +3437,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 245,
     "aliases": [
       "harissa",
@@ -3214,6 +3452,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 120,
     "aliases": [
       "fajita seasoning"
@@ -3226,6 +3465,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 240,
     "aliases": [
       "tamarind paste",
@@ -3240,6 +3480,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "densityGPerMl": 1.0,
     "aliases": [
       "horseradish",
@@ -3254,6 +3495,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 0.5,
     "aliases": [
       "star anise"
@@ -3266,6 +3508,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 0.1,
     "aliases": [
       "cloves",
@@ -3279,6 +3522,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.15,
     "aliases": [
       "mirin"
@@ -3291,6 +3535,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 144,
     "aliases": [
       "sesame seed",
@@ -3304,6 +3549,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 113,
     "aliases": [
       "gouda",
@@ -3318,6 +3564,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 150,
     "aliases": [
       "brie"
@@ -3331,6 +3578,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 246,
     "aliases": [
       "ricotta",
@@ -3345,6 +3593,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 226,
     "aliases": [
       "mascarpone"
@@ -3358,6 +3607,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 113,
     "aliases": [
       "monterey jack cheese",
@@ -3375,6 +3625,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 108,
     "aliases": [
       "gruyere",
@@ -3389,6 +3640,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 150,
     "aliases": [
       "goat cheese",
@@ -3403,6 +3655,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "densityGPerMl": 0.995,
     "aliases": [
       "double cream"
@@ -3416,6 +3669,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 306,
     "aliases": [
       "condensed milk",
@@ -3429,6 +3683,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 400,
     "aliases": [
       "coconut cream"
@@ -3441,6 +3696,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 150,
     "aliases": [
       "paneer"
@@ -3454,6 +3710,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 135,
     "aliases": [
       "pine nuts"
@@ -3466,6 +3723,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 108,
     "aliases": [
       "capers"
@@ -3478,6 +3736,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 240,
     "aliases": [
       "tahini"
@@ -3490,6 +3749,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 225,
     "aliases": [
       "puff pastry",
@@ -3504,6 +3764,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 165,
     "aliases": [
       "raisins",
@@ -3518,6 +3779,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 99,
     "aliases": [
       "pecans",
@@ -3531,6 +3793,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 250,
     "aliases": [
       "baguette",
@@ -3545,6 +3808,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "aliases": [
       "macaroni",
       "farfalle",
@@ -3566,6 +3830,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "aliases": [
       "rice noodles",
       "rice stick noodles",
@@ -3581,6 +3846,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 90,
     "aliases": [
       "naan",
@@ -3595,6 +3861,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 415,
     "aliases": [
       "baked beans",
@@ -3608,6 +3875,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 145,
     "aliases": [
       "peas",
@@ -3623,6 +3891,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 112,
     "aliases": [
       "five spice powder",
@@ -3637,6 +3906,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 245,
     "aliases": [
       "enchilada sauce"
@@ -3649,6 +3919,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 1500,
     "aliases": [
       "chicken",
@@ -3663,6 +3934,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 112,
     "aliases": [
       "allspice",
@@ -3677,6 +3949,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "beef brisket",
       "corned beef brisket",
@@ -3691,6 +3964,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.01,
     "aliases": [
       "red wine vinegar"
@@ -3703,6 +3977,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "pork",
       "pork tenderloin",
@@ -3718,6 +3993,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 340,
     "aliases": [
       "chicken legs",
@@ -3732,6 +4008,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 130,
     "aliases": [
       "apricot",
@@ -3746,6 +4023,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "unitWeightG": 10,
     "aliases": [
       "vegetable stock cube",
@@ -3762,6 +4040,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 34,
     "aliases": [
       "chives"
@@ -3775,6 +4054,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 4.5,
     "aliases": [
       "radish",
@@ -3789,6 +4069,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.2,
     "aliases": [
       "fish sauce",
@@ -3803,6 +4084,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 60,
     "aliases": [
       "pita bread",
@@ -3819,6 +4101,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 50,
     "aliases": [
       "sardines",
@@ -3833,6 +4116,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 0.99,
     "aliases": [
       "dry white wine",
@@ -3846,6 +4130,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 0.99,
     "aliases": [
       "sake",
@@ -3859,6 +4144,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 220,
     "aliases": [
       "corned beef",
@@ -3873,6 +4159,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 90,
     "aliases": [
       "chicken wings",
@@ -3887,6 +4174,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.2,
     "aliases": [
       "oyster sauce"
@@ -3899,6 +4187,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 0.99,
     "aliases": [
       "sherry",
@@ -3914,6 +4203,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 15,
     "aliases": [
       "lemongrass",
@@ -3928,7 +4218,9 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 54,
+    "unitWeightG": 6.75,
     "aliases": [
       "sun-dried tomatoes",
       "sundried tomatoes"
@@ -3941,6 +4233,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 256,
     "aliases": [
       "creamed corn",
@@ -3954,6 +4247,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 155,
     "aliases": [
       "broad beans",
@@ -3969,6 +4263,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 150,
     "aliases": [
       "beetroot",
@@ -3985,6 +4280,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 20,
     "aliases": [
       "arugula",
@@ -3999,6 +4295,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 275,
     "aliases": [
       "red pepper paste",
@@ -4014,6 +4311,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "red snapper",
       "snapper"
@@ -4027,6 +4325,7 @@
     "trackBy": "count",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "unitWeightG": 10,
     "aliases": [
       "scotch bonnet",
@@ -4041,6 +4340,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 70,
     "aliases": [
       "pak choi",
@@ -4056,6 +4356,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.25,
     "aliases": [
       "hoisin sauce",
@@ -4069,6 +4370,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "ground pork",
       "minced pork",
@@ -4083,6 +4385,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 140,
     "aliases": [
       "water chestnut",
@@ -4098,6 +4401,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 104,
     "aliases": [
       "bean sprouts",
@@ -4113,6 +4417,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.3,
     "aliases": [
       "sweet chilli sauce",
@@ -4126,6 +4431,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 205,
     "aliases": [
       "goose fat"
@@ -4139,6 +4445,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "aliases": [
       "beef shin",
       "shin of beef",
@@ -4153,6 +4460,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 149,
     "aliases": [
       "fennel seeds",
@@ -4167,6 +4475,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 130,
     "aliases": [
       "cheese curds"
@@ -4180,6 +4489,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "densityGPerMl": 1.02,
     "aliases": [
       "gravy",
@@ -4194,6 +4504,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 184,
     "aliases": [
       "navy beans",
@@ -4209,6 +4520,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 1.4,
     "aliases": [
       "molasses"
@@ -4221,6 +4533,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 90,
     "aliases": [
       "szechuan peppercorns",
@@ -4234,6 +4547,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 142,
     "aliases": [
       "sauerkraut"
@@ -4247,6 +4561,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 140,
     "aliases": [
       "kielbasa",
@@ -4263,6 +4578,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 100,
     "aliases": [
       "caraway seed",
@@ -4277,6 +4593,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 149,
     "aliases": [
       "cumin seeds",
@@ -4291,6 +4608,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "cupWeightG": 145,
     "aliases": [
       "poppy seeds",
@@ -4305,6 +4623,7 @@
     "trackBy": "mass",
     "tracked": true,
     "perishable": true,
+    "isSeed": true,
     "cupWeightG": 63,
     "aliases": [
       "snow peas",
@@ -4319,6 +4638,7 @@
     "trackBy": "volume",
     "tracked": true,
     "perishable": false,
+    "isSeed": true,
     "densityGPerMl": 0.94,
     "aliases": [
       "brandy",

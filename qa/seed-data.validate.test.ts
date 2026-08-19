@@ -18,6 +18,7 @@ import type {
   IngredientCategory,
   TrackBy,
 } from '../src/types/schema'
+import { toGrams } from '../src/engine/units'
 
 const here = dirname(fileURLToPath(import.meta.url))
 
@@ -35,52 +36,32 @@ const ontologyById = new Map<CanonicalId, CanonicalIngredient>(
 )
 
 // ---------------------------------------------------------------------------
-// Conversion math, mirroring the build scripts' constants exactly so this
-// test recomputes quantityG the same way it was originally computed.
+// Conversion math
+//
+// This used to be a second, private copy of the engine's conversion rules. It
+// is now the engine itself (`src/engine/units.ts`), for two reasons:
+//
+//  1. Two copies drift. A fix applied to one and not the other leaves this
+//     suite checking the seed data against rules the app does not use — it
+//     passes while the app is wrong, which is the worst possible failure mode
+//     for a validator.
+//  2. The old copy could not convert cup/tbsp/tsp for a `trackBy: 'volume'`
+//     ingredient, because no liquid in the ontology carries a `cupWeightG`.
+//     Those lines returned null and were silently SKIPPED — 266 of 1562
+//     ingredient lines, mostly oils and sauces measured in tablespoons, went
+//     unverified. The engine handles them via density, so they are now
+//     genuinely checked.
+//
+// Reading the other way round, the 150 seed recipes are a 1562-line regression
+// test on the engine: if `toGrams` ever disagrees with the values the Phase 2
+// build scripts computed, this suite fails.
 // ---------------------------------------------------------------------------
 
-const CUP_ML = 236.588
-const OZ_G = 28.3495
-const LB_G = 453.592
-const FLOZ_ML = 29.5735
-
-/** Returns null when the ontology entry doesn't carry the field needed to
- *  independently verify this unit — those lines are skipped, not failed. */
+/** Returns null only when the engine genuinely cannot convert this
+ *  unit/ingredient pair — those lines are reported below, not silently passed. */
 function recomputeQuantityG(entry: CanonicalIngredient, quantity: number, unit: Unit): number | null {
-  switch (unit) {
-    case 'g':
-      return quantity
-    case 'kg':
-      return quantity * 1000
-    case 'oz':
-      return quantity * OZ_G
-    case 'lb':
-      return quantity * LB_G
-    case 'count':
-      return entry.unitWeightG != null ? quantity * entry.unitWeightG : null
-    case 'cup':
-      return entry.cupWeightG != null ? quantity * entry.cupWeightG : null
-    case 'tbsp':
-      return entry.cupWeightG != null ? quantity * (entry.cupWeightG / 16) : null
-    case 'tsp':
-      return entry.cupWeightG != null ? quantity * (entry.cupWeightG / 48) : null
-    case 'ml':
-      if (entry.trackBy === 'volume' && entry.densityGPerMl != null) return quantity * entry.densityGPerMl
-      if (entry.cupWeightG != null) return quantity * (entry.cupWeightG / CUP_ML)
-      return null
-    case 'l':
-      if (entry.trackBy === 'volume' && entry.densityGPerMl != null) return quantity * 1000 * entry.densityGPerMl
-      if (entry.cupWeightG != null) return quantity * 1000 * (entry.cupWeightG / CUP_ML)
-      return null
-    case 'floz': {
-      const ml = quantity * FLOZ_ML
-      if (entry.trackBy === 'volume' && entry.densityGPerMl != null) return ml * entry.densityGPerMl
-      if (entry.cupWeightG != null) return ml * (entry.cupWeightG / CUP_ML)
-      return null
-    }
-    default:
-      return null
-  }
+  const result = toGrams(entry, quantity, unit)
+  return result.ok ? result.grams : null
 }
 
 beforeAll(() => {
@@ -116,6 +97,10 @@ describe('ontology.json — foundation', () => {
     expect(typeof entry.tracked, `${id}: tracked must be boolean`).toBe('boolean')
     expect(typeof entry.perishable, `${id}: perishable must be boolean`).toBe('boolean')
     expect(Array.isArray(entry.aliases), `${id}: aliases must be an array`).toBe(true)
+    // Everything in this file is bundled seed data by definition. A false here
+    // would make the entry permanently un-updatable by the seed merge, since
+    // the merge treats isSeed:false as "the User owns this, leave it alone".
+    expect(entry.isSeed, `${id}: bundled ontology entries must have isSeed true`).toBe(true)
   })
 
   it.each(ontology.filter((e) => e.trackBy === 'count').map((e) => [e.id, e] as const))(
@@ -241,7 +226,15 @@ describe('recipe ingredient lines vs. ontology', () => {
     (label, { ing }) => {
       const entry = ontologyById.get(ing.canonicalId)!
       const recomputed = recomputeQuantityG(entry, ing.quantity, ing.unit)
-      if (recomputed === null) return // can't independently verify this unit/entry combo — not a failure
+      // Previously a silent `return`. Every seed line is now convertible, so an
+      // unconvertible one means an ontology entry lost a conversion field — a
+      // real regression, not a gap to skip past.
+      expect(
+        recomputed,
+        `${label}: the engine cannot convert ${ing.quantity} ${ing.unit} of ` +
+          `"${entry.name}" — it needs a ${ing.unit === 'count' ? 'unitWeightG' : 'cupWeightG or densityGPerMl'}`,
+      ).not.toBeNull()
+      if (recomputed === null) return
       const tolerance = Math.max(1, recomputed * 0.02) // 2% relative, 1g floor for rounding
       expect(
         Math.abs(recomputed - ing.quantityG),
@@ -250,6 +243,21 @@ describe('recipe ingredient lines vs. ontology', () => {
       ).toBeLessThanOrEqual(tolerance)
     },
   )
+
+  it('every ingredient line is independently verifiable — nothing is skipped', () => {
+    const unverifiable = resolvableLines
+      .filter(({ ing }) => {
+        const entry = ontologyById.get(ing.canonicalId)!
+        return recomputeQuantityG(entry, ing.quantity, ing.unit) === null
+      })
+      .map(({ recipeId, index, ing }) => `${recipeId}[${index}] ${ing.quantity} ${ing.unit} of ${ing.canonicalId}`)
+
+    expect(
+      unverifiable,
+      `${unverifiable.length} of ${resolvableLines.length} lines cannot be recomputed:\n` +
+        unverifiable.join('\n'),
+    ).toEqual([])
+  })
 })
 
 // ---------------------------------------------------------------------------

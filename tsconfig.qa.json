@@ -11,6 +11,7 @@
     "types": ["node"],
     "noEmit": true,
     "skipLibCheck": true,
+    "strict": true,
 
     /* Linting */
     "noUnusedLocals": true,

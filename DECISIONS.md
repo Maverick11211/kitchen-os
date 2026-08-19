@@ -1131,3 +1131,240 @@ than a silent default):
    canonical entries instead. Recommended: leave as-is until it's
    actually annoying in practice — this is exactly the kind of premature
    precision CLAUDE.md's macro-tolerance gotcha warns against.
+
+---
+
+## 2026-08-19 — Phase 3: core engine built
+
+`src/engine/` now exists: `units.ts`, `ontology.ts`, `inventory.ts`,
+`macros.ts`, `ownership.ts`, plus an `index.ts` barrel. Zero React imports,
+no clock and no randomness read internally — anything time-dependent
+(`now`, `today`) is a parameter, which is what makes the engine
+reproducible in tests. 183 engine unit tests plus 10 integration tests
+against the real seed data; full suite 6220 passing, lint and build clean.
+
+### Decisions confirmed with Jack before writing code
+
+**1. Ownership matches on exact `canonicalId` only in v1.**
+`interchangeableWith` is defined in the schema but populated on zero of
+the 310 ontology entries, so reading it would be dead code. Substitution
+awareness stays deferred (consistent with the Open Items entry above).
+Mitigation against this being expensive later: every ownership lookup
+routes through a single function, `availableGramsForLine` in
+`ownership.ts`. Summing substitutes belongs in that one function and
+nowhere else, so wiring it up later is a localised change rather than a
+rewrite of the module.
+
+**2. FEFO consumes null-expiry lots LAST.**
+Confirms the presumption in the pre-Phase-3 review. Things that will
+actually go bad get used before things that won't, which is the whole
+point of FEFO being structural rather than optional. Full ordering is:
+`expiresOn` ascending with nulls last, then `acquiredOn` ascending, then
+lot `id`. The last key exists purely to make the ordering *total* — two
+lots sharing both dates would otherwise deduct in whatever order the
+database handed them back, making a passing test fail later for no
+visible reason.
+
+**3. Deduction takes what is available and reports the shortfall.**
+Rejected: refusing the whole deduction (you could not then record a meal
+you really cooked with slightly less butter than the recipe wanted), and
+allowing `remainingG` to go negative (corrupts inventory state; the
+Reconcile screen is the accepted mitigation for drift everywhere else).
+`planDeduction` returns a plan and mutates nothing; `applyDeductions`
+produces the new lots. That split is what lets Phase 7 show a deduction
+preview before committing. `applyDeductions` clamps at zero, so a plan
+built against a stale snapshot can under-deduct but never corrupt.
+
+### Housekeeping done in the same pass
+
+**TypeScript strict mode is now actually on.** CLAUDE.md has always
+listed "TypeScript strict mode. No `any`" as a rule, but `strict` was set
+in none of the tsconfigs — so it had never been enforced by the compiler.
+Turning it on passes clean on all pre-existing code, so this cost
+nothing today; it was only going to get more expensive once the engine
+existed. Added to `tsconfig.app.json` and `tsconfig.qa.json`.
+
+**`qa/seed-data.validate.test.ts` now imports the engine** instead of
+keeping a private copy of the conversion math (`recomputeQuantityG` is
+now a three-line wrapper around `toGrams`). Two motivations: two copies
+drift, and a validator checking the data against rules the app does not
+use passes while the app is wrong — the worst available failure mode.
+
+That refactor also closed a real blind spot. The old copy handled
+cup/tbsp/tsp only via `cupWeightG`, and **no liquid in the ontology
+carries a `cupWeightG`** — so every tablespoon of oil, soy sauce or
+stock returned null and was silently *skipped* rather than verified.
+266 of 1562 ingredient lines (17%) had never been checked. The engine
+converts those through density, and an unconvertible line is now a test
+failure rather than a silent pass. Verified the check has teeth by
+deleting a `unitWeightG` and confirming the suite goes red.
+
+**10 ontology entries backfilled** with the one conversion field each
+was missing, which is what made zero-skips achievable:
+`unitWeightG` on `shrimp-peeled-deveined` (15), `squid` (300),
+`steak-sirloin` (170), `basil` (0.5), `mint` (0.3), `cinnamon-ground`
+(3), `cardamom-ground` (0.1), `sun-dried-tomatoes` (6.75); `cupWeightG`
+on `potato-russet` (210) and `coconut-milk-canned` (225). Every value is
+the one the Phase 2 build scripts had already used implicitly — several
+recipes' `preparation` notes literally say so ("~0.5g/leaf estimated, no
+ontology unitWeightG for basil"). No recipe's stored `quantityG`
+changed; the diff is exactly 10 added lines.
+
+### Engine design notes worth knowing later
+
+**One volume path, not eleven.** `gramsPerMl()` in `units.ts` is the only
+place volume becomes mass: density when `trackBy === 'volume'`,
+otherwise `cupWeightG / CUP_ML`. Every volume unit routes through it, so
+CLAUDE.md's "never density × volume for solids" rule is enforced in one
+function instead of being repeated (and eventually mis-repeated) across
+a per-unit switch. There is a test asserting a malformed solid carrying
+a stray `densityGPerMl` still does NOT get the density path.
+
+**Two different error philosophies, deliberately.** `units.ts` never
+throws — it handles user and seed input, where an unconvertible value is
+a normal thing to report to the UI, so it returns
+`{ ok: false, reason, message }`. `inventory.ts` throws `RangeError` on a
+negative gram request or an unknown lot id, because those are values the
+app itself computed and a silent no-op would hide a real bug.
+
+**`GRAM_EPSILON` (1e-6).** Floating-point subtraction leaves crumbs like
+1e-13g behind; without a floor, a plainly-empty lot never gets marked
+depleted. A microgram is far below anything this app can represent.
+
+### Still open after Phase 3
+
+- **Expiring-soon threshold.** DECISIONS.md still lists this as unset
+  ("likely 3 and 7 day tiers"). `ownership.ts` uses a parameter with a
+  default of 7 days rather than silently inventing a value —
+  `DEFAULT_EXPIRING_SOON_DAYS`. Phase 6 should pick the real number when
+  it designs the warning tiers.
+- `interchangeableWith` (see decision 1) — deferred, with a single
+  designated place to add it.
+- The two `createdAt` / substitution-heavy-recipe items from the
+  pre-Phase-3 review are unchanged; recommendation is still to leave both.
+
+---
+
+## 2026-08-19 — Expiring-soon threshold settled at 5 days
+
+Supersedes the "expiry warning threshold in days — currently unset, likely
+3 and 7 day tiers" line in the Open Items section above.
+
+`DEFAULT_EXPIRING_SOON_DAYS` in `src/engine/ownership.ts` is now 5 (was a
+placeholder 7). Jack's call. It remains a parameter on every function that
+uses it, so a Phase 6 UI can still layer a shorter "urgent" band on top
+(the original note's two-tier idea) without touching the engine — the
+single default is what ranking's expiring-soon tie-break uses.
+
+Note that this window governs the recipe-ranking tie-break. If Phase 4's
+inventory expiry warnings want a different number, that is a separate
+decision and should be recorded as one rather than assumed to match.
+
+---
+
+## 2026-08-19 — In-app ingredient creation; schema amended (LOCKED file changed)
+
+**Resolves the open item from 2026-08-14** ("Phase 1 closed at 193 entries;
+no way to grow the ontology post-launch") and the related Phase 4 note in
+ROADMAP.md. Jack considered redeploy-only first and rejected it after
+reviewing the trade-offs.
+
+### Why redeploy-only was rejected
+
+Worth recording, because the obvious argument for it turns out to be wrong.
+Redeploy-only does NOT avoid the hard engine work: the bundled ontology is
+copied into IndexedDB on first run and never re-read, so a redeploy still
+needs merge logic to fold new entries in. What it avoids is only the form.
+Against that: a missing canonical blocks the whole chain — no canonical
+means no Product, which means no Lot — so an unknown ingredient makes it
+impossible to record that item at all until a laptop, a push, a Pages
+build and an iOS PWA cache refresh have all happened. That collides
+directly with the "entry friction is the most common cause of abandonment"
+risk recorded above.
+
+Mitigating evidence that it would rarely bite (recorded because it may
+matter again): 89 of 310 ontology entries are unused by any seed recipe,
+spice coverage is 40/41, and the last three Phase 2 batches — 37 recipes
+across six cuisines — needed zero new entries. The ontology has converged.
+The decision went the other way on the cost of the bad case, not the
+frequency of it.
+
+### Decisions
+
+1. **Add-only in v1.** The User can create a canonical ingredient but not
+   edit one, seed or their own. This is what keeps the merge simple: if a
+   seed entry can never carry User edits, a bundled update can always
+   replace it safely. Editing is a separate feature with real merge
+   complexity (a per-entry "modified" marker, or promoting an edited seed
+   entry to User-owned) and the ±15% tolerance means correcting a rough
+   `cupWeightG` rarely changes an answer. Revisit if it becomes annoying.
+2. **The form lives inline in the add-product flow**, not only on a
+   separate screen — "can't find it? add it", returning you to where you
+   were. That is the moment the wall is hit, standing in the kitchen with
+   the item in hand, and it is the only placement that meets the existing
+   sub-20-second entry-friction target.
+3. **On a merge conflict the User's entry wins** and the bundled one is
+   skipped (logged, not silent). Their device holds the only copy of their
+   data; an app update must never silently change conversion numbers that
+   existing lots and cook events depend on.
+4. **Nothing is ever deleted by a merge.** A seed entry that disappears
+   from a later bundle is retained, because `Product.canonicalId` and
+   `Lot.productId` would otherwise be orphaned for food the User still
+   physically owns. A stale row costs nothing.
+
+### Schema change — `CanonicalIngredient.isSeed`
+
+`src/types/schema.ts` is marked LOCKED, so this is a deliberate amendment
+rather than a silent edit. Added `isSeed: boolean`, the same field and
+meaning `Recipe` already carries. Backfilled `true` on all 310 ontology
+entries (diff is exactly 310 inserted lines, no values altered).
+
+Required rather than optional, and matching `Recipe` rather than inventing
+a new convention, because `undefined` quietly meaning "seed" is the kind of
+thing that trips someone up two phases later. The alternative of encoding
+it in an id prefix was rejected: a rule that lives in a string format
+cannot be enforced by the compiler.
+
+Without this field the merge has only two possible behaviours, and both are
+wrong — clobber the User's entries, or never update anything.
+
+`SCHEMA_VERSION` deliberately NOT incremented. It is still 1 because no
+build has ever been deployed and no IndexedDB database exists anywhere, so
+there is no stored data to migrate. The next change to this file after a
+real deployment must bump it.
+
+### Engine modules added (Phase 3 scope, form deferred to Phase 4)
+
+- **`src/engine/ingredients.ts`** — `slugifyIngredientId` (seed-ontology id
+  style, accent-stripping, so "Gruyère" -> "gruyere"),
+  `generateIngredientId` (numeric suffix on collision — ids are foreign
+  keys for every Product, so a silent collision would repoint real
+  inventory), `validateIngredientDraft` and `createUserIngredient`.
+
+  Validation returns errors and warnings SEPARATELY, each tagged with the
+  form field to highlight. Errors are things that make the entry unusable
+  (a counted ingredient with no `unitWeightG` can never convert to grams);
+  warnings are things that work but lose a capability (a solid with no
+  `cupWeightG` can never be measured in cups) and must not block saving.
+  Notably, the "no density for solids" rule is enforced here at the point
+  of entry, with a message explaining what to enter instead — rather than
+  being left for the conversion code to trip over later.
+
+- **`src/engine/seed-merge.ts`** — `needsSeedMerge` (guards on
+  `AppMeta.seedVersion`; undefined means fresh install, so the merge also
+  serves as first-run seeding) and `mergeSeedOntology`. Merge is pure,
+  idempotent, produces no duplicate ids, mutates neither input, and returns
+  the original objects where nothing changed. It also forces `isSeed: true`
+  on incoming bundled entries whatever the file claims, so a hand-edited
+  `ontology.json` cannot inject an entry that later merges then refuse to
+  touch. Writing the result to IndexedDB and updating `seedVersion` is the
+  caller's job in Phase 4.
+
+68 new tests. Full suite 6289 passing, lint and build clean.
+
+### Still open
+
+- Editing existing ingredients (see decision 1) — deliberately deferred.
+- Whether the standalone "manage ingredients" screen is worth building
+  alongside the inline form. It is mostly useful once editing exists, so it
+  is naturally the same decision.
