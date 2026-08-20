@@ -148,6 +148,35 @@ export async function firstConsumptionAt(db: KitchenOsDb): Promise<Timestamp | u
   return earliest?.consumedAt
 }
 
+/**
+ * Put a deleted entry back exactly as it was, and take its grams out again.
+ *
+ * This is Undo, and it restores the WHOLE record — the original id, timestamp
+ * and macro snapshot — rather than logging a fresh one. A re-log would land on
+ * today at today's figures, which is wrong twice over when what was deleted was
+ * a meal from last Tuesday.
+ *
+ * `put` rather than `add`, so a second Undo from a stale screen is harmless.
+ * The packet is re-read and the deduction re-clamped, because the world may
+ * have moved on between the delete and the change of mind.
+ */
+export async function restoreConsumption(db: KitchenOsDb, event: ConsumptionEvent): Promise<void> {
+  await db.transaction('rw', db.consumptionEvents, db.lots, async () => {
+    if (event.source.type === 'ingredient' && event.source.lotId !== undefined) {
+      const { lotId, canonicalId, grams } = event.source
+      const lot = await db.lots.get(lotId)
+      if (lot) {
+        const take = Math.min(lot.remainingG, grams)
+        if (take > 0) {
+          const [next] = applyDeductions([lot], [{ lotId, canonicalId, grams: take }], event.consumedAt)
+          await db.lots.put(next)
+        }
+      }
+    }
+    await db.consumptionEvents.put(event)
+  })
+}
+
 export interface DeletedConsumption {
   readonly event: ConsumptionEvent
   /** Grams put back into the packet. Zero when there was nothing to put back. */

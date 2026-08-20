@@ -22,6 +22,7 @@ import {
   firstConsumptionAt,
   listConsumptionBetween,
   logIngredient,
+  restoreConsumption,
 } from './consumption'
 
 beforeEach(() => {
@@ -351,6 +352,67 @@ describe('deleteConsumption', () => {
     // silent success would leave CookEvent.fractionConsumed wrong forever.
     await expect(deleteConsumption(db, fromCooking.id)).rejects.toThrow(/Phase 7/)
     expect(await db.consumptionEvents.get(fromCooking.id)).toBeDefined()
+  })
+})
+
+describe('restoreConsumption', () => {
+  it('puts the entry back as it was and takes the grams out again', async () => {
+    const db = freshDb()
+    const { lot } = await aPacketOfCheddar(db)
+    const { event } = await logIngredient(
+      db,
+      {
+        canonicalId: 'cheddar-shredded',
+        grams: 50,
+        label: 'Cheddar',
+        macros: FIFTY_GRAMS,
+        lotId: lot.id,
+      },
+      NOW,
+    )
+    await deleteConsumption(db, event.id)
+
+    await restoreConsumption(db, event)
+
+    // Same id, same timestamp, same snapshot — not a fresh entry stamped today.
+    expect(await db.consumptionEvents.get(event.id)).toEqual(event)
+    expect((await getLot(db, lot.id))?.remainingG).toBe(150)
+  })
+
+  it('restores the entry even when the packet has gone', async () => {
+    const db = freshDb()
+    const { lot } = await aPacketOfCheddar(db)
+    const { event } = await logIngredient(
+      db,
+      {
+        canonicalId: 'cheddar-shredded',
+        grams: 50,
+        label: 'Cheddar',
+        macros: FIFTY_GRAMS,
+        lotId: lot.id,
+      },
+      NOW,
+    )
+    await deleteConsumption(db, event.id)
+    await deleteLot(db, lot.id)
+
+    await restoreConsumption(db, event)
+
+    expect(await db.consumptionEvents.get(event.id)).toBeDefined()
+  })
+
+  it('is harmless if asked twice', async () => {
+    const db = freshDb()
+    const { event } = await logIngredient(
+      db,
+      { canonicalId: 'cheddar-shredded', grams: 50, label: 'Cheddar', macros: FIFTY_GRAMS },
+      NOW,
+    )
+
+    await restoreConsumption(db, event)
+    await restoreConsumption(db, event)
+
+    expect(await db.consumptionEvents.count()).toBe(1)
   })
 })
 
