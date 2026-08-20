@@ -92,3 +92,32 @@ export async function adjustLotRemaining(
 export async function saveLot(db: KitchenOsDb, lot: Lot): Promise<void> {
   await db.lots.put(lot)
 }
+
+/**
+ * Remove a lot outright. Backs "I threw it out".
+ *
+ * **This is a deliberate narrowing of "depleted lots are retained"**
+ * (DECISIONS.md), decided by Jack on 2026-08-20. That rule protects consumption
+ * HISTORY: a lot you ate your way through is the evidence for what you ate, and
+ * deleting it would destroy something unrecoverable. A packet that went in the
+ * bin past its date is the opposite case — nothing was eaten, there is no
+ * history in it, and leaving it in the emptied-packets list forever means the
+ * list stops being worth opening.
+ *
+ * Marking it empty was already possible and is NOT the same thing: empty means
+ * "I finished it", which is a claim about food that went into a person.
+ *
+ * What survives deletion: any `ConsumptionEvent` that debited this lot keeps its
+ * macro snapshot untouched, because those figures are stored on the event and
+ * never recomputed (DECISIONS.md, "history is immutable"). Past days' totals do
+ * not move. What is lost is the event's inventory link, so deleting such an
+ * event afterwards puts nothing back — `deleteConsumption` handles a missing lot
+ * silently for exactly this reason.
+ *
+ * Unknown ids are a no-op rather than an error, unlike `adjustLotRemaining`.
+ * Deleting twice is a plausible thing for a person to do with a stale screen
+ * open, and both taps mean the same thing: this packet should not exist.
+ */
+export async function deleteLot(db: KitchenOsDb, lotId: LotId): Promise<void> {
+  await db.lots.delete(lotId)
+}

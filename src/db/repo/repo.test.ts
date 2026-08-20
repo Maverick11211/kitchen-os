@@ -13,7 +13,7 @@ import { createDb, type KitchenOsDb } from '../db'
 import { defaultMeta, markExported, readMeta, writeMeta } from './meta'
 import { addUserIngredient, listIngredients } from './ingredients'
 import { addProduct, productsForCanonical } from './products'
-import { addLot, lotsForProduct } from './lots'
+import { addLot, deleteLot, lotsForProduct } from './lots'
 
 let dbCounter = 0
 function freshDb(): KitchenOsDb {
@@ -230,6 +230,36 @@ describe('addLot', () => {
     await addLot(db, { ...base, productId: 'prod_2', initialG: 300 })
 
     expect(await lotsForProduct(db, 'prod_1')).toHaveLength(2)
+    db.close()
+  })
+})
+
+/**
+ * Throwing a packet out. Jack, 2026-08-20: an expired thing goes in the bin and
+ * that is not an undo, so it leaves rather than joining the emptied list.
+ */
+describe('deleteLot', () => {
+  const base = { expiresOn: null, acquiredOn: '2026-08-19' }
+
+  it('removes the packet and leaves the others alone', async () => {
+    const db = freshDb()
+    const binned = await addLot(db, { ...base, productId: 'prod_1', initialG: 100 })
+    const kept = await addLot(db, { ...base, productId: 'prod_1', initialG: 200 })
+
+    await deleteLot(db, binned.id)
+
+    expect(await db.lots.get(binned.id)).toBeUndefined()
+    expect((await db.lots.get(kept.id))?.remainingG).toBe(200)
+    db.close()
+  })
+
+  it('is happy to be asked twice', async () => {
+    const db = freshDb()
+    const lot = await addLot(db, { ...base, productId: 'prod_1', initialG: 100 })
+
+    await deleteLot(db, lot.id)
+    // A stale screen can ask again, and it means the same thing both times.
+    await expect(deleteLot(db, lot.id)).resolves.toBeUndefined()
     db.close()
   })
 })
