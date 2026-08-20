@@ -26,6 +26,7 @@ function macros(overrides: Partial<MacroSet> = {}): MacroSet {
     sugarG: 6,
     sodiumMg: 700,
     saturatedFatG: 8,
+    cholesterolMg: 0,
     ...overrides,
   }
 }
@@ -40,6 +41,7 @@ const chickenPer100g: MacroSet = {
   sugarG: 0,
   sodiumMg: 74,
   saturatedFatG: 1,
+  cholesterolMg: 0,
 }
 
 describe('MACRO_KEYS', () => {
@@ -92,6 +94,7 @@ describe('scaleMacros', () => {
       sugarG: 3,
       sodiumMg: 350,
       saturatedFatG: 4,
+      cholesterolMg: 0,
     })
   })
 
@@ -125,7 +128,7 @@ describe('addMacros / subtractMacros / sumMacros', () => {
   it('adds field by field', () => {
     expect(addMacros(macros(), macros())).toEqual(macros({
       calories: 200, proteinG: 40, carbsG: 60, fatG: 80,
-      fiberG: 10, sugarG: 12, sodiumMg: 1400, saturatedFatG: 16,
+      fiberG: 10, sugarG: 12, sodiumMg: 1400, saturatedFatG: 16, cholesterolMg: 0,
     }))
   })
 
@@ -165,7 +168,7 @@ describe('macrosForLines — a whole cooked batch', () => {
   it('totals several ingredients', () => {
     const rice: MacroSet = {
       calories: 130, proteinG: 2.7, carbsG: 28, fatG: 0.3,
-      fiberG: 0.4, sugarG: 0.1, sodiumMg: 1, saturatedFatG: 0.1,
+      fiberG: 0.4, sugarG: 0.1, sodiumMg: 1, saturatedFatG: 0.1, cholesterolMg: 0,
     }
     const result = macrosForLines([
       { grams: 300, macrosPer100g: chickenPer100g },
@@ -218,16 +221,61 @@ describe('roundMacros', () => {
   it('rounds calories and sodium to whole numbers, grams to one decimal', () => {
     const result = roundMacros({
       calories: 330.4567, proteinG: 61.99, carbsG: 0.04, fatG: 7.25,
-      fiberG: 0.449, sugarG: 0.05, sodiumMg: 148.6, saturatedFatG: 2.04,
+      fiberG: 0.449, sugarG: 0.05, sodiumMg: 148.6, saturatedFatG: 2.04, cholesterolMg: 0,
     })
     expect(result).toEqual({
       calories: 330, proteinG: 62, carbsG: 0, fatG: 7.3,
-      fiberG: 0.4, sugarG: 0.1, sodiumMg: 149, saturatedFatG: 2,
+      fiberG: 0.4, sugarG: 0.1, sodiumMg: 149, saturatedFatG: 2, cholesterolMg: 0,
     })
   })
 
   it('leaves an already-round set alone', () => {
     const clean = macros()
     expect(roundMacros(clean)).toEqual(clean)
+  })
+})
+
+// ---------------------------------------------------------------------------
+
+describe('cholesterolMg (added in schema version 2)', () => {
+  // Its own fixtures rather than the shared ones above, so this reads as a
+  // check that the newest field is wired into the arithmetic like every other
+  // one — not as an afterthought bolted onto existing expectations.
+  const withChol = (cholesterolMg: number): MacroSet => macros({ cholesterolMg })
+
+  it('is one of the keys the engine iterates', () => {
+    expect(MACRO_KEYS).toContain('cholesterolMg')
+    expect(ZERO_MACROS.cholesterolMg).toBe(0)
+  })
+
+  it('scales with everything else', () => {
+    expect(multiplyMacros(withChol(70), 2).cholesterolMg).toBe(140)
+    expect(scaleMacros(withChol(85), 200).cholesterolMg).toBe(170)
+    expect(fractionOfMacros(withChol(80), 0.25).cholesterolMg).toBe(20)
+  })
+
+  it('adds and subtracts', () => {
+    expect(addMacros(withChol(30), withChol(45)).cholesterolMg).toBe(75)
+    expect(subtractMacros(withChol(45), withChol(30)).cholesterolMg).toBe(15)
+    expect(sumMacros([withChol(10), withChol(20), withChol(30)]).cholesterolMg).toBe(60)
+  })
+
+  it('counts towards a total across lines', () => {
+    const total = macrosForLines([
+      { grams: 200, macrosPer100g: withChol(85) },
+      { grams: 50, macrosPer100g: withChol(20) },
+    ])
+    expect(total.cholesterolMg).toBe(180)
+  })
+
+  it('rounds to whole milligrams, like sodium', () => {
+    expect(roundMacros(withChol(84.6)).cholesterolMg).toBe(85)
+    expect(roundMacros(withChol(0.4)).cholesterolMg).toBe(0)
+  })
+
+  it('does not make a zero set look non-empty', () => {
+    expect(isZeroMacros(ZERO_MACROS)).toBe(true)
+    expect(isZeroMacros(multiplyMacros(ZERO_MACROS, 5))).toBe(true)
+    expect(isZeroMacros({ ...ZERO_MACROS, cholesterolMg: 3 })).toBe(false)
   })
 })

@@ -263,3 +263,203 @@
 .splash-bad {
   color: var(--expired);
 }
+
+/* --- add button ---------------------------------------------------------- */
+
+.add-button {
+  width: 100%;
+  margin-bottom: 10px;
+  border-color: #4a443c;
+  background: #3a352f;
+  color: #fff;
+  font-weight: 600;
+}
+
+.add-button:active {
+  background: #47413a;
+}
+
+/* --- sheet --------------------------------------------------------------- */
+
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(28, 26, 23, 0.45);
+  z-index: 10;
+}
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  width: min(720px, 100%);
+  max-height: calc(100dvh - 48px);
+  border-radius: 14px;
+  background: var(--paper);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.sheet-head h2 {
+  font-size: 19px;
+}
+
+.sheet-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 18px 20px 24px;
+}
+
+.sheet-context {
+  margin-bottom: 16px;
+  color: var(--ink-soft);
+}
+
+/* --- search and pick lists ----------------------------------------------- */
+
+.search {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.list-heading {
+  padding: 18px 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.pick-list {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  overflow: hidden;
+}
+
+.pick-list li + li {
+  border-top: 1px solid var(--line);
+}
+
+.pick {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.pick-name {
+  font-weight: 500;
+}
+
+.pick-hint {
+  flex: 0 0 auto;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+/* --- form fields --------------------------------------------------------- */
+
+.field {
+  display: block;
+  margin-bottom: 14px;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.field input,
+.field select {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.field-bad input,
+.field-bad select {
+  border-color: var(--expired);
+}
+
+.field-error {
+  display: block;
+  margin-top: 5px;
+  font-size: 13px;
+  color: var(--expired);
+}
+
+.field-hint {
+  margin: -4px 0 14px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.row .field {
+  flex: 1 1 160px;
+}
+
+.macro-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--tap);
+  margin-bottom: 10px;
+}
+
+.toggle input {
+  width: 22px;
+  height: 22px;
+}
+
+.add-ingredient {
+  width: 100%;
+  margin-top: 14px;
+  border-style: dashed;
+  color: var(--ink-soft);
+}

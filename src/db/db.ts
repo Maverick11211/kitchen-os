@@ -36,6 +36,7 @@ import type {
   Product,
   Recipe,
 } from '../types/schema'
+import { SCHEMA_VERSION } from '../types/schema'
 
 /**
  * `AppMeta` is a single row, and it needs a key.
@@ -90,7 +91,58 @@ export function createDb(name: string = DB_NAME): KitchenOsDb {
     meta: '',
   })
 
+  /**
+   * Version 2 — `MacroSet.cholesterolMg` (2026-08-20).
+   *
+   * No table or index changes, so `stores({})` inherits version 1's layout
+   * untouched. What this does is backfill the new field on rows already
+   * written, because a `MacroSet` missing a field would break every sum it
+   * takes part in.
+   *
+   * All three places a MacroSet is stored are patched. Products carry
+   * `macrosPer100g`; cook and consumption events carry SNAPSHOTS, which
+   * DECISIONS.md requires never be recomputed from products — so they have to
+   * be edited in place rather than regenerated, or last month's totals would
+   * silently change.
+   *
+   * Zero is the honest backfill. The figure was never asked for when those
+   * rows were written, and any other value would be invented.
+   */
+  db.version(2)
+    .stores({})
+    .upgrade(async (tx) => {
+      await tx.table<StoredRow>('products').toCollection().modify((row) => {
+        backfillCholesterol(row, 'macrosPer100g')
+      })
+      await tx.table<StoredRow>('cookEvents').toCollection().modify((row) => {
+        backfillCholesterol(row, 'batchMacros')
+      })
+      await tx.table<StoredRow>('consumptionEvents').toCollection().modify((row) => {
+        backfillCholesterol(row, 'macros')
+      })
+      await tx.table<StoredRow>('meta').toCollection().modify((row) => {
+        row.schemaVersion = SCHEMA_VERSION
+      })
+    })
+
   return db
+}
+
+/**
+ * A stored row seen loosely, for migrations.
+ *
+ * A migration edits data written by an OLDER version of the app, so typing it
+ * as today's `Product` or `CookEvent` would be a lie — the whole reason it is
+ * being touched is that it does not match today's shape yet.
+ */
+type StoredRow = Record<string, unknown>
+
+/** Give a stored MacroSet the cholesterol field it predates. */
+function backfillCholesterol(row: StoredRow, field: string): void {
+  const macros = row[field]
+  if (macros === null || typeof macros !== 'object') return
+  const set = macros as Record<string, unknown>
+  if (typeof set.cholesterolMg !== 'number') set.cholesterolMg = 0
 }
 
 /** The application's database. Tests build their own with `createDb`. */

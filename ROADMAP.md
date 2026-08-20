@@ -2,9 +2,10 @@
 
 ## Current status
 Phase 0 complete. Phase 1 complete. Phase 2 complete. Phase 3 complete.
-Phase 4 in progress — persistence, export/import and the app shell are done;
-the add flows and the reconcile screen are not.
-Last updated: 2026-08-19
+Phase 4 in progress — persistence, export/import, the app shell and the add
+flows are done; quantity adjustment, the reconcile screen and the backup
+reminder banner are not.
+Last updated: 2026-08-20
 
 ## Environment (done)
 - Repo: github.com/Maverick11211/kitchen-os
@@ -91,24 +92,28 @@ Being built in six chunks, each ending with `npm test`, `npm run lint` and
    silent permanent data loss.
 2. **Export / import.** `src/engine/backup.ts` builds and checks a
    `BackupFile` (pure); `src/db/repo/backup.ts` moves the rows. A restore
-   replaces everything in one transaction and refuses a file from a different
-   schema version outright.
+   replaces everything in one transaction; an older file is upgraded with a
+   warning, and one from a newer app is refused outright.
 3. **App shell.** Hash routing, two-pane landscape layout, category list with
    live counts, inventory list with the two expiry bands, and a working backup
    screen. iPad baseline in the CSS: `dvh`, 16px inputs, 44pt targets, no
    hover.
 
+4. **Add flows.** Find it, describe it, say how much. The label can be read
+   per package, per serving or per 100g. The inline "can't find it? add it"
+   ingredient form is in and returns you to the product form for what you just
+   created.
+
 **Left:**
-4. Add product, inline add-ingredient, add lot. (Engine side already exists —
-   see the add-ingredient notes below.)
 5. Quantity adjustment, the Reconcile screen, and the backup reminder banner
    after 7 days without an export.
 6. Final documentation pass.
 
-Schema note: `Lot.frozen` was added in chunk 1 so frozen food does not trip
-the expiry warnings. `SCHEMA_VERSION` is still 1, but the reasoning that made
-that free has now expired — the first real database exists. Any further change
-to `schema.ts` needs a version bump and a Dexie migration.
+Schema note: `SCHEMA_VERSION` is now **2**. `Lot.frozen` went in under
+version 1 while no database existed; `MacroSet.cholesterolMg` forced the first
+real bump on 2026-08-20 and ships with both conversions — a Dexie `version(2)`
+upgrade for stored rows and an upgrade path in `validateBackupFile` for backup
+files. Any further change to `schema.ts` needs both of those again.
 
 **Add-ingredient is scoped in** (decided 2026-08-19, see DECISIONS.md).
 The engine side is already built and tested in Phase 3, so what is left

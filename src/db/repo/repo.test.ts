@@ -31,6 +31,7 @@ const MACROS: MacroSet = {
   sugarG: 0.5,
   sodiumMg: 621,
   saturatedFatG: 19,
+  cholesterolMg: 0,
 }
 
 // A draft with no cup weight, which the engine accepts with a warning.

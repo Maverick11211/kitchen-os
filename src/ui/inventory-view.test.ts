@@ -22,6 +22,7 @@ const MACROS: MacroSet = {
   sugarG: 0,
   sodiumMg: 0,
   saturatedFatG: 0,
+  cholesterolMg: 0,
 }
 
 function ingredient(
@@ -187,6 +188,28 @@ describe('filtering', () => {
   it('lists what needs using up, already-gone first', () => {
     const urgent = itemsNeedingUse(items())
     expect(urgent.map((item) => item.ingredient.name)).toEqual(['butter', 'milk'])
+  })
+
+  it('includes the softer "use soon" band, not just the urgent ones', () => {
+    // Three days out: tagged "Use soon" in the list, so it must be in the list
+    // that collects tagged items. The two bands set the tone, not the membership.
+    const soon = view(
+      [ingredient('beef', { category: 'protein' })],
+      [product('p1', 'beef')],
+      [lot('l1', 'p1', { expiresOn: '2026-08-22' })],
+    )
+
+    expect(soon[0]?.band).toBe('soon')
+    expect(itemsNeedingUse(soon).map((item) => item.ingredient.name)).toEqual(['beef'])
+  })
+
+  it('still leaves alone anything that does not expire at all', () => {
+    const never = view(
+      [ingredient('rice')],
+      [product('p1', 'rice')],
+      [lot('l1', 'p1', { expiresOn: null })],
+    )
+    expect(itemsNeedingUse(never)).toEqual([])
   })
 })
 

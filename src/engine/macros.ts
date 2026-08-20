@@ -26,6 +26,7 @@ export const MACRO_KEYS = [
   'sugarG',
   'sodiumMg',
   'saturatedFatG',
+  'cholesterolMg',
 ] as const satisfies readonly (keyof MacroSet)[]
 
 /** An empty macro set. Frozen — treat it as a value, never mutate it. */
@@ -38,6 +39,7 @@ export const ZERO_MACROS: Readonly<MacroSet> = Object.freeze({
   sugarG: 0,
   sodiumMg: 0,
   saturatedFatG: 0,
+  cholesterolMg: 0,
 })
 
 /**
@@ -55,6 +57,7 @@ function buildMacros(valueFor: (key: keyof MacroSet) => number): MacroSet {
     sugarG: valueFor('sugarG'),
     sodiumMg: valueFor('sodiumMg'),
     saturatedFatG: valueFor('saturatedFatG'),
+    cholesterolMg: valueFor('cholesterolMg'),
   }
 }
 
@@ -130,6 +133,8 @@ export function roundMacros(macros: MacroSet): MacroSet {
     sugarG: Math.round(macros.sugarG * 10) / 10,
     sodiumMg: Math.round(macros.sodiumMg),
     saturatedFatG: Math.round(macros.saturatedFatG * 10) / 10,
+    // Whole milligrams, same as sodium — a tenth of a milligram is noise.
+    cholesterolMg: Math.round(macros.cholesterolMg),
   }
 }
 

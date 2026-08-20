@@ -20,6 +20,7 @@ const MACROS: MacroSet = {
   sugarG: 0.5,
   sodiumMg: 621,
   saturatedFatG: 19,
+  cholesterolMg: 0,
 }
 
 function emptyContents(): BackupContents {
@@ -133,10 +134,10 @@ describe('validateBackupFile — files it must refuse', () => {
     expect(message).toContain('Update the app first')
   })
 
-  it('refuses a backup from an older app rather than guessing at conversion', () => {
+  it('refuses a version number that is not a real version', () => {
     const backup = asParsed(goodBackup()) as Record<string, unknown>
-    backup.schemaVersion = SCHEMA_VERSION - 1
-    expect(errorsFor(backup)[0]).toContain('older version of the app')
+    backup.schemaVersion = 0
+    expect(errorsFor(backup)[0]).toContain('not a real version')
   })
 
   it('refuses a file missing a whole collection', () => {
@@ -222,6 +223,47 @@ describe('validateBackupFile — warnings never block', () => {
 
     expect(result.ok).toBe(true)
     expect(result.warnings.join(' ')).toContain('1 product points at a missing ingredient')
+  })
+})
+
+describe('validateBackupFile — upgrading an older file', () => {
+  /** A backup as version 1 wrote it: no cholesterol anywhere. */
+  function version1Backup(): Record<string, unknown> {
+    const backup = asParsed(goodBackup()) as Record<string, unknown>
+    backup.schemaVersion = 1
+    const products = backup.products as Record<string, Record<string, number>>[]
+    delete products[0]!.macrosPer100g!.cholesterolMg
+    ;(backup.meta as Record<string, unknown>).schemaVersion = 1
+    return backup
+  }
+
+  it('accepts it and fills the missing field with zero', () => {
+    const result = validateBackupFile(version1Backup())
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.backup.products[0]?.macrosPer100g.cholesterolMg).toBe(0)
+    expect(result.backup.schemaVersion).toBe(SCHEMA_VERSION)
+    expect(result.backup.meta.schemaVersion).toBe(SCHEMA_VERSION)
+  })
+
+  it('says out loud that it converted something', () => {
+    const result = validateBackupFile(version1Backup())
+    expect(result.warnings.join(' ')).toContain('brought up to date')
+  })
+
+  it('leaves the figures that were there alone', () => {
+    const result = validateBackupFile(version1Backup())
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.backup.products[0]?.macrosPer100g.calories).toBe(402)
+    expect(result.backup.lots[0]?.remainingG).toBe(226)
+  })
+
+  it('does not touch a file that is already current', () => {
+    const result = validateBackupFile(asParsed(goodBackup()))
+    expect(result.warnings).toEqual([])
   })
 })
 

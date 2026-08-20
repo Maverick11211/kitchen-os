@@ -41,7 +41,7 @@ const NOW = '2026-08-19T12:00:00.000Z'
 /** Placeholder nutrition: exactly 200 kcal/100g, so totals are checkable by hand. */
 const FLAT_MACROS: MacroSet = {
   calories: 200, proteinG: 10, carbsG: 20, fatG: 5,
-  fiberG: 1, sugarG: 2, sodiumMg: 100, saturatedFatG: 1,
+  fiberG: 1, sugarG: 2, sodiumMg: 100, saturatedFatG: 1, cholesterolMg: 0,
 }
 
 /** A pantry holding `gramsEach` of every ontology entry. Half expire soon. */

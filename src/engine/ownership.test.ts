@@ -23,7 +23,7 @@ const NOW = '2026-08-19T12:00:00.000Z'
 
 const NO_MACROS: MacroSet = {
   calories: 0, proteinG: 0, carbsG: 0, fatG: 0,
-  fiberG: 0, sugarG: 0, sodiumMg: 0, saturatedFatG: 0,
+  fiberG: 0, sugarG: 0, sodiumMg: 0, saturatedFatG: 0, cholesterolMg: 0,
 }
 
 function ingredient(overrides: Partial<CanonicalIngredient> & { id: string }): CanonicalIngredient {

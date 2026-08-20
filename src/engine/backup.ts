@@ -131,15 +131,64 @@ function referenceWarning(
   return `${count(orphaned, singular, plural)} ${verb} at a ${target} that is not in this file. They will be restored but will not show up properly.`
 }
 
+// ---------------------------------------------------------------------------
+// Upgrading older files
+// ---------------------------------------------------------------------------
+
+/** Add the cholesterol field to one stored MacroSet. Version 1 -> 2. */
+function withCholesterol(macros: unknown): unknown {
+  if (!isRecord(macros)) return macros
+  if (typeof macros.cholesterolMg === 'number') return macros
+  return { ...macros, cholesterolMg: 0 }
+}
+
+function mapMacrosOn(rows: unknown, field: string): unknown {
+  if (!Array.isArray(rows)) return rows
+  return rows.map((row) => (isRecord(row) ? { ...row, [field]: withCholesterol(row[field]) } : row))
+}
+
+/**
+ * Convert a backup written by an older version of the app into today's shape.
+ *
+ * Works on the raw parsed JSON rather than on a typed `BackupFile`, because the
+ * whole point is that it does NOT match today's types yet — claiming otherwise
+ * to the compiler would defeat the check that matters.
+ *
+ * Steps are cumulative and run in order, so a version 1 file passing through a
+ * future version 4 app goes 1 -> 2 -> 3 -> 4. Add the next step here when
+ * `SCHEMA_VERSION` next moves.
+ */
+function upgradeBackup(value: Record<string, unknown>, from: number): Record<string, unknown> {
+  let current = value
+
+  if (from < 2) {
+    // Version 2 added MacroSet.cholesterolMg. Same backfill as the database
+    // migration in src/db/db.ts, and for the same reason: a MacroSet missing a
+    // field breaks every sum it takes part in.
+    current = {
+      ...current,
+      products: mapMacrosOn(current.products, 'macrosPer100g'),
+      cookEvents: mapMacrosOn(current.cookEvents, 'batchMacros'),
+      consumptionEvents: mapMacrosOn(current.consumptionEvents, 'macros'),
+    }
+  }
+
+  const meta = isRecord(current.meta)
+    ? { ...current.meta, schemaVersion: SCHEMA_VERSION }
+    : current.meta
+
+  return { ...current, schemaVersion: SCHEMA_VERSION, meta }
+}
+
 /**
  * Decide whether an arbitrary parsed JSON value is a backup this app can
- * restore from.
+ * restore from, upgrading it if it is older.
  *
- * Deliberately strict about the schema version. Only an exact match is
- * accepted, because there is no migration machinery yet — silently restoring a
- * file written under different rules is exactly the kind of failure that
- * destroys data without throwing. When `SCHEMA_VERSION` is first bumped, the
- * conversion belongs here, in place of the mismatch error.
+ * A file from a NEWER app is refused outright rather than restored partially —
+ * this app cannot know what that version added, so anything it wrote through
+ * would be guesswork, and guessing is how a restore destroys data without ever
+ * throwing. Older files are converted explicitly, step by step, and the
+ * conversion is reported as a warning so it is never silent.
  */
 export function validateBackupFile(value: unknown): BackupValidation {
   const errors: string[] = []
@@ -150,17 +199,20 @@ export function validateBackupFile(value: unknown): BackupValidation {
   }
 
   // --- version --------------------------------------------------------------
-  const version = value.schemaVersion
-  if (typeof version !== 'number' || !Number.isInteger(version)) {
+  const rawVersion = value.schemaVersion
+  const version =
+    typeof rawVersion === 'number' && Number.isInteger(rawVersion) ? rawVersion : null
+
+  if (version === null) {
     errors.push('That file is missing its version number, so it may not be a Kitchen OS backup.')
   } else if (version > SCHEMA_VERSION) {
+    // Forward conversion is impossible: this app does not know what a newer
+    // version added, so anything it wrote through would be guesswork.
     errors.push(
       `That backup was made by a newer version of the app (data version ${version}, this app reads ${SCHEMA_VERSION}). Update the app first.`,
     )
-  } else if (version < SCHEMA_VERSION) {
-    errors.push(
-      `That backup was made by an older version of the app (data version ${version}, this app reads ${SCHEMA_VERSION}) and cannot be converted yet.`,
-    )
+  } else if (version < 1) {
+    errors.push(`That backup claims data version ${version}, which is not a real version.`)
   }
 
   if (typeof value.exportedAt !== 'string' || value.exportedAt === '') {
@@ -200,10 +252,19 @@ export function validateBackupFile(value: unknown): BackupValidation {
     errors.push('That backup is missing its app settings.')
   }
 
-  if (errors.length > 0) return { ok: false, errors, warnings }
+  if (errors.length > 0 || version === null) return { ok: false, errors, warnings }
+
+  // --- bring an older file up to date ---------------------------------------
+  let upgraded = value
+  if (version < SCHEMA_VERSION) {
+    upgraded = upgradeBackup(value, version)
+    warnings.push(
+      `That backup was made by an older version of the app (data version ${version}). It has been brought up to date — cholesterol reads as 0 on anything saved before the app started asking for it.`,
+    )
+  }
 
   // --- cross-references (never blocking) ------------------------------------
-  const backup = value as unknown as BackupFile
+  const backup = upgraded as unknown as BackupFile
   const ingredientIds = new Set(backup.canonicalIngredients.map((item) => item.id))
   const productIds = new Set(backup.products.map((item) => item.id))
 

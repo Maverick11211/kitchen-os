@@ -1516,3 +1516,105 @@ and forces the bump.
   it still hurts, real conflict tracking. Nothing is lost by waiting, because
   the tracking field would be optional — unlike `Lot.frozen`, this was never
   a now-or-never decision.
+
+---
+
+## 2026-08-20 — Schema version 2 (cholesterol); add flows finished
+
+### `MacroSet.cholesterolMg` — and the first real migration
+
+Jack asked for cholesterol in the nutrition form, in US label position between
+saturated fat and sodium. `MacroSet` had no field for it. This was flagged
+rather than quietly worked around, because the entry above had just recorded
+that a change to `schema.ts` now costs a version bump and a migration — the
+database exists and has real data in it.
+
+Added `cholesterolMg: number`, **required, not optional**. An optional macro
+would have to be defended against in every sum, and the point of `MacroSet` is
+that its fields all behave the same way.
+
+**`SCHEMA_VERSION` is now 2.** Two conversions ship with it, and any future
+change to `schema.ts` needs both:
+
+1. **Stored rows** — `db.version(2).upgrade()` in `src/db/db.ts` backfills zero
+   on every stored `MacroSet`. All three places one is kept are patched:
+   `Product.macrosPer100g`, `CookEvent.batchMacros` and
+   `ConsumptionEvent.macros`. The last two matter most. They are SNAPSHOTS that
+   DECISIONS.md forbids recomputing from products, so a migration that skipped
+   them would leave them broken permanently with nothing able to repair them.
+2. **Backup files** — `validateBackupFile` no longer demands an exact version
+   match. A version 1 file is upgraded through the same backfill and the
+   conversion is reported as a warning, so it is never silent. A file from a
+   NEWER app is still refused outright: this app cannot know what that version
+   added, and guessing is how a restore destroys data without ever throwing.
+   The upgrade steps are cumulative, so a version 1 file will pass 1 -> 2 -> 3
+   when there is a 3.
+
+Zero is the honest backfill. The figure was never asked for when those rows
+were written; anything else would be invented data.
+
+`src/db/migration.test.ts` builds a real version 1 database with Dexie — using
+a copy of the version 1 store layout that is deliberately frozen and must not
+be updated when `db.ts` changes — then opens it with current code and checks
+what came out. Also covers opening twice, which must be a no-op.
+
+### The inventory "Use up" list was wrong
+
+`needsUsingUp` counted only `expired` and `urgent`, so an item three days from
+its date was tagged "Use soon" in the list while the filter built to collect
+exactly those items reported nothing. Found by Jack using it, on his own data.
+
+Fixed: all three warning bands count. The bands say how loudly to warn, not
+whether something is worth warning about. A count that disagrees with the
+badges next to it teaches you to stop trusting the count.
+
+### Add-product form, reshaped
+
+- **Three bases: the package, a serving, or 100g.** All three appear on real
+  packaging, and each now asks for exactly the one measurement it cannot work
+  out. Per serving asks for **servings per package** rather than a package
+  weight, because "about 4 servings" is what the label says and multiplying is
+  the app's job.
+- Number fields are text with a numeric keypad rather than `type="number"`.
+  The stepper arrows are useless on a tablet and easy to nudge while scrolling.
+- **Enter moves to the next field**, ending on the save button. It skips
+  dropdowns on purpose: landing on one stops the typing dead, because the next
+  keystroke goes nowhere.
+- Heading is "Nutrition".
+
+### Add-ingredient, inline (completes the 2026-08-19 decision)
+
+`src/ui/AddFlow.tsx` gains a step between finding and describing. The button is
+shown **always**, not only when a search finds nothing — something can exist
+under a name you would not have guessed, and being told "no matches" and then
+having to search again to be sure is worse than a button that is simply there.
+It carries the search text across, and saving lands you on the product form for
+what you just created, which is the "returns you to where you were" half of the
+decision: creating the ingredient was never the goal.
+
+Warnings are computed live while typing; errors appear only after a save is
+attempted. They are different kinds of thing — a warning says what the entry
+will not be able to do and must never block, while shouting an error at a
+half-typed form is noise. Warnings raised at creation are carried forward and
+shown on the product step rather than interrupting.
+
+Every rule is the engine's. `src/ui/entry-forms.ts` only turns text into a
+`CanonicalIngredientDraft`; the messages shown are `validateIngredientDraft`'s,
+as written. One subtlety worth keeping: a measurement field that is blank
+becomes `undefined`, but one holding text that is not a number becomes `NaN`,
+because those are different answers. Treating a typo as "not provided" would
+let a mistyped weight vanish instead of being pointed at.
+
+Verified in a browser against the real ontology, where it immediately proved
+the alias rule has teeth: "red pepper paste" was refused as an alias for a new
+Gochujang entry because it already belongs to *Red pepper paste (biber
+salcasi)*.
+
+### Still open
+
+- Chunk 5: quantity adjustment, the Reconcile screen, and the backup reminder
+  banner after 7 days without an export.
+- Reconcile interaction detail is still unspecified (Open Items). Proposed but
+  NOT agreed: one-tap Full / three-quarters / half / quarter / Empty against
+  `initialG`, plus a typed amount, applied immediately with an undo.
+- Ingredient editing remains out of v1. See the 2026-08-19 entry.

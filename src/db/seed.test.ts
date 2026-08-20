@@ -9,6 +9,7 @@
 import 'fake-indexeddb/auto'
 import { describe, it, expect, vi } from 'vitest'
 import type { CanonicalIngredient } from '../types/schema'
+import { SCHEMA_VERSION } from '../types/schema'
 import { BUNDLED_ONTOLOGY, BUNDLED_SEED_VERSION } from '../data/bundled'
 import { createDb, type KitchenOsDb } from './db'
 import { readMeta } from './repo/meta'
@@ -74,7 +75,7 @@ describe('runStartupSeedMerge — first run', () => {
   it('leaves schemaVersion at the default rather than inventing one', async () => {
     const db = freshDb()
     await runStartupSeedMerge(db, [entry('salt')], V1)
-    expect((await readMeta(db)).schemaVersion).toBe(1)
+    expect((await readMeta(db)).schemaVersion).toBe(SCHEMA_VERSION)
     db.close()
   })
 })

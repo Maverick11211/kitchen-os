@@ -34,6 +34,7 @@ const MACROS: MacroSet = {
   sugarG: 0.5,
   sodiumMg: 621,
   saturatedFatG: 19,
+  cholesterolMg: 0,
 }
 
 /** A database with a bit of everything in it. */

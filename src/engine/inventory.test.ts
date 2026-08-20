@@ -32,7 +32,7 @@ const NOW = '2026-08-19T12:00:00.000Z'
 
 const NO_MACROS: MacroSet = {
   calories: 0, proteinG: 0, carbsG: 0, fatG: 0,
-  fiberG: 0, sugarG: 0, sodiumMg: 0, saturatedFatG: 0,
+  fiberG: 0, sugarG: 0, sodiumMg: 0, saturatedFatG: 0, cholesterolMg: 0,
 }
 
 function ingredient(overrides: Partial<CanonicalIngredient> & { id: string }): CanonicalIngredient {
@@ -505,11 +505,11 @@ describe('planRecipeDeduction', () => {
 describe('macros for deductions', () => {
   const chicken: MacroSet = {
     calories: 165, proteinG: 31, carbsG: 0, fatG: 3.6,
-    fiberG: 0, sugarG: 0, sodiumMg: 74, saturatedFatG: 1,
+    fiberG: 0, sugarG: 0, sodiumMg: 74, saturatedFatG: 1, cholesterolMg: 0,
   }
   const rice: MacroSet = {
     calories: 130, proteinG: 2.7, carbsG: 28, fatG: 0.3,
-    fiberG: 0.4, sugarG: 0.1, sodiumMg: 1, saturatedFatG: 0.1,
+    fiberG: 0.4, sugarG: 0.1, sodiumMg: 1, saturatedFatG: 0.1, cholesterolMg: 0,
   }
   const index = buildInventoryIndex(
     [

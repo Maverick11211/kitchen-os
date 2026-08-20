@@ -9,7 +9,7 @@
  * Nothing here computes anything. The shell reads the kitchen once, hands it to
  * `inventory-view.ts` to be shaped, and passes the result down.
  */
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { HashRouter, NavLink, Navigate, Route, Routes } from 'react-router'
 import { INGREDIENT_CATEGORIES, buildInventoryIndex, buildOntologyIndex } from './engine'
 import { todayIso } from './lib/clock'
@@ -20,6 +20,7 @@ import {
   itemsNeedingUse,
   type InventoryItem,
 } from './ui/inventory-view'
+import { AddFlow } from './ui/AddFlow'
 import { CategoryScreen, InventoryScreen } from './ui/InventoryScreen'
 import { SettingsScreen } from './ui/SettingsScreen'
 import { useKitchen, useMeta, useStartup } from './ui/useKitchenData'
@@ -37,13 +38,23 @@ function Splash({ message, bad = false }: { message: string; bad?: boolean }) {
   )
 }
 
-function Sidebar({ items }: { items: readonly InventoryItem[] }) {
+function Sidebar({
+  items,
+  onAdd,
+}: {
+  items: readonly InventoryItem[]
+  onAdd: () => void
+}) {
   const counts = countByCategory(items)
   const useUpCount = itemsNeedingUse(items).length
 
   return (
     <nav className="pane-left">
       <div className="brand">Kitchen OS</div>
+
+      <button type="button" className="add-button" onClick={onAdd}>
+        + Add to the kitchen
+      </button>
 
       <ul className="nav">
         <li>
@@ -87,6 +98,7 @@ function Shell() {
   const data = useKitchen()
   const meta = useMeta()
   const today = todayIso()
+  const [adding, setAdding] = useState(false)
 
   const items = useMemo(() => {
     if (!data) return []
@@ -101,7 +113,7 @@ function Shell() {
 
   return (
     <div className="app">
-      <Sidebar items={items} />
+      <Sidebar items={items} onAdd={() => setAdding(true)} />
       <main className="pane-right">
         <Routes>
           <Route path="/" element={<Navigate to="/inventory" replace />} />
@@ -130,6 +142,15 @@ function Shell() {
           <Route path="*" element={<Navigate to="/inventory" replace />} />
         </Routes>
       </main>
+
+      {adding && (
+        <AddFlow
+          ingredients={data.ingredients}
+          products={data.products}
+          today={today}
+          onClose={() => setAdding(false)}
+        />
+      )}
     </div>
   )
 }

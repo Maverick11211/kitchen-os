@@ -88,6 +88,18 @@ export interface MacroSet {
   sugarG: number;
   sodiumMg: number;
   saturatedFatG: number;
+
+  /**
+   * Added 2026-08-20 (see DECISIONS.md). It appears on every US nutrition
+   * label, between saturated fat and sodium, and leaving it out meant typing a
+   * label involved skipping a line.
+   *
+   * Required, not optional, so it behaves like every other macro in the
+   * arithmetic — an optional field would have to be defended against in every
+   * sum. Existing rows are backfilled with 0 by the version 2 migration in
+   * `src/db/db.ts`, and older backup files are upgraded on import.
+   */
+  cholesterolMg: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -464,4 +476,16 @@ export interface BackupFile {
   meta: AppMeta;
 }
 
-export const SCHEMA_VERSION = 1;
+/**
+ * Version of the stored data shape.
+ *
+ * 1 — Phases 0-4a. Never deployed; `Lot.frozen` was added under this number
+ *     while no database existed anywhere, so nothing needed converting.
+ * 2 — 2026-08-20. `MacroSet.cholesterolMg` added. The first version bump with
+ *     real data behind it: see the `version(2)` upgrade in `src/db/db.ts` for
+ *     stored rows, and `validateBackupFile` for files.
+ *
+ * Any future change to this file needs the same two things — a migration for
+ * the database and a step in the backup upgrade path.
+ */
+export const SCHEMA_VERSION = 2;

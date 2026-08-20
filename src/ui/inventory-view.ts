@@ -57,9 +57,18 @@ export function expiryBand(lot: Lot, today: DateOnly): ExpiryBand {
   return 'fine'
 }
 
-/** True for the two bands that mean "use this up". Drives the Expiring filter. */
+/**
+ * True for every band that carries a warning. Drives the "Use up" list.
+ *
+ * All three warning bands count, not just the urgent ones. The bands exist to
+ * say how loudly to warn — colour and wording — not to decide what is worth
+ * warning about at all. Including only the urgent ones meant an item could be
+ * tagged "Use soon" in the list while the filter built to collect exactly those
+ * items reported nothing, which is the kind of disagreement that teaches you to
+ * stop trusting the count.
+ */
 export function needsUsingUp(band: ExpiryBand): boolean {
-  return band === 'expired' || band === 'urgent'
+  return band === 'expired' || band === 'urgent' || band === 'soon'
 }
 
 export interface InventoryItem {
