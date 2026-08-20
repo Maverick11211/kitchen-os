@@ -2,7 +2,8 @@
 
 ## Current status
 Phase 0 complete. Phase 1 complete. Phase 2 complete. Phase 3 complete.
-Phase 4 not started.
+Phase 4 in progress — persistence, export/import and the app shell are done;
+the add flows and the reconcile screen are not.
 Last updated: 2026-08-19
 
 ## Environment (done)
@@ -74,10 +75,40 @@ The expiring-soon threshold is settled at 5 days
 (`DEFAULT_EXPIRING_SOON_DAYS`), decided 2026-08-19 — see DECISIONS.md. It
 stays a parameter, so Phase 6 can add a shorter "urgent" band on top.
 
-## Phase 4 — Inventory UI
+## Phase 4 — Inventory UI — IN PROGRESS
 Two-pane landscape layout. Add product, add lot, category view,
 expiry warnings, quantity adjustment, reconcile screen.
 Export/import ships here — not later.
+
+Being built in six chunks, each ending with `npm test`, `npm run lint` and
+`npm run build` green. Decisions are recorded in DECISIONS.md
+(2026-08-19 "Phase 4: persistence, export/import, app shell").
+
+**Done:**
+1. **Persistence.** `src/db/` — Dexie tables plus a repository layer that is
+   the only thing allowed to write. Startup seed merge wired up: the merge and
+   the `seedVersion` stamp are one transaction, because either half alone is
+   silent permanent data loss.
+2. **Export / import.** `src/engine/backup.ts` builds and checks a
+   `BackupFile` (pure); `src/db/repo/backup.ts` moves the rows. A restore
+   replaces everything in one transaction and refuses a file from a different
+   schema version outright.
+3. **App shell.** Hash routing, two-pane landscape layout, category list with
+   live counts, inventory list with the two expiry bands, and a working backup
+   screen. iPad baseline in the CSS: `dvh`, 16px inputs, 44pt targets, no
+   hover.
+
+**Left:**
+4. Add product, inline add-ingredient, add lot. (Engine side already exists —
+   see the add-ingredient notes below.)
+5. Quantity adjustment, the Reconcile screen, and the backup reminder banner
+   after 7 days without an export.
+6. Final documentation pass.
+
+Schema note: `Lot.frozen` was added in chunk 1 so frozen food does not trip
+the expiry warnings. `SCHEMA_VERSION` is still 1, but the reasoning that made
+that free has now expired — the first real database exists. Any further change
+to `schema.ts` needs a version bump and a Dexie migration.
 
 **Add-ingredient is scoped in** (decided 2026-08-19, see DECISIONS.md).
 The engine side is already built and tested in Phase 3, so what is left

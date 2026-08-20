@@ -1,0 +1,84 @@
+/**
+ * Kitchen OS — Getting data into the screens
+ *
+ * Two hooks. `useStartup` runs the seed merge once when the app opens;
+ * `useKitchen` keeps the current inventory in sync with the database.
+ *
+ * Screens use these rather than touching Dexie themselves — the repository layer
+ * stays the only thing that reads and writes.
+ */
+import { useEffect, useState } from 'react'
+import { useLiveQuery } from 'dexie-react-hooks'
+import type { AppMeta, CanonicalIngredient, Lot, Product } from '../types/schema'
+import { db } from '../db/db'
+import { readMeta } from '../db/repo/meta'
+import { runStartupSeedMerge } from '../db/seed'
+
+export type StartupState =
+  | { readonly status: 'loading' }
+  | { readonly status: 'ready'; readonly summary: string }
+  | { readonly status: 'failed'; readonly message: string }
+
+/**
+ * Prepare the database, once, before anything else renders.
+ *
+ * Safe to run twice — React's development mode deliberately double-invokes
+ * effects, and the merge is idempotent and transactional, so the second run is a
+ * no-op rather than a duplicate.
+ */
+export function useStartup(): StartupState {
+  const [state, setState] = useState<StartupState>({ status: 'loading' })
+
+  useEffect(() => {
+    let abandoned = false
+
+    runStartupSeedMerge(db)
+      .then((outcome) => {
+        if (!abandoned) setState({ status: 'ready', summary: outcome.summary })
+      })
+      .catch((error: unknown) => {
+        if (abandoned) return
+        // Shown to the User. If this fails the app has no ingredient list at
+        // all, so it must say so loudly rather than render an empty kitchen.
+        const message = error instanceof Error ? error.message : 'Unknown problem.'
+        setState({ status: 'failed', message })
+      })
+
+    return () => {
+      abandoned = true
+    }
+  }, [])
+
+  return state
+}
+
+export interface KitchenData {
+  readonly ingredients: CanonicalIngredient[]
+  readonly products: Product[]
+  readonly lots: Lot[]
+}
+
+/**
+ * The whole kitchen, re-read whenever any of it changes.
+ *
+ * Reading everything at once is fine at this size — a few hundred ingredients
+ * and however many packets one person owns — and it means a screen never has to
+ * think about which query to invalidate after a save.
+ *
+ * Returns undefined on the very first render, before the read finishes.
+ */
+export function useKitchen(): KitchenData | undefined {
+  return useLiveQuery(async () => {
+    const [ingredients, products, lots] = await Promise.all([
+      db.canonicalIngredients.toArray(),
+      db.products.toArray(),
+      db.lots.toArray(),
+    ])
+    return { ingredients, products, lots }
+  }, [])
+}
+
+/** App metadata, kept live so the backup screen updates the moment you export. */
+export function useMeta(): AppMeta | undefined {
+  return useLiveQuery(() => readMeta(db), [])
+}

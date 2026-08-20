@@ -6,6 +6,9 @@
     "module": "esnext",
     "types": ["vite/client"],
     "allowArbitraryExtensions": true,
+    /* The bundled ontology is imported as a module and compiled into the build,
+       never fetched at runtime (CLAUDE.md: no backend, no runtime fetch). */
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
 

@@ -16,6 +16,7 @@
  *   ownership   — "what can I cook right now?" and recipe ranking
  *   ingredients — validating and creating a User-added canonical ingredient
  *   seed-merge  — folding a redeployed ontology.json into existing data
+ *   backup      — assembling and checking an export/import file
  */
 
 export {
@@ -122,3 +123,12 @@ export type {
 
 export { describeSeedMerge, mergeSeedOntology, needsSeedMerge } from './seed-merge'
 export type { SeedMergeResult } from './seed-merge'
+
+export {
+  BACKUP_COLLECTIONS,
+  buildBackupFile,
+  describeBackupContents,
+  parseBackupFile,
+  validateBackupFile,
+} from './backup'
+export type { BackupCollection, BackupContents, BackupValidation } from './backup'

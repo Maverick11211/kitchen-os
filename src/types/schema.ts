@@ -226,6 +226,21 @@ export interface Lot {
   acquiredOn: DateOnly;
 
   /**
+   * True for a lot kept in the freezer.
+   *
+   * Added 2026-08-19 (see DECISIONS.md). `defaultShelfLifeDays` on the
+   * canonical is a fridge/fresh figure — raw chicken breast is 2 days — so
+   * without this flag every frozen lot trips the expiry warning the moment it
+   * is added. When set, the add-lot form skips the shelf-life prefill and the
+   * lot is left out of expiry warnings unless an explicit `expiresOn` was
+   * entered.
+   *
+   * Optional rather than required: absent means "not frozen", which is the
+   * right reading for every lot written before this field existed.
+   */
+  frozen?: boolean;
+
+  /**
    * True once remainingG reaches zero. Depleted lots are RETAINED, not
    * deleted, so consumption history stays intact and usage rates are
    * derivable later.

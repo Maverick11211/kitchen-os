@@ -1368,3 +1368,151 @@ real deployment must bump it.
 - Whether the standalone "manage ingredients" screen is worth building
   alongside the inline form. It is mostly useful once editing exists, so it
   is naturally the same decision.
+
+---
+
+## 2026-08-19 — Phase 4: persistence, export/import, app shell
+
+The first three chunks of Phase 4. This is the phase where the app stops being
+a library and starts holding data, so most of what follows is about failure
+modes rather than features.
+
+### Decisions confirmed with Jack before writing code
+
+**1. Inventory expiry warnings use TWO bands: 2 days urgent, 5 days soon.**
+This is the separate decision the 2026-08-19 expiring-soon entry above said
+would be needed. `DEFAULT_EXPIRING_SOON_DAYS` (5) still governs the
+recipe-ranking tie-break and is untouched; the inventory screen has its own
+pair of numbers in `src/ui/inventory-view.ts` (`EXPIRY_URGENT_DAYS`,
+`EXPIRY_SOON_DAYS`). "Soon" landing on the same 5 is a coincidence, not a
+link — they are free to move apart. Rationale: the inventory list is where
+you decide what to cook tonight, and one band cannot distinguish "eat this
+today" from "plan around this".
+
+Bands are `expired` / `urgent` / `soon` / `fine` / `none`. `none` (nothing to
+expire) is deliberately distinct from `fine` (a real date, comfortably far
+off), because a frozen chicken and a chicken with three weeks left are not
+the same thing on screen.
+
+**2. Dexie lives in `src/db/`, behind a repository layer.**
+`src/db/db.ts` declares tables; `src/db/repo/*.ts` exposes named functions;
+screens call those and never touch Dexie. CLAUDE.md was firm that UI does no
+conversion or macro math but said nothing about data access. The reason for
+the extra layer is narrow: browser storage is the only copy of this data, and
+one reviewable list of every function that can write to it is worth more than
+the lines it costs. Rejected `src/data/db/` — `src/data/` already means
+bundled read-only JSON, and overloading it invites confusion between the
+shipped ontology and the live database.
+
+**3. Routing is react-router in HASH mode.**
+Jack asked for the trade-offs explicitly before choosing. Hash routing
+(`#/inventory`) makes the back gesture work and survives a reload without
+GitHub Pages needing to know anything about the app's paths — no base-path
+configuration and no `404.html` redirect trick, which is a moving part that
+fails at deploy time rather than in development. Rejected no-router (back
+gesture would exit the app; every reload lands on the home pane) and browser
+routing (clean URLs, but the Pages redirect trick for no benefit on a
+single-device PWA).
+
+**4. Import REPLACES everything. It is not a merge.**
+Merging two inventories that have both moved on has no correct answer — the
+same lot half-used on both sides cannot be reconciled — and this is a restore
+path, not a sync path. The confirmation says "replaces everything" in those
+words, shows what the file contains, and offers to export the current data
+first. That offer is not decoration: the one moment someone taps Restore
+carelessly is the moment they are about to lose a month of entries.
+
+**5. Recipes stay bundled and are NOT copied into IndexedDB in Phase 4.**
+The table is created empty. Copying 150 recipes in now would require writing a
+recipe merge before Phase 6 has decided what it needs, and recipes are seed
+data that a redeploy can always reproduce. Backups therefore carry an empty
+`recipes` list for now, which is honest rather than lossy.
+
+### Schema change — `Lot.frozen`
+
+`src/types/schema.ts` is marked LOCKED, so this is a deliberate amendment.
+Added `frozen?: boolean` to `Lot`.
+
+The problem it solves is recorded in Open Items above: `defaultShelfLifeDays`
+is a fridge/fresh figure — raw chicken breast is 2 days — so without this flag
+every frozen lot trips the expiry warning the moment it is added, and the
+warning becomes noise you learn to ignore. When `frozen` is set the add-lot
+form skips the shelf-life prefill and the lot carries no expiry unless one was
+typed deliberately; a frozen lot the User DID date still warns normally.
+
+Optional rather than required, unlike `CanonicalIngredient.isSeed`: absent
+means "not frozen", which is the correct reading for any lot written before
+the field existed, so there is no backfill and no ambiguity. Rejected a second
+shelf-life field on the ontology — it would mean revisiting all 310 entries
+for a precision the +/-15% tolerance does not need.
+
+Timing was the deciding factor. Phase 4 creates the first real database, so
+this was the last moment the change was free.
+
+**`SCHEMA_VERSION` is still 1** — no build has been deployed and, at the time
+of the change, no IndexedDB database existed. That reasoning has now expired:
+running `npm run dev` creates the database. **The next change to `schema.ts`
+after real data is entered needs a version bump AND a Dexie migration.**
+`validateBackupFile` currently accepts only an exact `SCHEMA_VERSION` match
+and refuses anything else with a plain-English message, which is where the
+conversion logic belongs when that day comes.
+
+### What was built
+
+- **`src/db/`** — `db.ts` (nine tables; `meta` keeps its key outside the
+  stored object so an `AppMeta` row is exactly an `AppMeta`), `ids.ts`,
+  `repo/{meta,ingredients,products,lots,backup}.ts`, `seed.ts`.
+- **`src/data/bundled.ts`** — `BUNDLED_ONTOLOGY` and `BUNDLED_SEED_VERSION`.
+  The ontology is imported as a module and compiled into the build, never
+  fetched (`resolveJsonModule` added to `tsconfig.app.json`).
+- **`src/engine/backup.ts`** — building and checking a `BackupFile` is pure
+  logic and belongs in the engine; only reading and writing rows is
+  persistence. Errors block a restore, warnings do not, matching
+  `ingredients.ts`. Cross-reference problems (a lot whose product is missing)
+  are warnings: a slightly odd backup beats no backup.
+- **`src/ui/`** — two-pane landscape shell, category list with live counts,
+  inventory list, and a working backup screen. `src/lib/clock.ts` is the only
+  place the clock is read; the engine convention of passing `now`/`today` in
+  is unchanged.
+
+Dependencies added: `dexie`, `dexie-react-hooks`, `react-router`, and
+`fake-indexeddb` (tests only). Suite 6357 passing, lint and build clean.
+Smoke-tested in a real browser: routing, first-run seeding of all 310
+ingredients into IndexedDB, expiry banding, no console errors.
+
+### Two failure modes worth naming
+
+**Half-done writes are the whole risk.** The seed merge writes the ingredient
+list and `AppMeta.seedVersion` in ONE transaction, and a restore clears and
+rewrites in one. Either half alone is silent and permanent: a stored version
+with no ingredients means `needsSeedMerge` returns false forever and those
+entries never appear, with no error to notice; a cleared database with a
+failed rewrite is simply gone. Both directions have tests that force the
+failure and assert the rollback.
+
+**`BUNDLED_SEED_VERSION` must be bumped by hand whenever `ontology.json`
+changes.** Forget it and a redeployed ontology never reaches a device that
+already ran an earlier build — silently. `src/db/seed.test.ts` pins the
+ontology at 310 entries specifically so that growing it turns the suite red
+and forces the bump.
+
+### Still open after this pass
+
+- Chunks 4-6: add product / add lot / inline add-ingredient, quantity
+  adjustment and the Reconcile screen, and the backup reminder banner
+  (DECISIONS.md commits to one after 7 days without an export;
+  `AppMeta.lastExportAt` is being recorded, the banner is not built yet).
+- Reconcile interaction detail is still unspecified in Open Items. Proposed
+  but NOT agreed: one-tap Full / three-quarters / half / quarter / Empty
+  against `initialG`, plus a typed amount, applied immediately with an undo.
+- Ingredient editing remains deliberately out of v1. A cost comparison was
+  done on 2026-08-19 and is recorded in the session notes: editing the User's
+  OWN entries is small and merge-safe, because `mergeSeedOntology` already
+  skips anything with `isSeed: false`. Editing SEED entries is the expensive
+  one — the merge replaces any differing seed entry, so such an edit is
+  destroyed silently by the next ontology redeploy. If it is ever wanted, the
+  order is: own entries first; then promote-on-edit (flip `isSeed` to false)
+  with a visible "this no longer receives app updates" note; and only then, if
+  it still hurts, real conflict tracking. Nothing is lost by waiting, because
+  the tracking field would be optional — unlike `Lot.frozen`, this was never
+  a now-or-never decision.
