@@ -463,3 +463,158 @@
   border-style: dashed;
   color: var(--ink-soft);
 }
+
+/* --- inventory rows are buttons now -------------------------------------- */
+
+button.item {
+  width: 100%;
+  padding: 10px 4px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  text-align: left;
+}
+
+button.item:active {
+  background: #f1ece4;
+}
+
+/* --- backup reminder ----------------------------------------------------- */
+
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 32px;
+  border-bottom: 1px solid #e6d9c2;
+  background: #fdf5e6;
+  color: #6b4e12;
+}
+
+.banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.banner-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding: 0 16px;
+  border-radius: var(--radius);
+  background: var(--rail);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* --- reconcile ----------------------------------------------------------- */
+
+.undo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 8px 8px 8px 16px;
+  border-radius: var(--radius);
+  background: #eef2e6;
+}
+
+.lot {
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+
+.lot-empty {
+  opacity: 0.55;
+}
+
+.lot-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.lot-name {
+  font-weight: 500;
+}
+
+.lot-amount {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.lot-of,
+.lot-meta {
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.lot-meta {
+  margin-top: 2px;
+}
+
+.lot-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.step {
+  flex: 1 1 0;
+  min-width: 64px;
+  padding: 0 10px;
+}
+
+.lot-exact {
+  flex: 0 0 108px;
+  min-height: var(--tap);
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  text-align: right;
+}
+
+.chip {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #ece5da;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.chip-expired {
+  background: var(--expired);
+  color: #fff;
+}
+
+.chip-urgent {
+  background: var(--urgent);
+  color: #fff;
+}
+
+.chip-soon {
+  background: var(--soon);
+  color: #fff;
+}
+
+.link-button {
+  min-height: var(--tap);
+  margin-top: 14px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: underline;
+}

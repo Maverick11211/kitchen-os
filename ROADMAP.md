@@ -2,9 +2,7 @@
 
 ## Current status
 Phase 0 complete. Phase 1 complete. Phase 2 complete. Phase 3 complete.
-Phase 4 in progress — persistence, export/import, the app shell and the add
-flows are done; quantity adjustment, the reconcile screen and the backup
-reminder banner are not.
+Phase 4 complete. Phase 5 not started.
 Last updated: 2026-08-20
 
 ## Environment (done)
@@ -76,7 +74,7 @@ The expiring-soon threshold is settled at 5 days
 (`DEFAULT_EXPIRING_SOON_DAYS`), decided 2026-08-19 — see DECISIONS.md. It
 stays a parameter, so Phase 6 can add a shorter "urgent" band on top.
 
-## Phase 4 — Inventory UI — IN PROGRESS
+## Phase 4 — Inventory UI — DONE
 Two-pane landscape layout. Add product, add lot, category view,
 expiry warnings, quantity adjustment, reconcile screen.
 Export/import ships here — not later.
@@ -104,10 +102,14 @@ Being built in six chunks, each ending with `npm test`, `npm run lint` and
    ingredient form is in and returns you to the product form for what you just
    created.
 
-**Left:**
-5. Quantity adjustment, the Reconcile screen, and the backup reminder banner
-   after 7 days without an export.
-6. Final documentation pass.
+5. **Reconcile and the backup reminder.** Tapping an inventory row opens its
+   packets: Full / three-quarters / half / quarter / Empty against the original
+   size, plus a typed amount, applied immediately with an Undo. Emptied packets
+   are one toggle away so a mis-tap is recoverable. The backup banner appears
+   after 7 days without an export, and when there has never been one.
+6. Documentation pass — this file, DECISIONS.md, and `PHASE5-HANDOFF.md`.
+
+Suite 6432 passing, lint and build clean.
 
 Schema note: `SCHEMA_VERSION` is now **2**. `Lot.frozen` went in under
 version 1 while no database existed; `MacroSet.cholesterolMg` forced the first
@@ -142,6 +144,10 @@ canonical means no Product means no Lot — until a redeploy.
 ## Phase 5 — Nutrition UI
 Daily totals (calories, carbs, fat, protein), browse past days,
 direct ingredient logging.
+
+Briefed in `PHASE5-HANDOFF.md` (written 2026-08-20): current state, the locked
+decisions this phase must respect, the engine functions to use rather than
+reimplement, and the open questions to settle with Jack first.
 
 ## Phase 6 — Recipe UI
 Card grid with ownership rings, Missing One tier, filters and sorts,

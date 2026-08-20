@@ -54,6 +54,7 @@ export {
   compareLotsFefo,
   daysUntil,
   expiringSoonLotsFor,
+  gramsForFraction,
   isExpiringSoon,
   isLotAvailable,
   macroLinesForDeductions,
@@ -61,6 +62,7 @@ export {
   planDeduction,
   planRecipeDeduction,
   revertDeductions,
+  setLotRemaining,
 } from './inventory'
 export type {
   DeductionPlan,

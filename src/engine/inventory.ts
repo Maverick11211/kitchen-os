@@ -337,6 +337,49 @@ export function applyDeductions(
   })
 }
 
+// ---------------------------------------------------------------------------
+// Correcting a lot by hand
+// ---------------------------------------------------------------------------
+
+/**
+ * How many grams a given fraction of a lot is.
+ *
+ * Trivial arithmetic, but it lives here rather than in the Reconcile screen so
+ * that CLAUDE.md's "components never do the maths" rule stays literally true
+ * and there is one place to change if fractions ever mean something else.
+ */
+export function gramsForFraction(lot: Lot, fraction: number): number {
+  return lot.initialG * fraction
+}
+
+/**
+ * Set what is left in a lot to an observed amount.
+ *
+ * This is the Reconcile screen's one operation, and the accepted mitigation for
+ * quantity drift (DECISIONS.md): milk poured without logging, handfuls of nuts.
+ * Drift is not preventable, so correction is made cheap instead.
+ *
+ * Clamped to the lot's original size. A lot cannot come to hold more than it
+ * did when it was added — `initialG` is by definition what was there — so
+ * "there is more than the app thinks" is a second lot, not a bigger one. The
+ * same ceiling `revertDeductions` uses, for the same reason.
+ *
+ * Reaching zero marks the lot depleted and keeps it, never deletes it. Going
+ * back UP from zero un-depletes it and clears `depletedAt`, because the usual
+ * reason for that is having just marked the wrong packet empty.
+ */
+export function setLotRemaining(lot: Lot, grams: number, now: Timestamp): Lot {
+  assertRequestable(grams, `setLotRemaining(${lot.id})`)
+
+  const remainingG = Math.min(lot.initialG, grams)
+  const depleted = remainingG <= GRAM_EPSILON
+
+  const next: Lot = { ...lot, remainingG: depleted ? 0 : remainingG, depleted }
+  if (depleted && !lot.depleted) next.depletedAt = now
+  if (!depleted) delete next.depletedAt
+  return next
+}
+
 /**
  * Reverse a committed cook event, putting the grams back on the lots they came
  * from. `CookEvent.deductions` is the source of truth for exactly this.

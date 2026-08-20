@@ -21,6 +21,8 @@ import {
   planDeduction,
   planRecipeDeduction,
   revertDeductions,
+  setLotRemaining,
+  gramsForFraction,
 } from './inventory'
 import { buildOntologyIndex } from './ontology'
 
@@ -567,5 +569,89 @@ describe('macros for deductions', () => {
 
   it('an empty deduction list totals zero', () => {
     expect(batchMacrosForDeductions(index, []).calories).toBe(0)
+  })
+})
+
+// ---------------------------------------------------------------------------
+
+describe('setLotRemaining', () => {
+  const NOW = '2026-08-20T12:00:00.000Z'
+
+  function lot(overrides: Partial<Lot> = {}): Lot {
+    return {
+      id: 'lot_1',
+      productId: 'prod_1',
+      initialG: 1000,
+      remainingG: 800,
+      expiresOn: null,
+      acquiredOn: '2026-08-01',
+      depleted: false,
+      ...overrides,
+    }
+  }
+
+  it('sets the amount to what was observed', () => {
+    expect(setLotRemaining(lot(), 250, NOW).remainingG).toBe(250)
+  })
+
+  it('does not change the original', () => {
+    const original = lot()
+    setLotRemaining(original, 250, NOW)
+    expect(original.remainingG).toBe(800)
+  })
+
+  it('marks a lot emptied, and keeps it rather than deleting it', () => {
+    const next = setLotRemaining(lot(), 0, NOW)
+    expect(next.remainingG).toBe(0)
+    expect(next.depleted).toBe(true)
+    expect(next.depletedAt).toBe(NOW)
+  })
+
+  it('treats a crumb as empty', () => {
+    // Floating-point leftovers must not keep a plainly empty packet alive.
+    expect(setLotRemaining(lot(), 1e-9, NOW).depleted).toBe(true)
+  })
+
+  it('brings a lot back when the wrong packet was marked empty', () => {
+    const emptied = lot({ remainingG: 0, depleted: true, depletedAt: NOW })
+
+    const next = setLotRemaining(emptied, 400, NOW)
+
+    expect(next.remainingG).toBe(400)
+    expect(next.depleted).toBe(false)
+    expect(next.depletedAt).toBeUndefined()
+  })
+
+  it('will not let a lot hold more than it started with', () => {
+    // More than was added is a second packet, not a bigger one.
+    expect(setLotRemaining(lot(), 5000, NOW).remainingG).toBe(1000)
+  })
+
+  it('leaves an existing depletedAt alone when it was already empty', () => {
+    const emptied = lot({ remainingG: 0, depleted: true, depletedAt: '2026-08-10T00:00:00.000Z' })
+    expect(setLotRemaining(emptied, 0, NOW).depletedAt).toBe('2026-08-10T00:00:00.000Z')
+  })
+
+  it('refuses a nonsensical amount rather than storing it', () => {
+    expect(() => setLotRemaining(lot(), -1, NOW)).toThrow(RangeError)
+    expect(() => setLotRemaining(lot(), Number.NaN, NOW)).toThrow(RangeError)
+  })
+})
+
+describe('gramsForFraction', () => {
+  it('measures against what the packet started as, not what is left', () => {
+    const half = gramsForFraction(
+      {
+        id: 'l',
+        productId: 'p',
+        initialG: 1000,
+        remainingG: 200,
+        expiresOn: null,
+        acquiredOn: '2026-08-01',
+        depleted: false,
+      },
+      0.5,
+    )
+    expect(half).toBe(500)
   })
 })

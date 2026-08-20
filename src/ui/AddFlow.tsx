@@ -185,7 +185,21 @@ function PickStep({
       .slice(0, 8)
   }, [products, byId, query])
 
-  const matchingIngredients = useMemo(() => rankSearch(ingredients, query, 30), [ingredients, query])
+  const searching = query.trim() !== ''
+
+  /**
+   * Ingredients appear only once something has been typed.
+   *
+   * Listing all 310 by default was worse than useless: it filled the sheet with
+   * an alphabetical run that never got past B, so it looked like the whole
+   * catalogue while showing almost none of it. Nobody scrolls a list to find
+   * food they can name. Search is the way in; the list is the answer to a
+   * question, not the starting position.
+   */
+  const matchingIngredients = useMemo(
+    () => (searching ? rankSearch(ingredients, query, 30) : []),
+    [ingredients, query, searching],
+  )
 
   return (
     <div className="sheet-body">
@@ -216,20 +230,34 @@ function PickStep({
         </>
       )}
 
-      <div className="list-heading">Ingredients</div>
-      {matchingIngredients.length === 0 ? (
-        <p className="empty">Nothing matches “{query.trim()}”.</p>
-      ) : (
-        <ul className="pick-list">
-          {matchingIngredients.map((ingredient) => (
-            <li key={ingredient.id}>
-              <button type="button" className="pick" onClick={() => onPickIngredient(ingredient)}>
-                <span className="pick-name">{ingredient.name}</span>
-                <span className="pick-hint">new product</span>
-              </button>
-            </li>
-          ))}
-        </ul>
+      {searching && (
+        <>
+          <div className="list-heading">Ingredients</div>
+          {matchingIngredients.length === 0 ? (
+            <p className="empty">Nothing matches “{query.trim()}”.</p>
+          ) : (
+            <ul className="pick-list">
+              {matchingIngredients.map((ingredient) => (
+                <li key={ingredient.id}>
+                  <button
+                    type="button"
+                    className="pick"
+                    onClick={() => onPickIngredient(ingredient)}
+                  >
+                    <span className="pick-name">{ingredient.name}</span>
+                    <span className="pick-hint">new product</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      )}
+
+      {!searching && products.length === 0 && (
+        <p className="empty">
+          Type what you bought — there are {ingredients.length} ingredients to match against.
+        </p>
       )}
 
       {/*

@@ -16,7 +16,7 @@ import type {
   Lot,
 } from '../types/schema'
 import type { InventoryIndex, OntologyIndex } from '../engine'
-import { availableLotsFor, daysUntil, findIngredient } from '../engine'
+import { availableLotsFor, daysUntil, findIngredient, isLotAvailable } from '../engine'
 
 /**
  * The inventory screen's two warning bands (Jack, 2026-08-19).
@@ -127,6 +127,18 @@ export function buildInventoryItems(
   return items
 }
 
+/**
+ * Grams left across a set of lots.
+ *
+ * Emptied packets contribute nothing, and "empty" is the engine's judgement
+ * (`isLotAvailable`) rather than a `> 0` test here — floating-point crumbs are
+ * exactly the sort of thing that would otherwise show as "0 g" on a packet the
+ * app still thought had something in it.
+ */
+export function totalRemaining(lots: readonly Lot[]): number {
+  return lots.filter(isLotAvailable).reduce((total, lot) => total + lot.remainingG, 0)
+}
+
 export function itemsInCategory(
   items: readonly InventoryItem[],
   category: IngredientCategory,
@@ -175,6 +187,27 @@ export const CATEGORY_LABELS: Record<IngredientCategory, string> = {
   beverage: 'Drinks',
   other: 'Other',
 }
+
+/**
+ * The one-tap fractions on the Reconcile sheet (Jack, 2026-08-20).
+ *
+ * Measured against what the packet held when it was added, not against what is
+ * left — "about half a bag" means half a bag, whatever the app currently thinks
+ * is in it. That is the whole point: the app's number is the thing being
+ * corrected, so it cannot also be the thing being measured against.
+ *
+ * Five steps rather than three. A nearly-full tub and a half-empty one are
+ * genuinely different, and both are things a person can judge at a glance;
+ * anything finer than a quarter is beyond what anyone can eyeball, which is
+ * what the typed amount is for.
+ */
+export const RECONCILE_STEPS: readonly { readonly label: string; readonly fraction: number }[] = [
+  { label: 'Full', fraction: 1 },
+  { label: '¾', fraction: 0.75 },
+  { label: '½', fraction: 0.5 },
+  { label: '¼', fraction: 0.25 },
+  { label: 'Empty', fraction: 0 },
+]
 
 /** Grams, rounded the way a person would say them. Never more precision than is real. */
 export function formatGrams(grams: number): string {

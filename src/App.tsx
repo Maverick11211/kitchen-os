@@ -10,7 +10,8 @@
  * `inventory-view.ts` to be shaped, and passes the result down.
  */
 import { useMemo, useState } from 'react'
-import { HashRouter, NavLink, Navigate, Route, Routes } from 'react-router'
+import { HashRouter, Link, NavLink, Navigate, Route, Routes } from 'react-router'
+import type { CanonicalIngredient } from './types/schema'
 import { INGREDIENT_CATEGORIES, buildInventoryIndex, buildOntologyIndex } from './engine'
 import { todayIso } from './lib/clock'
 import {
@@ -21,6 +22,8 @@ import {
   type InventoryItem,
 } from './ui/inventory-view'
 import { AddFlow } from './ui/AddFlow'
+import { ItemSheet } from './ui/ItemSheet'
+import { backupReminderMessage, needsBackupReminder } from './ui/backup-status'
 import { CategoryScreen, InventoryScreen } from './ui/InventoryScreen'
 import { SettingsScreen } from './ui/SettingsScreen'
 import { useKitchen, useMeta, useStartup } from './ui/useKitchenData'
@@ -99,22 +102,45 @@ function Shell() {
   const meta = useMeta()
   const today = todayIso()
   const [adding, setAdding] = useState(false)
+  const [selected, setSelected] = useState<CanonicalIngredient | null>(null)
+  const [reminderHidden, setReminderHidden] = useState(false)
 
-  const items = useMemo(() => {
-    if (!data) return []
-    return buildInventoryItems(
-      buildOntologyIndex(data.ingredients),
-      buildInventoryIndex(data.products, data.lots),
-      today,
-    )
+  const view = useMemo(() => {
+    if (!data) return null
+    const inventory = buildInventoryIndex(data.products, data.lots)
+    return {
+      inventory,
+      items: buildInventoryItems(buildOntologyIndex(data.ingredients), inventory, today),
+    }
   }, [data, today])
 
-  if (!data) return <Splash message="Opening the kitchen…" />
+  if (!data || view === null) return <Splash message="Opening the kitchen…" />
+  const items = view.items
 
   return (
     <div className="app">
       <Sidebar items={items} onAdd={() => setAdding(true)} />
       <main className="pane-right">
+        {/*
+          The backup reminder DECISIONS.md calls "not optional". Dismissing it
+          hides it for this sitting only — it comes back next time the app is
+          opened, because the risk it is warning about does not go away by being
+          acknowledged.
+        */}
+        {meta !== undefined && !reminderHidden && needsBackupReminder(meta, today) && (
+          <div className="banner">
+            <span>{backupReminderMessage(meta, today)}</span>
+            <span className="banner-actions">
+              <Link className="banner-link" to="/settings">
+                Back up now
+              </Link>
+              <button type="button" onClick={() => setReminderHidden(true)}>
+                Not now
+              </button>
+            </span>
+          </div>
+        )}
+
         <Routes>
           <Route path="/" element={<Navigate to="/inventory" replace />} />
           <Route
@@ -124,6 +150,7 @@ function Shell() {
                 title="Everything"
                 items={items}
                 emptyNote="Nothing in the kitchen yet."
+                onSelect={(item) => setSelected(item.ingredient)}
               />
             }
           />
@@ -134,14 +161,30 @@ function Shell() {
                 title="Use up"
                 items={itemsNeedingUse(items)}
                 emptyNote="Nothing needs using up."
+                onSelect={(item) => setSelected(item.ingredient)}
               />
             }
           />
-          <Route path="/inventory/c/:category" element={<CategoryScreen items={items} />} />
+          <Route
+            path="/inventory/c/:category"
+            element={
+              <CategoryScreen items={items} onSelect={(item) => setSelected(item.ingredient)} />
+            }
+          />
           <Route path="/settings" element={<SettingsScreen lastExportAt={meta?.lastExportAt} />} />
           <Route path="*" element={<Navigate to="/inventory" replace />} />
         </Routes>
       </main>
+
+      {selected !== null && (
+        <ItemSheet
+          ingredient={selected}
+          lots={view.inventory.lotsByCanonical.get(selected.id) ?? []}
+          products={view.inventory.productsById}
+          today={today}
+          onClose={() => setSelected(null)}
+        />
+      )}
 
       {adding && (
         <AddFlow

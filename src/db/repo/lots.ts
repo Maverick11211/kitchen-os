@@ -9,7 +9,8 @@
  * Depleted lots are kept, never deleted (DECISIONS.md): they are what makes
  * consumption history and usage rates recoverable later.
  */
-import type { Lot, LotId, ProductId } from '../../types/schema'
+import type { Lot, LotId, ProductId, Timestamp } from '../../types/schema'
+import { setLotRemaining } from '../../engine'
 import type { KitchenOsDb } from '../db'
 import { newId } from '../ids'
 
@@ -53,4 +54,41 @@ export async function addLot(db: KitchenOsDb, input: NewLot): Promise<Lot> {
   }
   await db.lots.add(lot)
   return lot
+}
+
+/**
+ * Correct what is left in a lot to an observed amount. Backs Reconcile.
+ *
+ * Read and write are one transaction so two corrections in quick succession
+ * cannot both act on the same stale copy and lose one of them.
+ *
+ * An unknown lot id throws rather than doing nothing, matching `inventory.ts`:
+ * the id came from something the app rendered, so its absence is a bug, and a
+ * silent no-op would look to the User exactly like a change that did not stick.
+ */
+export async function adjustLotRemaining(
+  db: KitchenOsDb,
+  lotId: LotId,
+  grams: number,
+  now: Timestamp,
+): Promise<Lot> {
+  return db.transaction('rw', db.lots, async () => {
+    const lot = await db.lots.get(lotId)
+    if (!lot) throw new Error(`adjustLotRemaining: unknown lot "${lotId}".`)
+    const next = setLotRemaining(lot, grams, now)
+    await db.lots.put(next)
+    return next
+  })
+}
+
+/**
+ * Write a lot back exactly as given. Used by Undo.
+ *
+ * Undo restores the whole previous record rather than recomputing it, because
+ * `depleted` and `depletedAt` are not derivable from the amount alone — a lot
+ * emptied last week and one emptied by the tap you are undoing look identical
+ * apart from that timestamp.
+ */
+export async function saveLot(db: KitchenOsDb, lot: Lot): Promise<void> {
+  await db.lots.put(lot)
 }

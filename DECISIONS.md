@@ -1618,3 +1618,122 @@ salcasi)*.
   NOT agreed: one-tap Full / three-quarters / half / quarter / Empty against
   `initialG`, plus a typed amount, applied immediately with an undo.
 - Ingredient editing remains out of v1. See the 2026-08-19 entry.
+
+---
+
+## 2026-08-20 — The add sheet stopped listing every ingredient
+
+Jack's observation, using it: the "Add to the kitchen" sheet listed canonical
+ingredients under the Recent products, capped at 30 and sorted alphabetically,
+so with an empty search box it showed an A-to-B slice of the ontology and
+nothing else. It read as though that was the whole catalogue while showing 10%
+of it.
+
+Ingredients now appear only once something has been typed. With an empty box
+the sheet shows recent products and the "can't find it? add it" button, and
+nothing more.
+
+The list was never the way in. Nobody scrolls 310 entries looking for food they
+can already name, and the ranked search — which matches aliases, so "coriander"
+finds cilantro — was doing the real work from the first keystroke. A list is the
+answer to a question, not the starting position.
+
+Recent products are untouched, and deliberately so: that IS a list worth showing
+unprompted, because it is short, it is yours, and tapping one is the
+sub-20-second repeat path the Product tier exists for.
+
+---
+
+## 2026-08-20 — Phase 4 chunk 5 is outstanding; a handoff exists
+
+`PHASE5-HANDOFF.md` written at Jack's request. It records the state of the
+codebase, the locked decisions Phase 5 must respect, the engine functions to use
+rather than reimplement, and the questions that are genuinely open.
+
+Recorded here because it names something that would otherwise go quiet: **Phase
+4 chunk 5 — quantity adjustment, the Reconcile screen, and the backup reminder
+banner — was never built.** Three entries in this file (quantity drift under
+Known risks, the sealed/best-by shelf-life convention of 2026-08-14, and the
+deduction clamping of 2026-08-19) each name the Reconcile screen as the accepted
+mitigation for something they deliberately do not solve. Until it exists, those
+three are pointing at nothing.
+
+Not overridden here — flagged. Either chunk 5 gets built before Phase 5, or a
+dated decision should say Reconcile is deferred and accept what that means.
+
+---
+
+## 2026-08-20 — Chunk 5: Reconcile, quantity adjustment, backup reminder. Phase 4 done.
+
+Closes the gap flagged earlier today. Jack's call: build it before Phase 5
+rather than defer it. The three entries that name the Reconcile screen as their
+accepted mitigation now point at something real.
+
+### Reconcile — the interaction, finally decided
+
+Supersedes "Reconcile screen interaction detail" in Open Items, unspecified
+since Phase 0.
+
+**Five fractions: Full / ¾ / ½ / ¼ / Empty**, plus a typed exact amount. Three
+was the original sketch; five went in because a nearly-full tub and a
+half-empty one are genuinely different states and both are things a person can
+judge at a glance. Anything finer than a quarter is beyond what anyone can
+eyeball, which is what typing a number is for.
+
+**Measured against `initialG`, not against what is left.** "About half a bag"
+means half a bag regardless of what the app currently believes. The app's number
+is the thing being corrected, so it cannot also be the thing being measured
+against.
+
+**Applied immediately, with Undo.** Confirming every correction would double the
+cost of the one operation DECISIONS.md promises will be cheap. Undo restores the
+whole previous lot record rather than recomputing it, because `depleted` and
+`depletedAt` cannot be worked back out from an amount alone.
+
+**It lives on the inventory row, not a separate pane.** Tapping any item opens
+its packets. Correcting a quantity is the most frequent thing anyone does to a
+stocked ingredient, and it happens when you notice — looking at the shelf, not
+during a scheduled sweep. A dedicated Reconcile pane that walks everything was
+considered and rejected as the wrong default; it can still be added later if the
+spot-fix turns out not to be enough.
+
+**Emptied packets are hidden behind a toggle.** They are kept forever
+(DECISIONS.md), but a year of them would bury the two actually in the fridge.
+One tap away, because the reason to want one back is having just marked the
+wrong packet empty.
+
+### Engine additions
+
+`setLotRemaining(lot, grams, now)` and `gramsForFraction(lot, fraction)` in
+`inventory.ts`. Both pure. `setLotRemaining` clamps at `initialG` — a lot cannot
+come to hold more than it did when added, so "there is more than the app thinks"
+is a second lot, not a bigger one, the same ceiling `revertDeductions` uses.
+Reaching zero marks it depleted; going back up un-depletes it and clears
+`depletedAt`, which is the undo path for marking the wrong packet empty.
+
+`gramsForFraction` is one line of arithmetic that could have lived in the
+component. It does not, so that CLAUDE.md's "components never do the maths" rule
+stays literally true rather than nearly true.
+
+### Backup reminder
+
+`src/ui/backup-status.ts`, pure and tested. The banner appears after 7 days
+without an export, and **also when there has never been one** — that is the most
+dangerous state there is, and it would be perverse for the one case the banner
+exists for to be the one it stays quiet about.
+
+Dismissing hides it for that sitting only. It returns next launch, because the
+risk does not go away by being acknowledged.
+
+### Phase 4 is complete
+
+Suite 6432 passing, lint and build clean. Verified in a real browser: two
+packets reconciled by fraction, undone, emptied, un-emptied, and set by typed
+amount, with the inventory list tracking every change.
+
+### Known limitation, accepted
+
+Reconcile cannot set a packet to more than it originally held. If the app says
+448g and there is visibly more, the answer is a second lot. Recording this
+because it is a deliberate consequence of `initialG` meaning "what was there
+when added", not an oversight — revisit only if it turns out to bite.

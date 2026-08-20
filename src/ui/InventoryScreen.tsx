@@ -29,20 +29,28 @@ function ExpiryTag({ item }: { item: InventoryItem }) {
   return <span className={`tag tag-${item.band}`}>{label}</span>
 }
 
-function ItemRow({ item }: { item: InventoryItem }) {
+function ItemRow({ item, onSelect }: { item: InventoryItem; onSelect: (item: InventoryItem) => void }) {
   return (
-    <li className={`item item-${item.band}`}>
-      <div className="item-main">
-        <span className="item-name">{item.ingredient.name}</span>
-        <ExpiryTag item={item} />
-      </div>
-      <div className="item-meta">
-        <span className="item-amount">{formatGrams(item.totalG)}</span>
-        <span className="item-detail">
-          {item.lotCount === 1 ? '1 packet' : `${item.lotCount} packets`}
-          {item.soonestExpiry !== null && ` · ${formatDate(item.soonestExpiry)}`}
+    <li>
+      {/*
+        The whole row is the target, not a separate edit affordance. Correcting
+        a quantity is the most frequent thing anyone does to a stocked
+        ingredient, and DECISIONS.md's answer to drift is that correction has to
+        be cheap — starting with finding the button.
+      */}
+      <button type="button" className={`item item-${item.band}`} onClick={() => onSelect(item)}>
+        <span className="item-main">
+          <span className="item-name">{item.ingredient.name}</span>
+          <ExpiryTag item={item} />
         </span>
-      </div>
+        <span className="item-meta">
+          <span className="item-amount">{formatGrams(item.totalG)}</span>
+          <span className="item-detail">
+            {item.lotCount === 1 ? '1 packet' : `${item.lotCount} packets`}
+            {item.soonestExpiry !== null && ` · ${formatDate(item.soonestExpiry)}`}
+          </span>
+        </span>
+      </button>
     </li>
   )
 }
@@ -51,9 +59,10 @@ export interface InventoryScreenProps {
   readonly title: string
   readonly items: readonly InventoryItem[]
   readonly emptyNote?: string
+  readonly onSelect: (item: InventoryItem) => void
 }
 
-export function InventoryScreen({ title, items, emptyNote }: InventoryScreenProps) {
+export function InventoryScreen({ title, items, emptyNote, onSelect }: InventoryScreenProps) {
   return (
     <section className="screen">
       <header className="screen-head">
@@ -68,7 +77,7 @@ export function InventoryScreen({ title, items, emptyNote }: InventoryScreenProp
       ) : (
         <ul className="items">
           {items.map((item) => (
-            <ItemRow key={item.ingredient.id} item={item} />
+            <ItemRow key={item.ingredient.id} item={item} onSelect={onSelect} />
           ))}
         </ul>
       )}
@@ -77,12 +86,25 @@ export function InventoryScreen({ title, items, emptyNote }: InventoryScreenProp
 }
 
 /** The category route, which has to read its category out of the address. */
-export function CategoryScreen({ items }: { items: readonly InventoryItem[] }) {
+export function CategoryScreen({
+  items,
+  onSelect,
+}: {
+  items: readonly InventoryItem[]
+  onSelect: (item: InventoryItem) => void
+}) {
   const { category } = useParams<{ category: string }>()
   const known = category !== undefined && category in CATEGORY_LABELS
 
   if (!known) {
-    return <InventoryScreen title="Unknown category" items={[]} emptyNote="No such category." />
+    return (
+      <InventoryScreen
+        title="Unknown category"
+        items={[]}
+        emptyNote="No such category."
+        onSelect={onSelect}
+      />
+    )
   }
 
   const typed = category as IngredientCategory
@@ -91,6 +113,7 @@ export function CategoryScreen({ items }: { items: readonly InventoryItem[] }) {
       title={CATEGORY_LABELS[typed]}
       items={itemsInCategory(items, typed)}
       emptyNote={`No ${CATEGORY_LABELS[typed].toLowerCase()} in the kitchen right now.`}
+      onSelect={onSelect}
     />
   )
 }
