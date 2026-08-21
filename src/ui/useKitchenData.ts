@@ -9,10 +9,19 @@
  */
 import { useEffect, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import type { AppMeta, CanonicalIngredient, Lot, Product } from '../types/schema'
+import type {
+  AppMeta,
+  CanonicalIngredient,
+  ConsumptionEvent,
+  DateOnly,
+  Lot,
+  Product,
+} from '../types/schema'
 import { db } from '../db/db'
 import { readMeta } from '../db/repo/meta'
+import { firstConsumptionAt, listConsumptionBetween } from '../db/repo/consumption'
 import { runStartupSeedMerge } from '../db/seed'
+import { localDayOf, localDayRange } from '../lib/clock'
 
 export type StartupState =
   | { readonly status: 'loading' }
@@ -75,6 +84,37 @@ export function useKitchen(): KitchenData | undefined {
       db.lots.toArray(),
     ])
     return { ingredients, products, lots }
+  }, [])
+}
+
+/**
+ * Everything eaten on one local day, oldest first.
+ *
+ * The day is a local-calendar question and `consumedAt` is a UTC instant, so
+ * this converts through `localDayRange` rather than matching on the stored
+ * string — an evening meal is filed under tomorrow's UTC date and a naive query
+ * would lose it.
+ *
+ * Undefined on the first render, before the read finishes.
+ */
+export function useDay(day: DateOnly): ConsumptionEvent[] | undefined {
+  return useLiveQuery(async () => {
+    const { startAt, endAt } = localDayRange(day)
+    return listConsumptionBetween(db, startAt, endAt)
+  }, [day])
+}
+
+/**
+ * The day of the oldest entry on record, which is as far back as paging goes.
+ *
+ * Undefined covers both "still loading" and "nothing has ever been logged". The
+ * daily view treats them the same — the ‹ arrow is dead — and the difference
+ * lasts one render.
+ */
+export function useFirstLoggedDay(): DateOnly | undefined {
+  return useLiveQuery(async () => {
+    const earliest = await firstConsumptionAt(db)
+    return earliest === undefined ? undefined : localDayOf(earliest)
   }, [])
 }
 

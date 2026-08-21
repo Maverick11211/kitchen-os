@@ -173,11 +173,39 @@ function upgradeBackup(value: Record<string, unknown>, from: number): Record<str
     }
   }
 
+  if (from < 3) {
+    // Version 3 added ConsumptionEvent.meal and Product.unitsPerPackage, both
+    // optional. Nothing to convert: absent is what those fields mean on a row
+    // written before they existed, and the same reasoning as the database
+    // migration applies — an invented meal in a restored backup would be
+    // indistinguishable from one the User typed.
+  }
+
   const meta = isRecord(current.meta)
     ? { ...current.meta, schemaVersion: SCHEMA_VERSION }
     : current.meta
 
   return { ...current, schemaVersion: SCHEMA_VERSION, meta }
+}
+
+/**
+ * What changed between a file's version and today's, in words a person can act
+ * on.
+ *
+ * Kept beside `upgradeBackup` because the two go stale together: a step added
+ * there without a note here produces a restore that quietly claims to have done
+ * something else. The old message said every old file had its cholesterol
+ * filled in, which stopped being true the moment version 3 existed.
+ */
+function upgradeNotes(from: number): string[] {
+  const notes: string[] = []
+  if (from < 2) {
+    notes.push('cholesterol reads as 0 on anything saved before the app started asking for it')
+  }
+  if (from < 3) {
+    notes.push('entries from before have no meal on them, and products no pack count')
+  }
+  return notes
 }
 
 /**
@@ -258,8 +286,10 @@ export function validateBackupFile(value: unknown): BackupValidation {
   let upgraded = value
   if (version < SCHEMA_VERSION) {
     upgraded = upgradeBackup(value, version)
+    const notes = upgradeNotes(version)
     warnings.push(
-      `That backup was made by an older version of the app (data version ${version}). It has been brought up to date — cholesterol reads as 0 on anything saved before the app started asking for it.`,
+      `That backup was made by an older version of the app (data version ${version}). It has been brought up to date` +
+        (notes.length > 0 ? ` — ${notes.join('; ')}.` : '.'),
     )
   }
 

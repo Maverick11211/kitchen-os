@@ -23,6 +23,7 @@ import type {
   ConsumptionEventId,
   LotId,
   MacroSet,
+  MealSlot,
   ProductId,
   Timestamp,
 } from '../../types/schema'
@@ -40,6 +41,10 @@ import { newId } from '../ids'
  * `lotId` is what decides whether inventory moves. Omitting it is the "don't
  * take it out of my stock" switch (Jack, 2026-08-20): food eaten out of the
  * house, or an ingredient the app holds nothing of.
+ *
+ * `meal` is optional and never guessed (Jack, 2026-08-21). Absent means the
+ * question was not answered, which the daily view shows under its own heading
+ * rather than filing under a made-up one.
  */
 export interface LogIngredientInput {
   readonly canonicalId: CanonicalId
@@ -48,6 +53,7 @@ export interface LogIngredientInput {
   readonly macros: MacroSet
   readonly productId?: ProductId
   readonly lotId?: LotId
+  readonly meal?: MealSlot
 }
 
 export interface LoggedIngredient {
@@ -116,6 +122,7 @@ export async function logIngredient(
       },
       macros: input.macros,
       label: input.label,
+      ...(input.meal === undefined ? {} : { meal: input.meal }),
     }
     await db.consumptionEvents.add(event)
 

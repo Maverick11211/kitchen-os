@@ -328,3 +328,125 @@ describe('validateLogDraft', () => {
     expect(result.errors.map((issue) => issue.field)).toContain('choice')
   })
 })
+
+// ---------------------------------------------------------------------------
+// Counts, and whose weight is used
+// ---------------------------------------------------------------------------
+
+describe('logging something counted', () => {
+  const TORTILLA = ingredient({
+    id: 'tortilla-flour',
+    name: 'Tortilla, flour',
+    category: 'grain',
+    trackBy: 'count',
+    unitWeightG: 45,
+  })
+
+  /** A 413 g bag of six, so one weighs 68.83 g — not the ontology's 45 g. */
+  function bagOfSix(): LogOptions {
+    const bag = product('prod_mission', {
+      canonicalId: 'tortilla-flour',
+      name: 'Mission Flour Tortillas',
+      packageSizeG: 413,
+      unitsPerPackage: 6,
+    })
+    const packet = lot('lot_mission', 'prod_mission', { initialG: 413, remainingG: 413 })
+    return logOptionsFor(buildInventoryIndex([bag], [packet]), 'tortilla-flour')
+  }
+
+  /*
+   * Jack's bug, as a test. One tortilla off a 413 g bag of six is 68.83 g; the
+   * app was charging him the ontology's 45 g average, on every count ingredient,
+   * silently.
+   */
+  it('converts a count using the packet being eaten, not the ontology average', () => {
+    const options = bagOfSix()
+    const draft: LogDraft = { ...emptyLogDraft(TORTILLA, options), amount: '1', unit: 'count' }
+
+    const result = validateLogDraft(draft, TORTILLA, options)
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.grams).toBeCloseTo(68.83, 2)
+    expect(result.log.macros.calories).toBeCloseTo(CHEDDAR.calories * 0.6883, 1)
+  })
+
+  it('starts the form in counts, because that is how you would say it', () => {
+    expect(emptyLogDraft(TORTILLA, bagOfSix()).unit).toBe('count')
+  })
+
+  it('falls back to the ontology average when nothing is on hand to ask', () => {
+    const empty = logOptionsFor(buildInventoryIndex([], []), 'tortilla-flour')
+    const draft: LogDraft = {
+      ...emptyLogDraft(TORTILLA, empty),
+      amount: '1',
+      unit: 'count',
+      quick: { calories: '150', carbsG: '', fatG: '', proteinG: '' },
+    }
+
+    const result = validateLogDraft(draft, TORTILLA, empty)
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.grams).toBe(45)
+  })
+
+  it('takes the right number of grams out of the packet', () => {
+    const options = bagOfSix()
+    const draft: LogDraft = { ...emptyLogDraft(TORTILLA, options), amount: '2', unit: 'count' }
+
+    const result = validateLogDraft(draft, TORTILLA, options)
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.deductedG).toBeCloseTo(137.67, 1)
+    expect(result.shortfallG).toBe(0)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Meals
+// ---------------------------------------------------------------------------
+
+describe('which meal', () => {
+  it('starts with nothing chosen, and does not consult the clock', () => {
+    const options = logOptionsFor(buildInventoryIndex([], []), 'cheddar-shredded')
+    expect(emptyLogDraft(ingredient(), options).meal).toBe('')
+  })
+
+  it('records the meal when one was picked', () => {
+    const options = logOptionsFor(
+      buildInventoryIndex([product('prod_1')], [lot('lot_1', 'prod_1')]),
+      'cheddar-shredded',
+    )
+    const result = validateLogDraft(
+      { ...emptyLogDraft(ingredient(), options), amount: '50', meal: 'lunch' },
+      ingredient(),
+      options,
+    )
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.log.meal).toBe('lunch')
+  })
+
+  /*
+   * Not saying is a real answer, and it has to survive as one: the daily view
+   * shows unlabelled entries under their own heading rather than guessing.
+   */
+  it('leaves the meal off entirely when none was picked', () => {
+    const options = logOptionsFor(
+      buildInventoryIndex([product('prod_1')], [lot('lot_1', 'prod_1')]),
+      'cheddar-shredded',
+    )
+    const result = validateLogDraft(
+      { ...emptyLogDraft(ingredient(), options), amount: '50' },
+      ingredient(),
+      options,
+    )
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect('meal' in result.log).toBe(false)
+  })
+})

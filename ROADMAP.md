@@ -2,8 +2,8 @@
 
 ## Current status
 Phase 0 complete. Phase 1 complete. Phase 2 complete. Phase 3 complete.
-Phase 4 complete. Phase 5 not started.
-Last updated: 2026-08-20
+Phase 4 complete. Phase 5 complete. Phase 6 not started.
+Last updated: 2026-08-21
 
 ## Environment (done)
 - Repo: github.com/Maverick11211/kitchen-os
@@ -141,13 +141,53 @@ Note this is what makes the app survivable offline: without it, an
 ingredient the bundled ontology lacks blocks the whole chain — no
 canonical means no Product means no Lot — until a redeploy.
 
-## Phase 5 — Nutrition UI
+## Phase 5 — Nutrition UI — DONE
 Daily totals (calories, carbs, fat, protein), browse past days,
 direct ingredient logging.
 
 Briefed in `PHASE5-HANDOFF.md` (written 2026-08-20): current state, the locked
 decisions this phase must respect, the engine functions to use rather than
-reimplement, and the open questions to settle with Jack first.
+reimplement, and the open questions to settle with Jack first. All seven of
+those questions are now settled and recorded in DECISIONS.md (2026-08-20
+"Phase 5: nutrition UI"). No schema change was needed.
+
+**Built (chunks 1-3):**
+1. **Plumbing.** `src/lib/clock.ts` gained local-day helpers — a day is local
+   midnight to local midnight, and `consumedAt` is a UTC instant, so the day
+   query is a range and not a string match. `src/db/repo/consumption.ts` logs an
+   entry and debits the packet in ONE transaction, deletes with a revert, and
+   restores the whole original record for Undo. `deleteLot` throws a packet out.
+2. **View logic, no React.** `src/ui/nutrition-view.ts` (the four headline
+   figures, the day's rows, paging bounded by the first entry and today) and
+   `src/ui/log-forms.ts` (which packets you could be eating from, unit
+   conversion through the engine, the typed-figures path).
+3. **Screens.** `src/ui/NutritionScreen.tsx` and `src/ui/LogFlow.tsx`, "Today"
+   in the rail, and Throw out on a packet in `ItemSheet.tsx`.
+
+Suite 6506 passing, lint and build clean, and the flow was driven end to end in
+a real browser (`qa/smoke-phase5.cjs`).
+
+**Jack's follow-up list of 2026-08-20 is done** (2026-08-21), and
+`PHASE5-FOLLOWUPS.md` is deleted with it — the decisions are in DECISIONS.md:
+
+4. **Counts are product-aware.** `gramsPerCount` in the engine; logging one
+   tortilla uses the bag in the kitchen, not the ontology's average. Counted
+   ingredients read as counts on the shelf — "6 flour tortillas", not "413 g".
+5. **Meal slots.** Breakfast / lunch / dinner / snack, optional, grouped with
+   subtotals, never guessed from the clock. Unlabelled entries sit under
+   "Other" and still count towards the day.
+6. **Editing a product** from the ingredient sheet, which the add-only rule
+   never covered — that rule is about canonical ingredients and seed-merge
+   safety.
+7. Rail renamed to **Food log** and reordered, with the add button beside the
+   kitchen list.
+
+Suite 6555 passing, lint and build clean, sixteen browser steps green.
+
+Schema note: `SCHEMA_VERSION` is now **3** — `ConsumptionEvent.meal` and
+`Product.unitsPerPackage`, both optional, in ONE bump with one migration and one
+backup upgrade step. Nothing is backfilled; absent is the truth about both on
+older rows.
 
 ## Phase 6 — Recipe UI
 Card grid with ownership rings, Missing One tier, filters and sorts,

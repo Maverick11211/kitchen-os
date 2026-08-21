@@ -22,7 +22,9 @@ import {
   type InventoryItem,
 } from './ui/inventory-view'
 import { AddFlow } from './ui/AddFlow'
+import { LogFlow } from './ui/LogFlow'
 import { ItemSheet } from './ui/ItemSheet'
+import { NutritionScreen } from './ui/NutritionScreen'
 import { backupReminderMessage, needsBackupReminder } from './ui/backup-status'
 import { CategoryScreen, InventoryScreen } from './ui/InventoryScreen'
 import { SettingsScreen } from './ui/SettingsScreen'
@@ -55,6 +57,32 @@ function Sidebar({
     <nav className="pane-left">
       <div className="brand">Kitchen OS</div>
 
+      {/*
+        Nutrition is a second top-level area, not another category (Jack,
+        2026-08-20). It comes FIRST, above the kitchen and above the add button
+        (Jack, 2026-08-21): it is the thing opened several times a day, where
+        adding food is the thing done once after a shop. Past days are reached
+        with arrows inside the screen, which keeps the rail from growing a
+        second list of dates nobody navigates by.
+
+        "Food log" rather than "Today" — the rail entry names the area, and the
+        screen's own heading already says which day you are looking at, so
+        having both say "Today" was one word doing two jobs.
+      */}
+      <ul className="nav">
+        <li>
+          <NavLink to="/today" className={navClass}>
+            <span>Food log</span>
+          </NavLink>
+        </li>
+      </ul>
+
+      <div className="nav-heading">Kitchen</div>
+
+      {/*
+        The add button belongs to the kitchen, so it lives with it rather than
+        floating at the top of the rail where it read as the app's main action.
+      */}
       <button type="button" className="add-button" onClick={onAdd}>
         + Add to the kitchen
       </button>
@@ -102,6 +130,7 @@ function Shell() {
   const meta = useMeta()
   const today = todayIso()
   const [adding, setAdding] = useState(false)
+  const [logging, setLogging] = useState(false)
   const [selected, setSelected] = useState<CanonicalIngredient | null>(null)
   const [reminderHidden, setReminderHidden] = useState(false)
 
@@ -142,7 +171,20 @@ function Shell() {
         )}
 
         <Routes>
-          <Route path="/" element={<Navigate to="/inventory" replace />} />
+          <Route path="/" element={<Navigate to="/today" replace />} />
+          <Route
+            path="/today"
+            element={<NutritionScreen today={today} onLog={() => setLogging(true)} />}
+          />
+          {/*
+            Past days get their own address so a reload lands where you were.
+            Today keeps the stable `/today` one, so the rail link stays lit on it
+            rather than only matching the date it happens to be.
+          */}
+          <Route
+            path="/day/:day"
+            element={<NutritionScreen today={today} onLog={() => setLogging(true)} />}
+          />
           <Route
             path="/inventory"
             element={
@@ -192,6 +234,15 @@ function Shell() {
           products={data.products}
           today={today}
           onClose={() => setAdding(false)}
+        />
+      )}
+
+      {logging && (
+        <LogFlow
+          ingredients={data.ingredients}
+          items={items}
+          index={view.inventory}
+          onClose={() => setLogging(false)}
         />
       )}
     </div>

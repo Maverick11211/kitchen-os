@@ -16,7 +16,7 @@ import type {
   Lot,
 } from '../types/schema'
 import type { InventoryIndex, OntologyIndex } from '../engine'
-import { availableLotsFor, daysUntil, findIngredient, isLotAvailable } from '../engine'
+import { availableLotsFor, daysUntil, findIngredient, gramsPerCount, isLotAvailable } from '../engine'
 
 /**
  * The inventory screen's two warning bands (Jack, 2026-08-19).
@@ -75,6 +75,17 @@ export interface InventoryItem {
   readonly ingredient: CanonicalIngredient
   /** Total grams on hand across every product and lot. */
   readonly totalG: number
+  /**
+   * How many individual items are on hand, for things counted rather than
+   * weighed — six tortillas, four eggs. Null when the ingredient is not counted
+   * or when nothing can say what one of them weighs.
+   *
+   * Summed PER PACKET, each with its own product's weight, rather than dividing
+   * the total by one figure: a bag of six and a bag of ten are different sizes
+   * of the same thing, and adding their counts is exact where picking a single
+   * divisor for both would not be.
+   */
+  readonly totalCount: number | null
   readonly lotCount: number
   /** The worst band of any lot held, so one about-to-turn carton is visible. */
   readonly band: ExpiryBand
@@ -111,6 +122,8 @@ export function buildInventoryItems(
     let band: ExpiryBand = 'none'
     let soonestExpiry: DateOnly | null = null
 
+    const totalCount = countOnHand(lots, ingredient, inventory.productsById)
+
     for (const lot of lots) {
       totalG += lot.remainingG
       const lotBand = expiryBand(lot, today)
@@ -120,11 +133,36 @@ export function buildInventoryItems(
       }
     }
 
-    items.push({ ingredient, totalG, lotCount: lots.length, band, soonestExpiry })
+    items.push({ ingredient, totalG, totalCount, lotCount: lots.length, band, soonestExpiry })
   }
 
   items.sort((a, b) => a.ingredient.name.localeCompare(b.ingredient.name))
   return items
+}
+
+/**
+ * How many individual items these packets hold, or null when that is not a
+ * question with an answer.
+ *
+ * Counted packet by packet, because each packet's own product knows what one of
+ * ITS items weighs — a bag of six and a bag of ten are different sizes of the
+ * same thing. One packet that cannot say gives up the whole count: half an
+ * answer would still read as a fact.
+ */
+export function countOnHand(
+  lots: readonly Lot[],
+  ingredient: CanonicalIngredient,
+  productsById: ReadonlyMap<string, { readonly packageSizeG?: number; readonly unitsPerPackage?: number }>,
+): number | null {
+  if (ingredient.trackBy !== 'count') return null
+
+  let total = 0
+  for (const lot of lots.filter(isLotAvailable)) {
+    const perUnit = gramsPerCount(ingredient, productsById.get(lot.productId))
+    if (perUnit === null) return null
+    total += lot.remainingG / perUnit
+  }
+  return total
 }
 
 /**
@@ -214,4 +252,81 @@ export function formatGrams(grams: number): string {
   if (grams >= 1000) return `${(grams / 1000).toFixed(grams >= 10_000 ? 0 : 1)} kg`
   if (grams >= 10) return `${Math.round(grams)} g`
   return `${grams.toFixed(1)} g`
+}
+
+/**
+ * The noun for one of something, from its ontology name.
+ *
+ * The name is a catalogue entry — "Tortilla, flour" — and only the part before
+ * the comma is the thing itself; the rest says which kind. Nobody says "six
+ * tortilla, flours".
+ */
+function itemNoun(ingredient: CanonicalIngredient): string {
+  return (ingredient.name.split(',')[0] ?? ingredient.name).trim().toLowerCase()
+}
+
+/**
+ * Make a noun plural, well enough for a kitchen.
+ *
+ * Deliberately three rules and no dictionary. Getting "boxes" and "berries"
+ * right covers the ontology; a genuinely irregular one would read a little
+ * wrong, once, on a screen that also states the exact weight — which is a much
+ * smaller cost than a list of exceptions nobody maintains. Same spirit as the
+ * ±15% tolerance in CLAUDE.md.
+ */
+export function pluralize(noun: string, count: number): string {
+  if (count === 1) return noun
+  if (/(s|x|z|ch|sh)$/.test(noun)) return `${noun}es`
+  if (/[^aeiou]y$/.test(noun)) return `${noun.slice(0, -1)}ies`
+  return `${noun}s`
+}
+
+/** "6 tortillas", "1 egg", "3.5 tortillas". Halves are real: half a packet is a thing. */
+export function formatCount(count: number, ingredient: CanonicalIngredient): string {
+  const rounded = Math.round(count * 10) / 10
+  const shown = Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1)
+  return `${shown} ${pluralize(itemNoun(ingredient), rounded)}`
+}
+
+/**
+ * What the amount on a row should say.
+ *
+ * Counted things read as counts (Jack, 2026-08-21): "6 tortillas left" is what
+ * you would say standing at the fridge, and "413 g" is a number you would have
+ * to do arithmetic on before it meant anything. Everything else stays in grams,
+ * and the exact weight is still shown beside it as the detail.
+ */
+export function formatAmount(item: InventoryItem): string {
+  if (item.totalCount === null) return formatGrams(item.totalG)
+  return formatCount(item.totalCount, item.ingredient)
+}
+
+/**
+ * How one packet's fullness reads: "4 of 6 tortillas", or "226 g of 413 g".
+ *
+ * Returned as two pieces because the sheet renders the second one quieter than
+ * the first. Counted packets put the noun on the SECOND piece only — "4 of 6
+ * tortillas" is how a person says it, where "4 tortillas of 6 tortillas" is how
+ * a form says it.
+ */
+export interface LotAmountText {
+  readonly remaining: string
+  readonly initial: string
+}
+
+export function lotAmountText(
+  lot: Lot,
+  ingredient: CanonicalIngredient,
+  product?: { readonly packageSizeG?: number; readonly unitsPerPackage?: number },
+): LotAmountText {
+  const perUnit = ingredient.trackBy === 'count' ? gramsPerCount(ingredient, product) : null
+  if (perUnit === null) {
+    return { remaining: formatGrams(lot.remainingG), initial: formatGrams(lot.initialG) }
+  }
+
+  const left = Math.round((lot.remainingG / perUnit) * 10) / 10
+  return {
+    remaining: Number.isInteger(left) ? String(left) : left.toFixed(1),
+    initial: formatCount(lot.initialG / perUnit, ingredient),
+  }
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import type { CanonicalIngredient } from '../types/schema'
+import type { CanonicalIngredient, Product } from '../types/schema'
 import { validateIngredientDraft } from '../engine'
 import {
   addDays,
@@ -8,6 +8,7 @@ import {
   emptyLotDraft,
   emptyProductDraft,
   parseAmount,
+  productDraftFrom,
   rankSearch,
   splitAliases,
   toIngredientDraft,
@@ -415,5 +416,119 @@ describe('the new-ingredient form', () => {
 
     expect(result.ok).toBe(true)
     expect(result.warnings.map((issue) => issue.field)).toContain('cupWeightG')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Pack counts and editing
+// ---------------------------------------------------------------------------
+
+describe('pack counts on a product', () => {
+  function countDraft(overrides: Partial<ProductDraft> = {}): ProductDraft {
+    return {
+      ...emptyProductDraft(),
+      name: 'Mission Flour Tortillas',
+      basis: 'per100g',
+      packageSizeG: '413',
+      unitsPerPackage: '6',
+      macros: { ...emptyProductDraft().macros, calories: '306' },
+      ...overrides,
+    }
+  }
+
+  it('stores the count when the package weight is known too', () => {
+    const result = validateProductDraft(countDraft(), 'tortilla-flour')
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.product.unitsPerPackage).toBe(6)
+    expect(result.product.packageSizeG).toBe(413)
+  })
+
+  /*
+   * A count with no package weight cannot say what one item weighs, which is
+   * the only thing the field is for. Saving it would look like an answer.
+   */
+  it('declines to store a count with no package weight, and says why', () => {
+    const result = validateProductDraft(countDraft({ packageSizeG: '' }), 'tortilla-flour')
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.product.unitsPerPackage).toBeUndefined()
+    expect(result.warnings.some((issue) => issue.field === 'unitsPerPackage')).toBe(true)
+  })
+
+  it('rejects a count that is not a number greater than zero', () => {
+    for (const bad of ['nine', '0', '-2']) {
+      const result = validateProductDraft(countDraft({ unitsPerPackage: bad }), 'tortilla-flour')
+      expect(result.ok).toBe(false)
+      if (result.ok) return
+      expect(result.errors.some((issue) => issue.field === 'unitsPerPackage')).toBe(true)
+    }
+  })
+
+  it('leaves the field out entirely when it was not asked for', () => {
+    const result = validateProductDraft(countDraft({ unitsPerPackage: '' }), 'tortilla-flour')
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.product.unitsPerPackage).toBeUndefined()
+    expect(result.warnings.some((issue) => issue.field === 'unitsPerPackage')).toBe(false)
+  })
+})
+
+describe('productDraftFrom', () => {
+  const STORED: Product = {
+    id: 'prod_1',
+    canonicalId: 'tortilla-flour',
+    name: 'Mission Flour Tortillas',
+    brand: 'Mission',
+    macrosPer100g: {
+      calories: 306,
+      proteinG: 8,
+      carbsG: 51,
+      fatG: 7.4,
+      fiberG: 3,
+      sugarG: 2,
+      sodiumMg: 590,
+      saturatedFatG: 2.1,
+      cholesterolMg: 0,
+    },
+    packageSizeG: 413,
+    unitsPerPackage: 6,
+    labelServingSizeG: 69,
+    createdAt: '2026-08-20T10:00:00.000Z',
+  }
+
+  it('fills the form in from what was stored', () => {
+    const draft = productDraftFrom(STORED)
+    expect(draft.name).toBe('Mission Flour Tortillas')
+    expect(draft.brand).toBe('Mission')
+    expect(draft.packageSizeG).toBe('413')
+    expect(draft.unitsPerPackage).toBe('6')
+    expect(draft.servingSizeG).toBe('69')
+    expect(draft.macros.calories).toBe('306')
+  })
+
+  /*
+   * The basis originally typed is not stored, so the form opens on the one the
+   * schema actually keeps. Claiming to know which way the label read would be a
+   * guess, and a guess here rewrites every figure by a factor.
+   */
+  it('opens on the basis the figures are actually stored in', () => {
+    expect(productDraftFrom(STORED).basis).toBe('per100g')
+  })
+
+  it('round-trips: filling in and saving again changes nothing', () => {
+    const result = validateProductDraft(productDraftFrom(STORED), STORED.canonicalId)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.product.macrosPer100g).toEqual(STORED.macrosPer100g)
+    expect(result.product.packageSizeG).toBe(413)
+    expect(result.product.unitsPerPackage).toBe(6)
+    expect(result.product.name).toBe(STORED.name)
+  })
+
+  it('leaves a blank brand blank rather than inventing one', () => {
+    const noBrand = { ...STORED }
+    delete noBrand.brand
+    expect(productDraftFrom(noBrand).brand).toBe('')
   })
 })

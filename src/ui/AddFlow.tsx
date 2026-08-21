@@ -14,7 +14,7 @@
  * No arithmetic here. Every number is validated and converted by
  * `entry-forms.ts`, which in turn calls the engine.
  */
-import { useMemo, useState, type KeyboardEvent, type ReactNode } from 'react'
+import { useMemo, useState } from 'react'
 import type {
   CanonicalIngredient,
   DateOnly,
@@ -34,8 +34,10 @@ import { addLot } from '../db/repo/lots'
 import { addUserIngredient } from '../db/repo/ingredients'
 import { nowIso } from '../lib/clock'
 import { CATEGORY_LABELS, formatGrams } from './inventory-view'
+import { Field, NumberInput } from './FormControls'
+import { advanceOnEnter, issueFor } from './form-behaviour'
+import { ProductFields } from './ProductForm'
 import {
-  MACRO_FIELDS,
   TRACK_BY_LABELS,
   defaultExpiry,
   emptyIngredientDraft,
@@ -48,8 +50,6 @@ import {
   type FieldIssue,
   type IngredientDraft,
   type LotDraft,
-  type MacroBasis,
-  type MacroKey,
   type ProductDraft,
 } from './entry-forms'
 
@@ -62,87 +62,6 @@ type Step =
       readonly notice?: readonly string[]
     }
   | { readonly name: 'lot'; readonly ingredient: CanonicalIngredient; readonly product: Product }
-
-function issueFor(issues: readonly FieldIssue[], field: string): string | undefined {
-  return issues.find((issue) => issue.field === field)?.message
-}
-
-/**
- * Enter moves to the next field rather than submitting the form.
- *
- * Typing a nutrition label is eight numbers in a row. Reaching for the screen
- * between each one is the difference between this taking fifteen seconds and
- * taking a minute, and a minute is where entry friction starts costing you the
- * habit. Past the last field, focus lands on the save button, so Enter all the
- * way through works.
- *
- * Only text fields are walked. Dropdowns are deliberately skipped: landing on
- * one mid-run stops the typing dead, because the next thing typed goes nowhere
- * and the next Enter does something unexpected. A choice gets tapped; a value
- * gets typed.
- */
-function advanceOnEnter(event: KeyboardEvent<HTMLFormElement>): void {
-  if (event.key !== 'Enter') return
-  const target = event.target
-  if (!(target instanceof HTMLInputElement) || target.type === 'checkbox') return
-
-  event.preventDefault()
-  const form = event.currentTarget
-  const fields = Array.from(form.querySelectorAll<HTMLInputElement>('input')).filter(
-    (field) => field.type !== 'checkbox',
-  )
-  const next = fields[fields.indexOf(target) + 1]
-  if (next) next.focus()
-  else form.querySelector<HTMLButtonElement>('button.primary')?.focus()
-}
-
-/**
- * A number field without the stepper arrows.
- *
- * `type="number"` draws little up/down wheels that are useless on a tablet and
- * easy to nudge by accident while scrolling. `inputMode="decimal"` still brings
- * up the numeric keypad on iPad, which is the part that actually matters.
- */
-function NumberInput({
-  value,
-  onChange,
-  placeholder,
-  autoFocus = false,
-}: {
-  value: string
-  onChange: (value: string) => void
-  placeholder?: string
-  autoFocus?: boolean
-}) {
-  return (
-    <input
-      type="text"
-      inputMode="decimal"
-      value={value}
-      placeholder={placeholder}
-      autoFocus={autoFocus}
-      onChange={(event) => onChange(event.target.value)}
-    />
-  )
-}
-
-function Field({
-  label,
-  error,
-  children,
-}: {
-  label: string
-  error?: string
-  children: ReactNode
-}) {
-  return (
-    <label className={error ? 'field field-bad' : 'field'}>
-      <span className="field-label">{label}</span>
-      {children}
-      {error !== undefined && <span className="field-error">{error}</span>}
-    </label>
-  )
-}
 
 // ---------------------------------------------------------------------------
 // Step 1 — find it
@@ -295,7 +214,7 @@ function PickStep({
  * `engine/ingredients.ts`. The messages below are its messages, shown as
  * written; nothing here decides what is allowed.
  */
-function IngredientStep({
+export function IngredientStep({
   initialName,
   ingredients,
   onSaved,
@@ -500,10 +419,6 @@ function ProductStep({
   const [warnings, setWarnings] = useState<readonly FieldIssue[]>([])
   const [busy, setBusy] = useState(false)
 
-  function setMacro(key: MacroKey, value: string) {
-    setDraft((current) => ({ ...current, macros: { ...current.macros, [key]: value } }))
-  }
-
   async function save() {
     const result = validateProductDraft(draft, ingredient.id)
     setWarnings(result.warnings)
@@ -544,94 +459,13 @@ function ProductStep({
         </ul>
       )}
 
-      <Field label="Product name" error={issueFor(errors, 'name')}>
-        <input
-          type="text"
-          value={draft.name}
-          autoFocus
-          placeholder="Kroger Boneless Chicken Breast"
-          onChange={(event) => setDraft({ ...draft, name: event.target.value })}
-        />
-      </Field>
-
-      <Field label="Brand (optional)">
-        <input
-          type="text"
-          value={draft.brand}
-          onChange={(event) => setDraft({ ...draft, brand: event.target.value })}
-        />
-      </Field>
-
-      <div className="row">
-        <Field label="Label figures are per">
-          <select
-            value={draft.basis}
-            onChange={(event) => setDraft({ ...draft, basis: event.target.value as MacroBasis })}
-          >
-            <option value="package">the package</option>
-            <option value="serving">a serving</option>
-            <option value="per100g">100 g</option>
-          </select>
-        </Field>
-
-        {/* Each basis asks only for the measurement it cannot work out itself. */}
-        {draft.basis === 'package' && (
-          <Field label="Package size (g)" error={issueFor(errors, 'packageSizeG')}>
-            <NumberInput
-              value={draft.packageSizeG}
-              onChange={(value) => setDraft({ ...draft, packageSizeG: value })}
-            />
-          </Field>
-        )}
-
-        {draft.basis === 'serving' && (
-          <>
-            <Field label="Serving size (g)" error={issueFor(errors, 'servingSizeG')}>
-              <NumberInput
-                value={draft.servingSizeG}
-                onChange={(value) => setDraft({ ...draft, servingSizeG: value })}
-              />
-            </Field>
-            <Field label="Servings per package" error={issueFor(errors, 'servingsPerPackage')}>
-              <NumberInput
-                value={draft.servingsPerPackage}
-                placeholder="about 4"
-                onChange={(value) => setDraft({ ...draft, servingsPerPackage: value })}
-              />
-            </Field>
-          </>
-        )}
-
-        {draft.basis === 'per100g' && (
-          <Field label="Package size (g)" error={issueFor(errors, 'packageSizeG')}>
-            <NumberInput
-              value={draft.packageSizeG}
-              placeholder="pre-fills the amount"
-              onChange={(value) => setDraft({ ...draft, packageSizeG: value })}
-            />
-          </Field>
-        )}
-      </div>
-
-      <div className="list-heading">Nutrition</div>
-      <div className="macro-grid">
-        {MACRO_FIELDS.map((field) => (
-          <Field key={field.key} label={field.label} error={issueFor(errors, field.key)}>
-            <NumberInput
-              value={draft.macros[field.key]}
-              onChange={(value) => setMacro(field.key, value)}
-            />
-          </Field>
-        ))}
-      </div>
-
-      {warnings.length > 0 && (
-        <ul className="warnings">
-          {warnings.map((warning) => (
-            <li key={warning.field}>{warning.message}</li>
-          ))}
-        </ul>
-      )}
+      <ProductFields
+        ingredient={ingredient}
+        draft={draft}
+        setDraft={setDraft}
+        errors={errors}
+        warnings={warnings}
+      />
 
       <div className="actions">
         <button type="button" className="primary" disabled={busy} onClick={() => void save()}>
@@ -668,7 +502,7 @@ function LotStep({
   const [errors, setErrors] = useState<readonly FieldIssue[]>([])
   const [busy, setBusy] = useState(false)
 
-  const units = useMemo(() => convertibleUnits(ingredient), [ingredient])
+  const units = useMemo(() => convertibleUnits(ingredient, product), [ingredient, product])
 
   /**
    * Turning the freezer switch on clears the pre-filled date and turning it off
@@ -689,7 +523,7 @@ function LotStep({
   }
 
   async function save() {
-    const result = validateLotDraft(draft, ingredient, product.id)
+    const result = validateLotDraft(draft, ingredient, product.id, product)
     if (!result.ok) {
       setErrors(result.errors)
       return
@@ -704,7 +538,7 @@ function LotStep({
     }
   }
 
-  const preview = validateLotDraft(draft, ingredient, product.id)
+  const preview = validateLotDraft(draft, ingredient, product.id, product)
 
   return (
     <form

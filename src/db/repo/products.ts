@@ -47,3 +47,34 @@ export async function addProduct(
   await db.products.add(product)
   return product
 }
+
+/**
+ * Replace a product's details with corrected ones.
+ *
+ * Added 2026-08-21 (Jack: be able to fix a product from the ingredient sheet).
+ * The whole row is rewritten from the form rather than patched field by field,
+ * so clearing the brand or removing a pack count actually clears it — a form
+ * that shows every field is a complete statement of what the product is.
+ *
+ * `id` and `createdAt` are carried over: this is the same product with better
+ * information, not a new one, and every lot in the kitchen points at that id.
+ *
+ * **Past days do not move.** `ConsumptionEvent.macros` is a snapshot taken when
+ * the entry was logged, and nothing here touches those rows — which is the
+ * whole reason DECISIONS.md made history immutable, and why editing a product
+ * is safe where editing a canonical ingredient still is not (the seed merge can
+ * silently overwrite that one). Meals eaten from the old figures keep them;
+ * anything logged from here on uses the corrected ones.
+ */
+export async function updateProduct(
+  db: KitchenOsDb,
+  id: ProductId,
+  changes: NewProduct,
+): Promise<Product> {
+  const existing = await db.products.get(id)
+  if (!existing) throw new Error(`updateProduct: unknown product "${id}".`)
+
+  const updated: Product = { ...changes, id: existing.id, createdAt: existing.createdAt }
+  await db.products.put(updated)
+  return updated
+}

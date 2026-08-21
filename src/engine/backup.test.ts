@@ -265,6 +265,43 @@ describe('validateBackupFile — upgrading an older file', () => {
     const result = validateBackupFile(asParsed(goodBackup()))
     expect(result.warnings).toEqual([])
   })
+
+  /** A backup as version 2 wrote it: cholesterol present, no meals, no counts. */
+  function version2Backup(): Record<string, unknown> {
+    const backup = asParsed(goodBackup()) as Record<string, unknown>
+    backup.schemaVersion = 2
+    ;(backup.meta as Record<string, unknown>).schemaVersion = 2
+    return backup
+  }
+
+  it('accepts a version 2 file, adding nothing that was not in it', () => {
+    const result = validateBackupFile(version2Backup())
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.backup.schemaVersion).toBe(SCHEMA_VERSION)
+    expect(result.backup.meta.schemaVersion).toBe(SCHEMA_VERSION)
+    // Optional fields stay absent. Restoring a backup must not invent a meal.
+    expect(result.backup.consumptionEvents.every((event) => event.meal === undefined)).toBe(true)
+    expect(result.backup.products.every((product) => product.unitsPerPackage === undefined)).toBe(
+      true,
+    )
+  })
+
+  /*
+   * The warning has to describe THIS file's conversion. It used to say every
+   * old file had its cholesterol filled in, which was true of the only upgrade
+   * that existed and false the moment a second one did.
+   */
+  it('describes what actually changed, not what changed for some other version', () => {
+    const fromV1 = validateBackupFile(version1Backup()).warnings.join(' ')
+    const fromV2 = validateBackupFile(version2Backup()).warnings.join(' ')
+
+    expect(fromV1).toContain('cholesterol')
+    expect(fromV1).toContain('meal')
+    expect(fromV2).toContain('meal')
+    expect(fromV2).not.toContain('cholesterol')
+  })
 })
 
 describe('parseBackupFile', () => {

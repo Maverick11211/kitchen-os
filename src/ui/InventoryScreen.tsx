@@ -9,6 +9,7 @@ import type { IngredientCategory } from '../types/schema'
 import { formatDate } from '../lib/clock'
 import {
   CATEGORY_LABELS,
+  formatAmount,
   formatGrams,
   itemsInCategory,
   type ExpiryBand,
@@ -44,8 +45,14 @@ function ItemRow({ item, onSelect }: { item: InventoryItem; onSelect: (item: Inv
           <ExpiryTag item={item} />
         </span>
         <span className="item-meta">
-          <span className="item-amount">{formatGrams(item.totalG)}</span>
+          {/*
+            Counted things read as counts (Jack, 2026-08-21). The weight is not
+            thrown away — it moves to the quiet line underneath, where it is
+            available without being the thing you have to interpret first.
+          */}
+          <span className="item-amount">{formatAmount(item)}</span>
           <span className="item-detail">
+            {item.totalCount !== null && `${formatGrams(item.totalG)} · `}
             {item.lotCount === 1 ? '1 packet' : `${item.lotCount} packets`}
             {item.soonestExpiry !== null && ` · ${formatDate(item.soonestExpiry)}`}
           </span>

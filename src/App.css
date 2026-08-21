@@ -618,3 +618,197 @@ button.item:active {
   font-weight: 600;
   text-decoration: underline;
 }
+
+/* --- the day ------------------------------------------------------------- */
+
+.day-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.day-step {
+  min-width: var(--tap);
+  min-height: var(--tap);
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.day-step:disabled {
+  opacity: 0.35;
+}
+
+.log-button {
+  min-height: var(--tap);
+  background: var(--rail);
+  color: #fff;
+  font-weight: 600;
+}
+
+.totals {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0 4px;
+}
+
+.total {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  text-align: center;
+}
+
+.total-value {
+  display: block;
+  font-size: 30px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.total-label {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.entries {
+  margin-top: 10px;
+}
+
+.entry {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: var(--tap);
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--line);
+}
+
+.entry-time {
+  flex: 0 0 82px;
+  font-size: 14px;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.entry-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.entry-name {
+  display: block;
+}
+
+.entry-detail {
+  display: block;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.entry-calories {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.entry-remove,
+.entry-remove-spacer {
+  flex: 0 0 auto;
+  min-width: 84px;
+  min-height: var(--tap);
+}
+
+.entry-remove-spacer {
+  display: inline-block;
+}
+
+/* --- log sheet ----------------------------------------------------------- */
+
+.pick-chosen {
+  background: #eef2e6;
+  font-weight: 600;
+}
+
+/* --- throwing a packet out ----------------------------------------------- */
+
+.lot-bin {
+  margin-left: auto;
+  color: var(--ink-soft);
+}
+
+.lot-confirm {
+  align-items: center;
+}
+
+.lot-confirm-text {
+  flex: 1 1 auto;
+  font-size: 14px;
+}
+
+.step-bad {
+  border-color: var(--urgent);
+  color: var(--urgent);
+}
+
+.entry-unit {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+/* --- meals ---------------------------------------------------------------- */
+
+.meal {
+  margin-top: 22px;
+}
+
+.meal-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--line);
+}
+
+.meal-head h2 {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.meal-total {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* The four choices in the log sheet. Wraps rather than shrinking below the
+   44pt target, since this is a tap on a moving iPad. */
+.meal-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.meal-picker .step {
+  flex: 1 1 120px;
+}
+
+.step-chosen {
+  border-color: var(--rail);
+  background: #eef2e6;
+  font-weight: 600;
+}
+
+/* --- editing a product ---------------------------------------------------- */
+
+.lot-edit {
+  margin-left: 10px;
+  font-size: 14px;
+}

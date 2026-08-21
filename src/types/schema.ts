@@ -211,6 +211,23 @@ export interface Product {
   /** Net weight of a full package, in grams. Pre-fills lot quantity. */
   packageSizeG?: number;
 
+  /**
+   * How many individual items are in a full package. "6" for a pack of six
+   * tortillas.
+   *
+   * Added 2026-08-21 (see DECISIONS.md). Only meaningful when the canonical
+   * ingredient is tracked by count, and only useful alongside `packageSizeG` —
+   * together they give what ONE of them actually weighs, which is the number
+   * the app was previously guessing.
+   *
+   * The guess it replaces was `CanonicalIngredient.unitWeightG`, an average
+   * across every brand of the thing. That is the right fallback when nothing
+   * better is known, but the package in the kitchen knows better, and logging
+   * "1 tortilla" against a generic average is a silent error on every count
+   * ingredient in the app.
+   */
+  unitsPerPackage?: number;
+
   /** UPC barcode. Unused in v1; reserved for barcode scanning in v2. */
   upc?: string;
 
@@ -410,6 +427,15 @@ export type ConsumptionSource =
     };
 
 /**
+ * Which meal an entry belongs to.
+ *
+ * Added 2026-08-21 (see DECISIONS.md). A flat day answers "how much did I eat"
+ * but not "where did it go", and the answer to the second question is what
+ * changes what you do tomorrow.
+ */
+export type MealSlot = 'breakfast' | 'lunch' | 'dinner' | 'snack';
+
+/**
  * Anything eaten. This is what the daily totals sum over.
  *
  * Macros are SNAPSHOTTED here, not recomputed on read. Correcting a product's
@@ -423,6 +449,23 @@ export interface ConsumptionEvent {
 
   /** Display label. Example: "Chicken Tikka Masala" or "Carrots" */
   label: string;
+
+  /**
+   * Which meal this was, when it was said.
+   *
+   * Optional on purpose (added 2026-08-21). Entries logged before meals existed
+   * genuinely have no answer, and inventing one — filing every old entry as a
+   * snack, or guessing from the clock retroactively — would put made-up
+   * information in the one table the app promises never to rewrite. Absent
+   * means unlabelled, and the daily view groups those together under their own
+   * heading rather than hiding them.
+   *
+   * The app does NOT guess from the time of day when logging either (Jack,
+   * 2026-08-21): a 3pm meal is as likely to be a late lunch as an early dinner,
+   * and a wrong default that has to be corrected every time is worse than no
+   * default at all.
+   */
+  meal?: MealSlot;
 }
 
 // ---------------------------------------------------------------------------
@@ -484,8 +527,13 @@ export interface BackupFile {
  * 2 — 2026-08-20. `MacroSet.cholesterolMg` added. The first version bump with
  *     real data behind it: see the `version(2)` upgrade in `src/db/db.ts` for
  *     stored rows, and `validateBackupFile` for files.
+ * 3 — 2026-08-21. `ConsumptionEvent.meal` and `Product.unitsPerPackage` added,
+ *     both optional. Two fields decided on the same day, shipped as ONE version
+ *     with one migration — two bumps for two same-day decisions would be a
+ *     self-inflicted wound. Nothing is backfilled: both fields are absent on
+ *     older rows, which is the truth about them.
  *
  * Any future change to this file needs the same two things — a migration for
  * the database and a step in the backup upgrade path.
  */
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;

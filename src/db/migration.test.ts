@@ -159,3 +159,118 @@ describe('opening a version 1 database with today’s code', () => {
     second.close()
   })
 })
+
+// ---------------------------------------------------------------------------
+// Version 2 -> 3
+// ---------------------------------------------------------------------------
+
+/**
+ * The version 2 store layout, frozen the same way V1_STORES is.
+ *
+ * Identical to version 1's: neither bump has added a table or an index, only
+ * fields inside the stored objects. It is written out again rather than reusing
+ * the constant above so that changing one cannot silently change the other —
+ * they are two historical records that happen to match today, not one fact.
+ */
+const V2_STORES = {
+  canonicalIngredients: 'id, name, category',
+  products: 'id, canonicalId, name',
+  lots: 'id, productId, expiresOn, acquiredOn',
+  recipes: 'id, name, *cuisines',
+  appliances: 'id',
+  cookEvents: 'id, recipeId, cookedAt',
+  consumptionEvents: 'id, consumedAt',
+  leftovers: 'id, cookEventId',
+  meta: '',
+}
+
+/** A MacroSet as version 2 wrote it: nine fields, cholesterol included. */
+const V2_MACROS = { ...V1_MACROS, cholesterolMg: 88 }
+
+/** Build and populate a database the way version 2 of the app would have. */
+async function writeVersion2Database(name: string): Promise<void> {
+  const legacy = new Dexie(name)
+  legacy.version(1).stores(V1_STORES)
+  legacy.version(2).stores(V2_STORES)
+  await legacy.open()
+
+  await legacy.table('products').add({
+    id: 'prod_2',
+    canonicalId: 'tortilla-flour',
+    name: 'Mission Flour Tortillas',
+    macrosPer100g: { ...V2_MACROS },
+    packageSizeG: 413,
+    createdAt: '2026-08-20T10:00:00.000Z',
+  })
+  await legacy.table('consumptionEvents').add({
+    id: 'ate_2',
+    consumedAt: '2026-08-20T18:30:00.000Z',
+    source: { type: 'ingredient', canonicalId: 'tortilla-flour', grams: 69 },
+    macros: { ...V2_MACROS },
+    label: 'Mission Flour Tortillas',
+  })
+  await legacy.table('meta').put({ schemaVersion: 2, seedVersion: '2026-08-19-ontology-310' }, META_KEY)
+
+  legacy.close()
+}
+
+describe('opening a version 2 database with today’s code', () => {
+  it('moves the recorded schema version forward', async () => {
+    const name = freshName()
+    await writeVersion2Database(name)
+
+    const db = createDb(name)
+    expect((await readMeta(db)).schemaVersion).toBe(SCHEMA_VERSION)
+    expect((await readMeta(db)).seedVersion).toBe('2026-08-19-ontology-310')
+    db.close()
+  })
+
+  /*
+   * The point of version 3. Both fields it adds are optional, and an entry
+   * logged before meals existed genuinely has no meal — so the migration must
+   * leave it ABSENT rather than inventing "snack" to make the column look full.
+   * `consumptionEvents` is the table DECISIONS.md promises never to rewrite,
+   * which makes an invented value here worse than a missing one.
+   */
+  it('invents no meal on an entry logged before meals existed', async () => {
+    const name = freshName()
+    await writeVersion2Database(name)
+
+    const db = createDb(name)
+    const event = await db.consumptionEvents.get('ate_2')
+
+    expect(event).toBeDefined()
+    expect(event && 'meal' in event).toBe(false)
+    expect(event?.macros.cholesterolMg).toBe(88)
+    expect(event?.label).toBe('Mission Flour Tortillas')
+    db.close()
+  })
+
+  it('invents no pack count on a product entered before counts existed', async () => {
+    const name = freshName()
+    await writeVersion2Database(name)
+
+    const db = createDb(name)
+    const product = await db.products.get('prod_2')
+
+    expect(product && 'unitsPerPackage' in product).toBe(false)
+    // and leaves what WAS there alone
+    expect(product?.packageSizeG).toBe(413)
+    expect(product?.macrosPer100g.cholesterolMg).toBe(88)
+    db.close()
+  })
+
+  it('is safe to open twice', async () => {
+    const name = freshName()
+    await writeVersion2Database(name)
+
+    const first = createDb(name)
+    await first.open()
+    first.close()
+
+    const second = createDb(name)
+    expect((await readMeta(second)).schemaVersion).toBe(SCHEMA_VERSION)
+    expect(await second.products.count()).toBe(1)
+    second.close()
+  })
+})

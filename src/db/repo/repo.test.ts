@@ -12,8 +12,9 @@ import type { MacroSet } from '../../types/schema'
 import { createDb, type KitchenOsDb } from '../db'
 import { defaultMeta, markExported, readMeta, writeMeta } from './meta'
 import { addUserIngredient, listIngredients } from './ingredients'
-import { addProduct, productsForCanonical } from './products'
+import { addProduct, productsForCanonical, updateProduct } from './products'
 import { addLot, deleteLot, lotsForProduct } from './lots'
+import { logIngredient } from './consumption'
 
 let dbCounter = 0
 function freshDb(): KitchenOsDb {
@@ -260,6 +261,101 @@ describe('deleteLot', () => {
     await deleteLot(db, lot.id)
     // A stale screen can ask again, and it means the same thing both times.
     await expect(deleteLot(db, lot.id)).resolves.toBeUndefined()
+    db.close()
+  })
+})
+
+describe('updateProduct', () => {
+  it('corrects the figures without becoming a different product', async () => {
+    const db = freshDb()
+    const created = await addProduct(
+      db,
+      { canonicalId: 'cheddar-block', name: 'Store Cheddar', macrosPer100g: MACROS },
+      NOW,
+    )
+
+    const updated = await updateProduct(db, created.id, {
+      canonicalId: 'cheddar-block',
+      name: 'Kroger Sharp Cheddar',
+      macrosPer100g: { ...MACROS, calories: 410 },
+      packageSizeG: 226,
+    })
+
+    expect(updated.id).toBe(created.id)
+    expect(updated.createdAt).toBe(created.createdAt)
+    expect(updated.name).toBe('Kroger Sharp Cheddar')
+    expect(updated.macrosPer100g.calories).toBe(410)
+    expect(await db.products.count()).toBe(1)
+    db.close()
+  })
+
+  it('clears a field that was emptied on the form', async () => {
+    const db = freshDb()
+    const created = await addProduct(
+      db,
+      {
+        canonicalId: 'cheddar-block',
+        name: 'Store Cheddar',
+        brand: 'Store',
+        macrosPer100g: MACROS,
+      },
+      NOW,
+    )
+
+    const updated = await updateProduct(db, created.id, {
+      canonicalId: 'cheddar-block',
+      name: 'Store Cheddar',
+      macrosPer100g: MACROS,
+    })
+
+    expect(updated.brand).toBeUndefined()
+    db.close()
+  })
+
+  /*
+   * The property that makes editing a product safe at all (DECISIONS.md,
+   * "history is immutable"). A logged entry carries its own snapshot, so
+   * correcting the product it came from must leave last week exactly as it was.
+   */
+  it('does not move a day already logged', async () => {
+    const db = freshDb()
+    const product = await addProduct(
+      db,
+      { canonicalId: 'cheddar-block', name: 'Store Cheddar', macrosPer100g: MACROS },
+      NOW,
+    )
+    const logged = await logIngredient(
+      db,
+      {
+        canonicalId: 'cheddar-block',
+        grams: 100,
+        label: 'Store Cheddar',
+        macros: MACROS,
+        productId: product.id,
+      },
+      NOW,
+    )
+
+    await updateProduct(db, product.id, {
+      canonicalId: 'cheddar-block',
+      name: 'Store Cheddar',
+      macrosPer100g: { ...MACROS, calories: 999 },
+    })
+
+    const event = await db.consumptionEvents.get(logged.event.id)
+    expect(event?.macros.calories).toBe(MACROS.calories)
+    db.close()
+  })
+
+  it('refuses to update something that is not there', async () => {
+    const db = freshDb()
+    await expect(
+      updateProduct(db, 'prod_nope', {
+        canonicalId: 'cheddar-block',
+        name: 'Ghost',
+        macrosPer100g: MACROS,
+      }),
+    ).rejects.toThrow(/unknown product/)
     db.close()
   })
 })

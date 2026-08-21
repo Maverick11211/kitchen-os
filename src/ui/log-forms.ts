@@ -22,12 +22,13 @@ import type {
   Lot,
   LotId,
   MacroSet,
+  MealSlot,
   Product,
   ProductId,
   Unit,
 } from '../types/schema'
 import type { InventoryIndex } from '../engine'
-import { ZERO_MACROS, availableLotsFor, scaleMacros, toGrams } from '../engine'
+import { ZERO_MACROS, availableLotsFor, gramsPerCount, scaleMacros, toGrams } from '../engine'
 import type { LogIngredientInput } from '../db/repo/consumption'
 import { parseAmount, type FieldIssue } from './entry-forms'
 import { formatGrams } from './inventory-view'
@@ -116,6 +117,8 @@ export interface LogDraft {
   readonly choice: LogChoice
   /** The "don't take it out of my stock" switch. Only means anything for a packet. */
   readonly deduct: boolean
+  /** Which meal, or '' for not saying. Never filled in on the User's behalf. */
+  readonly meal: MealSlot | ''
   readonly quick: QuickMacroDraft
 }
 
@@ -127,10 +130,21 @@ export interface LogDraft {
  * actually on the ontology entry — offering a unit the engine will refuse is
  * worse than offering a duller one that works.
  */
-export function defaultUnit(ingredient: CanonicalIngredient): Unit {
-  if (ingredient.trackBy === 'count' && ingredient.unitWeightG !== undefined) return 'count'
+export function defaultUnit(ingredient: CanonicalIngredient, product?: Product): Unit {
+  if (ingredient.trackBy === 'count' && gramsPerCount(ingredient, product) !== null) return 'count'
   if (ingredient.trackBy === 'volume' && ingredient.densityGPerMl !== undefined) return 'ml'
   return 'g'
+}
+
+/** The product a choice points at, or undefined for a quick log. */
+export function productForChoice(choice: LogChoice, options: LogOptions): Product | undefined {
+  if (choice.kind === 'packet') {
+    return options.packets.find((option) => option.lot.id === choice.lotId)?.product
+  }
+  if (choice.kind === 'product') {
+    return options.otherProducts.find((option) => option.id === choice.productId)
+  }
+  return undefined
 }
 
 /** The best available source of figures: the first-expiring packet, if there is one. */
@@ -143,11 +157,17 @@ export function defaultChoice(options: LogOptions): LogChoice {
 }
 
 export function emptyLogDraft(ingredient: CanonicalIngredient, options: LogOptions): LogDraft {
+  const choice = defaultChoice(options)
   return {
     amount: '',
-    unit: defaultUnit(ingredient),
-    choice: defaultChoice(options),
+    // The unit follows the packet being logged from, because for a count that
+    // packet is what decides what "1" weighs.
+    unit: defaultUnit(ingredient, productForChoice(choice, options)),
+    choice,
     deduct: true,
+    // No default and no guess from the clock (Jack, 2026-08-21). A wrong guess
+    // has to be corrected every single time, which is worse than no answer.
+    meal: '',
     quick: { calories: '', carbsG: '', fatG: '', proteinG: '' },
   }
 }
@@ -252,14 +272,12 @@ export function validateLogDraft(
     errors.push({ field: 'amount', message: 'That has to be more than zero.' })
   }
 
-  let grams = 0
-  if (amount !== null && amount > 0) {
-    const converted = toGrams(ingredient, amount, draft.unit)
-    if (!converted.ok) errors.push({ field: 'unit', message: converted.message })
-    else grams = converted.grams
-  }
-
   // Where the figures come from, and what moves in the kitchen.
+  //
+  // This is settled BEFORE the amount is converted, and the order matters: for
+  // a count, the chosen product is what decides what "1" weighs. Converting
+  // first meant one tortilla was always the ontology's average tortilla rather
+  // than one out of the bag in the kitchen (Jack, 2026-08-21).
   let macrosPer100g: MacroSet | null = null
   let macros: MacroSet | null = null
   let label = ingredient.name
@@ -292,6 +310,13 @@ export function validateLogDraft(
     macros = quickMacros(draft.quick, errors, warnings)
   }
 
+  let grams = 0
+  if (amount !== null && amount > 0) {
+    const converted = toGrams(ingredient, amount, draft.unit, productForChoice(draft.choice, options))
+    if (!converted.ok) errors.push({ field: 'unit', message: converted.message })
+    else grams = converted.grams
+  }
+
   // How much the packet can actually give up. The remainder is quantity drift:
   // you ate what you ate, and the packet is simply empty (Jack, 2026-08-20).
   let deductedG = 0
@@ -318,6 +343,7 @@ export function validateLogDraft(
     macros: macros ?? scaleMacros(macrosPer100g ?? ZERO_MACROS, grams),
     ...(productId === undefined ? {} : { productId }),
     ...(lotId === undefined ? {} : { lotId }),
+    ...(draft.meal === '' ? {} : { meal: draft.meal }),
   }
 
   return { ok: true, log, grams, deductedG, shortfallG, warnings }

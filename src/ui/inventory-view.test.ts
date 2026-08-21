@@ -5,10 +5,14 @@ import {
   buildInventoryItems,
   countByCategory,
   expiryBand,
+  formatAmount,
+  formatCount,
   formatGrams,
   itemsInCategory,
   itemsNeedingUse,
+  lotAmountText,
   needsUsingUp,
+  pluralize,
 } from './inventory-view'
 
 const TODAY = '2026-08-19'
@@ -219,5 +223,123 @@ describe('formatGrams', () => {
     expect(formatGrams(226)).toBe('226 g')
     expect(formatGrams(1500)).toBe('1.5 kg')
     expect(formatGrams(12_000)).toBe('12 kg')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Counted things read as counts
+// ---------------------------------------------------------------------------
+
+describe('counts on the shelf', () => {
+  const TORTILLA: CanonicalIngredient = {
+    id: 'tortilla-flour',
+    name: 'Tortilla, flour',
+    category: 'grain',
+    trackBy: 'count',
+    tracked: true,
+    perishable: true,
+    unitWeightG: 45,
+    aliases: [],
+    isSeed: true,
+  }
+
+  const BAG = {
+    id: 'prod_mission',
+    canonicalId: 'tortilla-flour',
+    name: 'Mission Flour Tortillas',
+    macrosPer100g: MACROS,
+    packageSizeG: 413,
+    unitsPerPackage: 6,
+    createdAt: '2026-08-01T00:00:00.000Z',
+  }
+
+  function packet(id: string, remainingG: number, productId = 'prod_mission') {
+    return {
+      id,
+      productId,
+      initialG: 413,
+      remainingG,
+      expiresOn: null,
+      acquiredOn: '2026-08-18',
+      depleted: false,
+    }
+  }
+
+  it('says how many are left, not how much they weigh', () => {
+    const items = buildInventoryItems(
+      buildOntologyIndex([TORTILLA]),
+      buildInventoryIndex([BAG], [packet('lot_1', 413)]),
+      TODAY,
+    )
+
+    expect(items[0]?.totalCount).toBeCloseTo(6, 5)
+    expect(formatAmount(items[0]!)).toBe('6 tortillas')
+  })
+
+  it('adds up packets of different sizes, each in its own terms', () => {
+    const tenPack = { ...BAG, id: 'prod_ten', packageSizeG: 500, unitsPerPackage: 10 }
+    const items = buildInventoryItems(
+      buildOntologyIndex([TORTILLA]),
+      buildInventoryIndex(
+        [BAG, tenPack],
+        [packet('lot_1', 413), packet('lot_2', 250, 'prod_ten')],
+      ),
+      TODAY,
+    )
+
+    // Six from the bag of six, five from the half-used bag of ten.
+    expect(items[0]?.totalCount).toBeCloseTo(11, 5)
+  })
+
+  it('gives up the count when a packet cannot say what one weighs', () => {
+    const { unitWeightG, ...noAverage } = TORTILLA
+    void unitWeightG
+    const unlabelled = { ...BAG, id: 'prod_plain', packageSizeG: undefined, unitsPerPackage: undefined }
+    const items = buildInventoryItems(
+      buildOntologyIndex([noAverage]),
+      buildInventoryIndex([unlabelled], [packet('lot_1', 300, 'prod_plain')]),
+      TODAY,
+    )
+
+    expect(items[0]?.totalCount).toBeNull()
+    expect(formatAmount(items[0]!)).toBe('300 g')
+  })
+
+  it('leaves things that are weighed in grams', () => {
+    const cheese: CanonicalIngredient = { ...TORTILLA, id: 'cheddar', name: 'Cheddar', trackBy: 'mass' }
+    const items = buildInventoryItems(
+      buildOntologyIndex([cheese]),
+      buildInventoryIndex(
+        [{ ...BAG, id: 'prod_c', canonicalId: 'cheddar' }],
+        [packet('lot_1', 226, 'prod_c')],
+      ),
+      TODAY,
+    )
+
+    expect(items[0]?.totalCount).toBeNull()
+    expect(formatAmount(items[0]!)).toBe('226 g')
+  })
+
+  it('reads a part-used packet as a fraction rather than pretending it is whole', () => {
+    const half = lotAmountText(packet('lot_1', 206.5), TORTILLA, BAG)
+    expect(half.remaining).toBe('3')
+    expect(half.initial).toBe('6 tortillas')
+  })
+
+  it('says one of a thing in the singular', () => {
+    expect(formatCount(1, TORTILLA)).toBe('1 tortilla')
+    expect(formatCount(2, TORTILLA)).toBe('2 tortillas')
+  })
+
+  it('pluralises well enough for a kitchen', () => {
+    expect(pluralize('egg', 2)).toBe('eggs')
+    expect(pluralize('box', 2)).toBe('boxes')
+    expect(pluralize('berry', 2)).toBe('berries')
+    expect(pluralize('egg', 1)).toBe('egg')
+  })
+
+  it('uses the head of a catalogue name, not the whole thing', () => {
+    // "Tortilla, flour" is a catalogue entry; nobody says "six tortilla, flours".
+    expect(formatCount(6, TORTILLA)).toBe('6 tortillas')
   })
 })

@@ -18,11 +18,12 @@ import type {
   DateOnly,
   IngredientCategory,
   MacroSet,
+  Product,
   ProductId,
   TrackBy,
   Unit,
 } from '../types/schema'
-import type { CanonicalIngredientDraft } from '../engine'
+import type { CanonicalIngredientDraft, CountSource } from '../engine'
 import { MACRO_KEYS, multiplyMacros, toGrams } from '../engine'
 import type { NewProduct } from '../db/repo/products'
 import type { NewLot } from '../db/repo/lots'
@@ -114,6 +115,15 @@ export interface ProductDraft {
   readonly packageSizeG: string
   readonly servingSizeG: string
   readonly servingsPerPackage: string
+  /**
+   * How many items are in a full package — "6" for a pack of six tortillas.
+   *
+   * Only asked for when the ingredient is counted rather than weighed. It is
+   * the number that makes "1 tortilla" mean one of THESE tortillas instead of
+   * the ontology's average across every brand (added 2026-08-21, see
+   * DECISIONS.md).
+   */
+  readonly unitsPerPackage: string
   readonly macros: Readonly<Record<MacroKey, string>>
 }
 
@@ -127,6 +137,38 @@ export function emptyProductDraft(): ProductDraft {
     packageSizeG: '',
     servingSizeG: '',
     servingsPerPackage: '',
+    unitsPerPackage: '',
+    macros,
+  }
+}
+
+/**
+ * Fill the product form in from a product already stored, for correcting it.
+ *
+ * Opened on the per-100g basis because that is what the schema keeps — the
+ * basis originally typed is not stored, so claiming to know it would be a
+ * guess. The serving size and pack count are prefilled where they were
+ * recorded, so the common correction (a wrong calorie figure, a pack count
+ * never entered) needs no retyping of anything else.
+ *
+ * Switching the basis afterwards means the figures shown no longer match what
+ * they are measured against; the edit sheet says so rather than silently
+ * clearing them, because deleting eight numbers someone might only be passing
+ * through is worse than a sentence asking them to check.
+ */
+export function productDraftFrom(product: Product): ProductDraft {
+  const macros = {} as Record<MacroKey, string>
+  for (const key of MACRO_KEYS) macros[key] = String(product.macrosPer100g[key])
+
+  return {
+    name: product.name,
+    brand: product.brand ?? '',
+    basis: 'per100g',
+    packageSizeG: product.packageSizeG === undefined ? '' : String(product.packageSizeG),
+    servingSizeG: product.labelServingSizeG === undefined ? '' : String(product.labelServingSizeG),
+    servingsPerPackage: '',
+    unitsPerPackage:
+      product.unitsPerPackage === undefined ? '' : String(product.unitsPerPackage),
     macros,
   }
 }
@@ -213,6 +255,14 @@ export function validateProductDraft(
     }
   }
 
+  const unitsPerPackage = parseAmount(draft.unitsPerPackage)
+  if (hasText(draft.unitsPerPackage) && (unitsPerPackage === null || unitsPerPackage <= 0)) {
+    errors.push({
+      field: 'unitsPerPackage',
+      message: 'How many are in the pack? It needs to be a number greater than zero.',
+    })
+  }
+
   const entered = {} as Record<MacroKey, number>
   for (const key of MACRO_KEYS) {
     const text = draft.macros[key]
@@ -261,6 +311,21 @@ export function validateProductDraft(
     product.labelServingSizeG = servingSizeG
   }
   if (resolvedPackageSizeG !== undefined) product.packageSizeG = resolvedPackageSizeG
+
+  /*
+   * A pack count is only worth storing next to a package weight, since one
+   * without the other cannot say what a single item weighs. Stored alone it
+   * would look like an answer while still leaving the count unconvertible.
+   */
+  if (unitsPerPackage !== null && unitsPerPackage > 0 && resolvedPackageSizeG !== undefined) {
+    product.unitsPerPackage = unitsPerPackage
+  } else if (unitsPerPackage !== null && unitsPerPackage > 0) {
+    warnings.push({
+      field: 'unitsPerPackage',
+      message:
+        'Without the weight of the whole package, a pack count cannot say what one of them weighs — so it has not been saved.',
+    })
+  }
 
   return { ok: true, product, warnings }
 }
@@ -331,6 +396,7 @@ export function validateLotDraft(
   draft: LotDraft,
   ingredient: CanonicalIngredient,
   productId: ProductId,
+  product?: CountSource,
 ): LotValidation {
   const errors: FieldIssue[] = []
 
@@ -347,7 +413,9 @@ export function validateLotDraft(
 
   let grams = 0
   if (quantity !== null && quantity > 0) {
-    const converted = toGrams(ingredient, quantity, draft.unit)
+    // The product is passed so that "6" in counts means six of THESE, using the
+    // pack count on the label rather than the ontology's average (2026-08-21).
+    const converted = toGrams(ingredient, quantity, draft.unit, product)
     if (!converted.ok) errors.push({ field: 'unit', message: converted.message })
     else grams = converted.grams
   }

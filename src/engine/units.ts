@@ -54,7 +54,8 @@ const VOLUME_UNIT_ML: Readonly<Record<'ml' | 'l' | 'floz' | 'tsp' | 'tbsp' | 'cu
 // ---------------------------------------------------------------------------
 
 export type ConversionFailureReason =
-  /** Unit is `count` but the ingredient has no `unitWeightG`. */
+  /** Unit is `count` but neither the product's pack count nor the
+   *  ingredient's `unitWeightG` can say what one of them weighs. */
   | 'missing-unit-weight'
   /** A volume unit was used but the ingredient has neither `cupWeightG` nor
    *  (for liquids) `densityGPerMl`. */
@@ -121,6 +122,46 @@ export function gramsPerMl(ingredient: CanonicalIngredient): number | null {
 }
 
 // ---------------------------------------------------------------------------
+// The one place a count becomes mass
+// ---------------------------------------------------------------------------
+
+/**
+ * The part of a `Product` that can answer "what does one of them weigh?".
+ *
+ * Structural rather than the whole `Product` so this module keeps knowing
+ * nothing about brands, macros or ids — and so a caller holding a half-built
+ * product form can ask the question just as easily as one holding a stored row.
+ */
+export interface CountSource {
+  readonly packageSizeG?: number
+  readonly unitsPerPackage?: number
+}
+
+/**
+ * What ONE of something weighs, in grams, or null if nothing knows.
+ *
+ * The product wins when it can answer, because it is the package actually in
+ * the kitchen: 413 g of tortillas divided by the 6 on the bag is what one of
+ * THESE weighs. `CanonicalIngredient.unitWeightG` is an average across every
+ * brand of the thing, which is the right answer when there is no product to
+ * ask and a silently wrong one when there is (added 2026-08-21 — logging "1
+ * tortilla" against the ontology's average was Jack's bug).
+ *
+ * A pack count of zero is ignored rather than dividing by it.
+ */
+export function gramsPerCount(
+  ingredient: CanonicalIngredient,
+  product?: CountSource,
+): number | null {
+  const packageSizeG = product?.packageSizeG
+  const unitsPerPackage = product?.unitsPerPackage
+  if (packageSizeG != null && unitsPerPackage != null && unitsPerPackage > 0) {
+    return packageSizeG / unitsPerPackage
+  }
+  return ingredient.unitWeightG ?? null
+}
+
+// ---------------------------------------------------------------------------
 // Conversion
 // ---------------------------------------------------------------------------
 
@@ -139,11 +180,17 @@ function checkQuantity(quantity: number): ConversionFailure | null {
  *
  * Recipes store the result as `RecipeIngredient.quantityG` so ranking never has
  * to convert on render.
+ *
+ * `product` is optional and only matters for counts, where it is the difference
+ * between "one tortilla" meaning the one in the kitchen and meaning the average
+ * of every tortilla ever made. Pass it whenever the caller knows which product
+ * is being measured; leaving it out keeps the old behaviour exactly.
  */
 export function toGrams(
   ingredient: CanonicalIngredient,
   quantity: number,
   unit: Unit,
+  product?: CountSource,
 ): ToGramsResult {
   const bad = checkQuantity(quantity)
   if (bad) return bad
@@ -153,13 +200,14 @@ export function toGrams(
   }
 
   if (unit === 'count') {
-    if (ingredient.unitWeightG == null) {
+    const perUnit = gramsPerCount(ingredient, product)
+    if (perUnit == null) {
       return fail(
         'missing-unit-weight',
-        `"${ingredient.name}" has no unitWeightG, so a count cannot be converted to grams.`,
+        `Nothing says what one "${ingredient.name}" weighs, so a count cannot be converted to grams.`,
       )
     }
-    return { ok: true, grams: quantity * ingredient.unitWeightG }
+    return { ok: true, grams: quantity * perUnit }
   }
 
   if (isVolumeUnit(unit)) {
@@ -185,6 +233,7 @@ export function fromGrams(
   ingredient: CanonicalIngredient,
   grams: number,
   unit: Unit,
+  product?: CountSource,
 ): FromGramsResult {
   const bad = checkQuantity(grams)
   if (bad) return bad
@@ -194,13 +243,14 @@ export function fromGrams(
   }
 
   if (unit === 'count') {
-    if (ingredient.unitWeightG == null) {
+    const perUnit = gramsPerCount(ingredient, product)
+    if (perUnit == null) {
       return fail(
         'missing-unit-weight',
-        `"${ingredient.name}" has no unitWeightG, so grams cannot be shown as a count.`,
+        `Nothing says what one "${ingredient.name}" weighs, so grams cannot be shown as a count.`,
       )
     }
-    return { ok: true, quantity: grams / ingredient.unitWeightG }
+    return { ok: true, quantity: grams / perUnit }
   }
 
   if (isVolumeUnit(unit)) {
@@ -219,15 +269,19 @@ export function fromGrams(
 }
 
 /** True when `toGrams` would succeed for this ingredient/unit pair. */
-export function canConvert(ingredient: CanonicalIngredient, unit: Unit): boolean {
-  return toGrams(ingredient, 1, unit).ok
+export function canConvert(
+  ingredient: CanonicalIngredient,
+  unit: Unit,
+  product?: CountSource,
+): boolean {
+  return toGrams(ingredient, 1, unit, product).ok
 }
 
 /**
  * Every unit this ingredient can be expressed in, for populating a unit picker
  * without offering choices that would fail.
  */
-export function convertibleUnits(ingredient: CanonicalIngredient): Unit[] {
+export function convertibleUnits(ingredient: CanonicalIngredient, product?: CountSource): Unit[] {
   const all: Unit[] = ['g', 'kg', 'oz', 'lb', 'ml', 'l', 'tsp', 'tbsp', 'cup', 'floz', 'count']
-  return all.filter((unit) => canConvert(ingredient, unit))
+  return all.filter((unit) => canConvert(ingredient, unit, product))
 }

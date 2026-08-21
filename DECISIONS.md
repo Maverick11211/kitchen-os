@@ -1737,3 +1737,231 @@ Reconcile cannot set a packet to more than it originally held. If the app says
 448g and there is visibly more, the answer is a second lot. Recording this
 because it is a deliberate consequence of `initialG` meaning "what was there
 when added", not an oversight — revisit only if it turns out to bite.
+
+---
+
+## 2026-08-20 — Phase 5: nutrition UI. Seven decisions, no schema change.
+
+Daily totals, browsing past days, and direct ingredient logging. Chunks 1-3 are
+built; suite 6506 passing, lint and build clean, and the whole flow was driven in
+a real browser (log from a packet, remove, undo, throw the packet out, log with
+typed figures, page the days).
+
+### Decisions confirmed with Jack before writing code
+
+**Logging deducts stock.** Default on when there is stock, with a visible "take
+it out of my kitchen" switch to turn it off, and automatically off when nothing
+is on hand. Eating your cheese should reduce your cheese; food eaten elsewhere
+should not.
+
+**Macros come from the packet being deducted from.** One rule for both
+questions, so with two cheddars in the fridge the answer is never arbitrary: the
+figures belong to the food that actually moved. Nothing on hand falls back to
+the most recently added product for that canonical. No product at all falls back
+to a quick log, where the figures are typed for that entry only.
+
+**A day is local midnight to local midnight**, matching expiry rather than
+inventing a second convention. `consumedAt` stays a UTC instant, so a day is a
+RANGE query between two computed timestamps — an evening meal is stored under
+tomorrow's UTC date, and matching the first ten characters of the string would
+silently lose it. `localDayRange` and `localDayOf` in `src/lib/clock.ts` do the
+conversion, and the timezone is read there and nowhere else.
+
+**Delete with Undo, no editing.** Fixing a mis-tap is a different thing from
+rewriting history: withdrawing an entry and logging a new one leaves the
+immutability rule literally true, where editing a stored snapshot in place would
+not. Deleting puts the grams back. Undo restores the WHOLE original record —
+same id, same timestamp, same figures — because a re-log would land on today.
+
+**One packet, not several.** FEFO can span two packets but the schema's
+ingredient arm holds a single optional `lotId`. Rather than bump the schema for
+it, a log takes what the first-expiring packet has, records the full amount of
+macros anyway — you ate what you ate — and says so on screen: "Only 30 g left in
+that packet, so 50 g is logged and the packet is emptied." The difference is
+quantity drift, which this file already accepts and which Reconcile fixes in one
+tap.
+
+**Nutrition is a second top-level area.** "Today" at the top of the rail, past
+days on arrows inside the screen rather than as rail entries nobody navigates
+by. (Superseded within a day — see the follow-ups below.)
+
+**Lots can be deleted outright.** Jack, on seeing an expired packet he had
+thrown away: "thrown out and not undone." This NARROWS "depleted lots are
+retained" near the top of this file. That rule protects consumption HISTORY — a
+lot you ate your way through is the evidence for what you ate. A packet that
+went in the bin has no history in it, and leaving it in the emptied list forever
+means the list stops being worth opening. Marking something empty stays a claim
+that the food went into a person; binning it is a different claim. Any
+`ConsumptionEvent` that debited a deleted lot keeps its macro snapshot untouched
+and past totals do not move; what is lost is the inventory link, so deleting
+such an entry afterwards puts nothing back. No Undo, deliberately — an app
+offering to un-throw-away food would be pretending.
+
+### No schema change was needed
+
+Worth recording because it was the first thing checked. A quick-logged food
+still has a canonical ingredient — it simply has no Product — and
+`{ type: 'ingredient', canonicalId, grams }` already allows both `productId` and
+`lotId` to be absent. So `SCHEMA_VERSION` stays 2: no Dexie migration, no
+`upgradeBackup` step.
+
+### Known inaccuracy, accepted
+
+An entry whose deduction was clamped by a nearly-empty packet records the grams
+EATEN, not the grams REMOVED, and there is no field for the difference. Deleting
+such an entry can therefore hand back slightly more than it took, bounded by
+`initialG`. The escape hatch, if it ever bites, is a schema v3 carrying a
+`Deduction[]` on the ingredient arm — which Phase 7 wants anyway.
+
+### The quick log asks for four figures, not nine
+
+The product form asks for the whole label because a product is entered once and
+reused forever. A quick log is one entry that will never be seen again, and the
+other five figures are not displayed anywhere in v1, so asking for them would be
+friction with no payoff. Stored as zero, the same honest backfill the cholesterol
+migration used.
+
+### Two things the browser caught that the tests did not
+
+The log sheet had "Something else" twice — as a source option and as the back
+button — and the Log button was not styled as the primary action, so the sheet
+looked like it had no next step. Both are the same lesson as Phase 4: a green
+suite says the arithmetic is right, not that the screen makes sense.
+
+### Deferred to the next session — Jack's list of 2026-08-20
+
+Recorded rather than built, at 90% of the usage limit. Full detail, including a
+diagnosis of the first one, is in `PHASE5-FOLLOWUPS.md`.
+
+1. **Count-tracked ingredients log the wrong weight.** `toGrams` uses the
+   canonical's average `unitWeightG`, not the product's own package or serving
+   size, so "1 tortilla" is the ontology's generic tortilla rather than the one
+   in the fridge. The product knows better and is not being asked.
+2. **Count-tracked ingredients should DISPLAY as counts** — "6 tortillas left",
+   not "413 g". Same root cause: which weight is one of them?
+3. **Meal slots** (breakfast / lunch / dinner / snack) on a logged entry. This
+   one needs `SCHEMA_VERSION` 3, a Dexie `version(3)` upgrade and an
+   `upgradeBackup` step. Flagged, not worked around.
+4. **Editing a product** — serving size, calories — from the ingredient sheet.
+   Note this does NOT conflict with "add-only, no editing" of 2026-08-19: that
+   decision is about CANONICAL ingredients and seed-merge safety. Products are a
+   different tier, and past days cannot move because their figures are snapshots.
+5. **Rename "Today"** in the rail to something that reads as macro tracking.
+6. **Rail order**: the nutrition section above "+ Add to the kitchen", and the
+   add button next to the kitchen list it belongs to.
+
+---
+
+## 2026-08-21 — Jack's six follow-ups. Schema version 3.
+
+Everything on the list of 2026-08-20 is built. `PHASE5-FOLLOWUPS.md` is deleted
+with this entry — it was a holding note for one session, and leaving it beside
+this file would be a second, staler account of the same decisions.
+
+Suite 6555 passing, lint and build clean, and the whole lot driven in a real
+browser (`qa/smoke-phase5.cjs`, now sixteen steps).
+
+### The count bug, and what actually caused it
+
+Jack logged one tortilla from a 413 g bag of six and the app charged him 45 g.
+`toGrams` converted a count with `CanonicalIngredient.unitWeightG` and nothing
+else — an average across every brand of the thing. The bag in the kitchen knew
+better and was never asked.
+
+**The product now answers the question when it can.** `gramsPerCount(ingredient,
+product)` in `src/engine/units.ts` is the one place a count becomes mass, in the
+same spirit as `gramsPerMl` for volume: package weight divided by pack count,
+falling back to the ontology average when there is no product, and null when
+nothing anywhere knows. `toGrams`, `fromGrams`, `canConvert` and
+`convertibleUnits` all take an optional product now; leaving it out behaves
+exactly as before, so the seed data and the recipe conversions are untouched.
+
+**`Product.unitsPerPackage` is the new field**, asked for on the product form
+only when the ingredient is counted. It is stored only alongside a package
+weight — one without the other cannot say what a single item weighs, so storing
+it alone would look like an answer while still leaving counts unconvertible.
+That case warns rather than blocking, per the standing rule about warnings.
+
+**The ordering bug behind the bug.** `validateLogDraft` converted the amount
+BEFORE resolving which packet was being logged from. Even with the field in
+place that would have kept using the average. Choice first, conversion second.
+
+### Counts display as counts
+
+"6 flour tortillas", not "413 g" — the weight moves to the quiet line
+underneath, where it is available without being the thing you have to interpret
+first. Counted per PACKET, each with its own product's weight, and summed: a bag
+of six and a bag of ten are different sizes of the same thing, and adding their
+counts is exact where picking one divisor for both would not be. One packet that
+cannot say what one item weighs gives up the whole count — half an answer would
+still read as a fact.
+
+Pluralisation is three rules and no dictionary (`pluralize` in
+`inventory-view.ts`), and the noun is the head of the ontology name: "Tortilla,
+flour" gives "tortillas", because nobody says "six tortilla, flours". An
+irregular noun will read a little wrong, once, on a screen that also states the
+exact weight — a much smaller cost than an exceptions list nobody maintains.
+
+### Meal slots — grouped, never guessed
+
+`ConsumptionEvent.meal` is optional: breakfast, lunch, dinner, snack. The day
+splits into sections with a subtotal on each, empty sections omitted.
+
+**No default and no guess from the clock** (Jack). A 3pm plate is as likely to be
+a late lunch as an early dinner, and a wrong default that has to be corrected
+every time is worse than no answer. Tapping the chosen meal again clears it, so
+"I would rather not say" stays reachable rather than being a trap.
+
+**Unlabelled entries gather under "Other", last, and still count towards the
+day.** Every entry logged before this existed is one of them. Optional rather
+than required is what lets them stay honest — a required field would have meant
+inventing a meal for every row already written, in the one table this file
+promises never to rewrite.
+
+### Editing a product is allowed. Editing an ingredient still is not.
+
+Jack asked to correct a product from the ingredient sheet. This does NOT conflict
+with "add-only, no editing" of 2026-08-19: **that rule is about CANONICAL
+ingredients**, and its whole reasoning is seed-merge safety — a redeployed
+`ontology.json` replaces a differing seed entry, so an edit there is destroyed
+silently. Products are a different tier. The merge never touches them, and a
+logged day cannot move when one changes, because `ConsumptionEvent.macros` was
+snapshotted at log time. That is the property the immutability rule was built to
+give, and this is the first thing to actually cash it in. There is a test for it
+in `repo.test.ts` and a step for it in the browser run.
+
+Two things the form says out loud, both about what editing does not do: the
+figures shown are per 100 g whatever was originally typed off the label (the
+basis is not stored, so claiming to know it would be a guess), and days already
+logged keep the figures they were logged with.
+
+`ProductFields` was extracted from `AddFlow.tsx` into `ProductForm.tsx` so the
+add and edit forms cannot drift; `FormControls.tsx` and `form-behaviour.ts` came
+out of the same file, because controls used by three sheets should not live
+inside one of them.
+
+### Schema version 3, one bump for two fields
+
+`ConsumptionEvent.meal` and `Product.unitsPerPackage`, both optional, shipped
+together with one `db.version(3)` upgrade and one `upgradeBackup` step. Two bumps
+for two decisions taken on the same day would have been a self-inflicted wound.
+
+**Nothing is backfilled.** Both migrations do exactly one thing — stamp the new
+version on the metadata row. Absent is the truth about both fields on older
+rows, and `migration.test.ts` now asserts it: opening a version 2 database must
+leave `meal` absent rather than inventing "snack" to make the column look full.
+The version 2 upgrade was also corrected to stamp the literal `2` rather than
+today's `SCHEMA_VERSION`, so a device replaying 1 → 2 → 3 records each step
+honestly.
+
+The restore warning is now built per version (`upgradeNotes`). It used to say
+every old file had its cholesterol filled in, which was true of the only upgrade
+that existed and false the moment a second one did.
+
+### The rail
+
+"Today" became **"Food log"** (Jack's pick from four): the rail entry names the
+area, and the screen's own heading already says which day you are looking at, so
+having both say "Today" was one word doing two jobs. Nutrition now sits above
+the kitchen, and "+ Add to the kitchen" moved down beside the kitchen list it
+belongs to — it is the thing done once after a shop, not the app's main action.

@@ -18,12 +18,16 @@ import { useState } from 'react'
 import type { CanonicalIngredient, DateOnly, Lot, Product } from '../types/schema'
 import { gramsForFraction } from '../engine'
 import { db } from '../db/db'
-import { adjustLotRemaining, saveLot } from '../db/repo/lots'
+import { adjustLotRemaining, deleteLot, saveLot } from '../db/repo/lots'
 import { formatDate, nowIso } from '../lib/clock'
+import { EditProduct } from './EditProduct'
 import {
   RECONCILE_STEPS,
+  countOnHand,
   expiryBand,
+  formatCount,
   formatGrams,
+  lotAmountText,
   totalRemaining,
 } from './inventory-view'
 
@@ -42,20 +46,28 @@ interface UndoState {
 
 function LotRow({
   lot,
+  ingredient,
   product,
   today,
   busy,
   onFraction,
   onExact,
+  onThrowOut,
+  onEditProduct,
 }: {
   lot: Lot
+  ingredient: CanonicalIngredient
   product: Product | undefined
   today: DateOnly
   busy: boolean
   onFraction: (lot: Lot, fraction: number) => void
   onExact: (lot: Lot, grams: number) => void
+  onThrowOut: (lot: Lot) => void
+  onEditProduct: (product: Product) => void
 }) {
   const [typed, setTyped] = useState('')
+  const [confirming, setConfirming] = useState(false)
+  const amount = lotAmountText(lot, ingredient, product)
   const band = expiryBand(lot, today)
   const note = BAND_NOTE[band]
 
@@ -73,10 +85,26 @@ function LotRow({
           <span className="lot-name">{product?.name ?? 'Unknown product'}</span>
           {lot.frozen === true && <span className="chip">frozen</span>}
           {note !== '' && <span className={`chip chip-${band}`}>{note}</span>}
+          {/*
+            The product's own details, reachable from the packet in front of you
+            (Jack, 2026-08-21). A figure is nearly always found to be wrong while
+            looking at the thing it describes, which is here rather than back in
+            the add flow.
+          */}
+          {product !== undefined && (
+            <button
+              type="button"
+              className="link-button lot-edit"
+              disabled={busy}
+              onClick={() => onEditProduct(product)}
+            >
+              Edit
+            </button>
+          )}
         </div>
         <span className="lot-amount">
-          {lot.depleted ? 'empty' : formatGrams(lot.remainingG)}
-          <span className="lot-of"> of {formatGrams(lot.initialG)}</span>
+          {lot.depleted ? 'empty' : amount.remaining}
+          <span className="lot-of"> of {amount.initial}</span>
         </span>
       </div>
 
@@ -86,8 +114,34 @@ function LotRow({
         {lot.note !== undefined && lot.note !== '' && ` · ${lot.note}`}
       </div>
 
-      <div className="lot-actions">
-        {RECONCILE_STEPS.map((step) => (
+      {/*
+        Throwing it out is not the same as finishing it (Jack, 2026-08-20).
+        Empty means the food went into a person and is worth keeping a record
+        of; binned means the packet should not be in the list at all. It cannot
+        be undone, so it asks first — inline rather than as a dialog, which on
+        an iPad is both easier to hit and easier to back out of.
+      */}
+      {confirming ? (
+        <div className="lot-actions lot-confirm">
+          <span className="lot-confirm-text">Throw this packet out? It will not come back.</span>
+          <button
+            type="button"
+            className="step step-bad"
+            disabled={busy}
+            onClick={() => {
+              setConfirming(false)
+              onThrowOut(lot)
+            }}
+          >
+            Yes, it is gone
+          </button>
+          <button type="button" className="step" disabled={busy} onClick={() => setConfirming(false)}>
+            Keep it
+          </button>
+        </div>
+      ) : (
+        <div className="lot-actions">
+          {RECONCILE_STEPS.map((step) => (
           <button
             key={step.label}
             type="button"
@@ -99,23 +153,33 @@ function LotRow({
           </button>
         ))}
 
-        <input
-          type="text"
-          inputMode="decimal"
-          className="lot-exact"
-          placeholder="grams"
-          value={typed}
-          disabled={busy}
-          onChange={(event) => setTyped(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') {
-              event.preventDefault()
-              submitTyped()
-            }
-          }}
-          onBlur={submitTyped}
-        />
-      </div>
+          <input
+            type="text"
+            inputMode="decimal"
+            className="lot-exact"
+            placeholder="grams"
+            value={typed}
+            disabled={busy}
+            onChange={(event) => setTyped(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault()
+                submitTyped()
+              }
+            }}
+            onBlur={submitTyped}
+          />
+
+          <button
+            type="button"
+            className="link-button lot-bin"
+            disabled={busy}
+            onClick={() => setConfirming(true)}
+          >
+            Throw out
+          </button>
+        </div>
+      )}
     </li>
   )
 }
@@ -140,9 +204,11 @@ export function ItemSheet({
   onClose: () => void
 }) {
   const [undo, setUndo] = useState<UndoState | null>(null)
+  const [editing, setEditing] = useState<Product | null>(null)
   const [showEmptied, setShowEmptied] = useState(false)
   const [busy, setBusy] = useState(false)
 
+  const onHandCount = countOnHand(lots, ingredient, products)
   const live = lots.filter((lot) => !lot.depleted)
   const emptied = lots.filter((lot) => lot.depleted)
   const shown = showEmptied ? [...live, ...emptied] : live
@@ -159,6 +225,24 @@ export function ItemSheet({
     }
   }
 
+  /**
+   * Bin a packet. No Undo, deliberately — you have thrown the food away, and an
+   * app offering to un-throw-away food would be pretending.
+   *
+   * Any pending Undo for THIS packet is dropped first. It restores a whole lot
+   * record with `put`, so leaving it on screen would let one tap resurrect a row
+   * that was just deleted.
+   */
+  async function throwOut(lot: Lot) {
+    setBusy(true)
+    try {
+      if (undo?.lot.id === lot.id) setUndo(null)
+      await deleteLot(db, lot.id)
+    } finally {
+      setBusy(false)
+    }
+  }
+
   async function undoLast() {
     if (!undo) return
     setBusy(true)
@@ -168,6 +252,33 @@ export function ItemSheet({
     } finally {
       setBusy(false)
     }
+  }
+
+  /*
+   * Editing takes over the sheet rather than opening a second one on top. The
+   * product being corrected is the one whose packet you were just looking at,
+   * and stacking a dialog over a dialog on an iPad leaves neither with room.
+   */
+  if (editing !== null) {
+    return (
+      <div className="sheet-backdrop">
+        <section className="sheet" role="dialog" aria-label={`Edit ${editing.name}`}>
+          <header className="sheet-head">
+            <h2>{editing.name}</h2>
+            <button type="button" onClick={() => setEditing(null)}>
+              Close
+            </button>
+          </header>
+
+          <EditProduct
+            ingredient={ingredient}
+            product={editing}
+            onSaved={() => setEditing(null)}
+            onCancel={() => setEditing(null)}
+          />
+        </section>
+      </div>
+    )
   }
 
   return (
@@ -182,9 +293,11 @@ export function ItemSheet({
 
         <div className="sheet-body">
           <p className="sheet-context">
-            {formatGrams(totalRemaining(lots))} on hand across{' '}
-            {live.length === 1 ? '1 packet' : `${live.length} packets`}. Tap how full each one
-            actually is.
+            {onHandCount === null
+              ? formatGrams(totalRemaining(lots))
+              : formatCount(onHandCount, ingredient)}{' '}
+            on hand across {live.length === 1 ? '1 packet' : `${live.length} packets`}. Tap how
+            full each one actually is.
           </p>
 
           {undo !== null && (
@@ -201,6 +314,7 @@ export function ItemSheet({
               <LotRow
                 key={lot.id}
                 lot={lot}
+                ingredient={ingredient}
                 product={products.get(lot.productId)}
                 today={today}
                 busy={busy}
@@ -216,6 +330,8 @@ export function ItemSheet({
                 onExact={(target, grams) =>
                   void apply(target, grams, `Set a packet to ${formatGrams(grams)}.`)
                 }
+                onThrowOut={(target) => void throwOut(target)}
+                onEditProduct={setEditing}
               />
             ))}
           </ul>

@@ -29,6 +29,7 @@ export {
   canConvert,
   convertibleUnits,
   fromGrams,
+  gramsPerCount,
   gramsPerMl,
   isMassUnit,
   isVolumeUnit,
@@ -37,6 +38,7 @@ export {
 export type {
   ConversionFailure,
   ConversionFailureReason,
+  CountSource,
   FromGramsResult,
   ToGramsResult,
 } from './units'

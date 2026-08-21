@@ -36,7 +36,6 @@ import type {
   Product,
   Recipe,
 } from '../types/schema'
-import { SCHEMA_VERSION } from '../types/schema'
 
 /**
  * `AppMeta` is a single row, and it needs a key.
@@ -121,7 +120,29 @@ export function createDb(name: string = DB_NAME): KitchenOsDb {
         backfillCholesterol(row, 'macros')
       })
       await tx.table<StoredRow>('meta').toCollection().modify((row) => {
-        row.schemaVersion = SCHEMA_VERSION
+        row.schemaVersion = 2
+      })
+    })
+
+  /**
+   * Version 3 — `ConsumptionEvent.meal` and `Product.unitsPerPackage`
+   * (2026-08-21).
+   *
+   * Both new fields are OPTIONAL, so unlike version 2 there is nothing to
+   * backfill: an entry logged before meals existed has no meal, and a product
+   * entered before pack counts existed has no count. Absent is the honest
+   * answer in both cases, and every reader already treats it that way.
+   *
+   * The block exists anyway, doing the one thing it must — stamping the new
+   * version on the metadata row. DECISIONS.md requires a migration per schema
+   * bump, and "this one needs no data changes" is a conclusion worth writing
+   * down explicitly rather than an absence someone later has to re-derive.
+   */
+  db.version(3)
+    .stores({})
+    .upgrade(async (tx) => {
+      await tx.table<StoredRow>('meta').toCollection().modify((row) => {
+        row.schemaVersion = 3
       })
     })
 

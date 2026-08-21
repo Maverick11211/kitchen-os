@@ -16,7 +16,7 @@
  * snapshotted when the entry was written. Nothing here reaches back into a
  * product, so correcting a product's nutrition tomorrow cannot move a past day.
  */
-import type { ConsumptionEvent, DateOnly, MacroSet } from '../types/schema'
+import type { ConsumptionEvent, DateOnly, MacroSet, MealSlot } from '../types/schema'
 import { roundMacros, totalMacros } from '../engine'
 import { addDays } from './entry-forms'
 import { formatGrams } from './inventory-view'
@@ -101,6 +101,72 @@ export function dayEntries(events: readonly ConsumptionEvent[]): DayEntry[] {
     calories: Math.round(event.macros.calories),
     canDelete: event.source.type === 'ingredient',
   }))
+}
+
+// ---------------------------------------------------------------------------
+// Meals
+// ---------------------------------------------------------------------------
+
+/**
+ * The meals a day is divided into, in the order they are eaten.
+ *
+ * Snack last rather than in clock order: it is the one that happens at any hour,
+ * so there is no time of day that would put it anywhere in particular.
+ */
+export const MEAL_SLOTS: readonly MealSlot[] = ['breakfast', 'lunch', 'dinner', 'snack']
+
+export const MEAL_LABELS: Record<MealSlot, string> = {
+  breakfast: 'Breakfast',
+  lunch: 'Lunch',
+  dinner: 'Dinner',
+  snack: 'Snacks',
+}
+
+/** One section of the day. `meal` is null for entries with no meal on them. */
+export interface MealGroup {
+  readonly meal: MealSlot | null
+  readonly heading: string
+  readonly entries: readonly DayEntry[]
+  /** Rounded subtotal for the section. */
+  readonly calories: number
+  /** The section's full totals, for anything that wants more than calories. */
+  readonly macros: MacroSet
+}
+
+/**
+ * The day, split into meals.
+ *
+ * Empty sections are left out entirely: a day with no breakfast should not show
+ * a Breakfast heading with nothing under it, which reads as a thing you failed
+ * to do rather than a thing you did not do.
+ *
+ * Entries with no meal come LAST, under their own heading, rather than being
+ * hidden or filed under a guess. Every entry logged before meals existed is one
+ * of these (`ConsumptionEvent.meal` is optional precisely so they can stay
+ * honest about it), and they still count towards the day's totals — the four
+ * figures at the top are computed from the whole day, not from the sections.
+ */
+export function mealGroups(events: readonly ConsumptionEvent[]): MealGroup[] {
+  const groups: MealGroup[] = []
+
+  const build = (meal: MealSlot | null, heading: string, matching: ConsumptionEvent[]) => {
+    if (matching.length === 0) return
+    const macros = totalMacros(matching)
+    groups.push({
+      meal,
+      heading,
+      entries: dayEntries(matching),
+      calories: Math.round(macros.calories),
+      macros,
+    })
+  }
+
+  for (const meal of MEAL_SLOTS) {
+    build(meal, MEAL_LABELS[meal], events.filter((event) => event.meal === meal))
+  }
+  build(null, 'Other', events.filter((event) => event.meal === undefined))
+
+  return groups
 }
 
 // ---------------------------------------------------------------------------

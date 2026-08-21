@@ -8,6 +8,7 @@ import {
   canConvert,
   convertibleUnits,
   fromGrams,
+  gramsPerCount,
   gramsPerMl,
   isMassUnit,
   isVolumeUnit,
@@ -320,5 +321,90 @@ describe('canConvert / convertibleUnits', () => {
 
   it('an ingredient with no conversion fields supports mass units only', () => {
     expect(convertibleUnits(groundBeef)).toEqual(['g', 'kg', 'oz', 'lb'])
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Counts: whose weight wins
+// ---------------------------------------------------------------------------
+
+describe('gramsPerCount', () => {
+  /** The ontology's generic tortilla: an average across every brand. */
+  const TORTILLA: CanonicalIngredient = {
+    id: 'tortilla-flour',
+    name: 'Tortilla, flour',
+    category: 'grain',
+    trackBy: 'count',
+    tracked: true,
+    perishable: true,
+    unitWeightG: 45,
+    aliases: [],
+    isSeed: true,
+  }
+
+  /** The bag actually in the kitchen: 413 g, six of them, so 68.83 g each. */
+  const MISSION = { packageSizeG: 413, unitsPerPackage: 6 }
+
+  it('prefers the product in the kitchen over the ontology average', () => {
+    expect(gramsPerCount(TORTILLA, MISSION)).toBeCloseTo(68.83, 2)
+  })
+
+  it('falls back to the ingredient average when there is no product', () => {
+    expect(gramsPerCount(TORTILLA)).toBe(45)
+  })
+
+  it('falls back when the product knows a weight but not a count', () => {
+    expect(gramsPerCount(TORTILLA, { packageSizeG: 413 })).toBe(45)
+  })
+
+  it('falls back when the product knows a count but not a weight', () => {
+    expect(gramsPerCount(TORTILLA, { unitsPerPackage: 6 })).toBe(45)
+  })
+
+  it('does not divide by a pack count of zero', () => {
+    expect(gramsPerCount(TORTILLA, { packageSizeG: 413, unitsPerPackage: 0 })).toBe(45)
+  })
+
+  /** The same ingredient with no average weight recorded at all. */
+  function withoutAverage(): CanonicalIngredient {
+    const copy = { ...TORTILLA }
+    delete copy.unitWeightG
+    return copy
+  }
+
+  it('is null when nothing anywhere knows', () => {
+    expect(gramsPerCount(withoutAverage())).toBeNull()
+  })
+
+  /*
+   * The bug this was written for. Jack logged one tortilla from a 413 g bag of
+   * six and the app charged him the ontology's 45 g — a third light, on every
+   * count ingredient, silently.
+   */
+  it('converts one tortilla to the weight of one of HIS tortillas', () => {
+    const generic = toGrams(TORTILLA, 1, 'count')
+    const actual = toGrams(TORTILLA, 1, 'count', MISSION)
+
+    expect(generic.ok && generic.grams).toBe(45)
+    expect(actual.ok && actual.grams).toBeCloseTo(68.83, 2)
+  })
+
+  it('shows a part-used bag as a count of what is left', () => {
+    // Four tortillas left out of six: 275.33 g.
+    const shown = fromGrams(TORTILLA, 275.33, 'count', MISSION)
+    expect(shown.ok && shown.quantity).toBeCloseTo(4, 2)
+  })
+
+  it('round-trips a count through grams and back', () => {
+    const grams = toGrams(TORTILLA, 3, 'count', MISSION)
+    expect(grams.ok).toBe(true)
+    if (!grams.ok) return
+    const back = fromGrams(TORTILLA, grams.grams, 'count', MISSION)
+    expect(back.ok && back.quantity).toBeCloseTo(3, 10)
+  })
+
+  it('offers count as a unit when only the product can explain it', () => {
+    expect(convertibleUnits(withoutAverage())).not.toContain('count')
+    expect(convertibleUnits(withoutAverage(), MISSION)).toContain('count')
   })
 })

@@ -1,11 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import type { ConsumptionEvent, MacroSet } from '../types/schema'
+import type { ConsumptionEvent, MacroSet, MealSlot } from '../types/schema'
 import {
   canPageBack,
   canPageForward,
   dayEntries,
   emptyDayNote,
   headlineFigures,
+  mealGroups,
   nextDay,
   previousDay,
   relativeDayName,
@@ -147,5 +148,61 @@ describe('emptyDayNote', () => {
   it('reads as unfinished today and finished on a past day', () => {
     expect(emptyDayNote(TODAY, TODAY)).toBe('Nothing logged yet today.')
     expect(emptyDayNote('2026-08-12', TODAY)).toBe('Nothing was logged this day.')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Meals
+// ---------------------------------------------------------------------------
+
+describe('mealGroups', () => {
+  const ZERO = macros()
+  const at = (hour: number, meal?: MealSlot, calories = 100): ConsumptionEvent => ({
+    id: `cons_${hour}_${meal ?? 'none'}`,
+    consumedAt: `2026-08-21T${String(hour).padStart(2, '0')}:00:00.000Z`,
+    source: { type: 'ingredient', canonicalId: 'oats-rolled', grams: 50 },
+    macros: { ...ZERO, calories },
+    label: 'Porridge',
+    ...(meal === undefined ? {} : { meal }),
+  })
+
+  it('puts the meals in the order they are eaten, snacks last', () => {
+    const groups = mealGroups([at(20, 'dinner'), at(8, 'breakfast'), at(15, 'snack'), at(12, 'lunch')])
+    expect(groups.map((group) => group.meal)).toEqual(['breakfast', 'lunch', 'dinner', 'snack'])
+  })
+
+  it('leaves out a meal that did not happen', () => {
+    const groups = mealGroups([at(12, 'lunch')])
+    expect(groups).toHaveLength(1)
+    expect(groups[0]?.heading).toBe('Lunch')
+  })
+
+  it('subtotals each section', () => {
+    const groups = mealGroups([at(12, 'lunch', 300), at(13, 'lunch', 250), at(20, 'dinner', 600)])
+    expect(groups.map((group) => group.calories)).toEqual([550, 600])
+  })
+
+  /*
+   * The reason `meal` is optional. Every entry logged before meals existed has
+   * none, and filing those under a guessed meal would put invented data in the
+   * one table DECISIONS.md promises never to rewrite.
+   */
+  it('gathers unlabelled entries under their own heading, at the end', () => {
+    const groups = mealGroups([at(9), at(8, 'breakfast')])
+    expect(groups.map((group) => group.heading)).toEqual(['Breakfast', 'Other'])
+    expect(groups[1]?.meal).toBeNull()
+  })
+
+  it('counts unlabelled entries towards the day, not away from it', () => {
+    const events = [at(9, undefined, 400), at(8, 'breakfast', 300)]
+    const day = headlineFigures(events).find((figure) => figure.key === 'calories')
+    const sections = mealGroups(events).reduce((total, group) => total + group.calories, 0)
+
+    expect(day?.value).toBe(700)
+    expect(sections).toBe(700)
+  })
+
+  it('has nothing to show for a day with nothing in it', () => {
+    expect(mealGroups([])).toEqual([])
   })
 })
