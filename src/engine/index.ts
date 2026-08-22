@@ -13,6 +13,7 @@
  *   ontology    — canonical ingredient lookup
  *   inventory   — FEFO deduction, availability, expiry
  *   macros      — MacroSet arithmetic and batch/portion totals
+ *   cooking     — what is left of a cooked batch, and clamping a portion to it
  *   ownership   — "what can I cook right now?" and recipe ranking
  *   recipe-source — the bundled seed recipes joined with the User's own
  *   equipment   — what a recipe needs to cook it, against what he owns
@@ -91,6 +92,15 @@ export {
   totalMacros,
 } from './macros'
 export type { MacroLine } from './macros'
+
+export {
+  FRACTION_EPSILON,
+  clampPortion,
+  isBatchOpen,
+  removePortion,
+  remainingFraction,
+  addPortion,
+} from './cooking'
 
 export {
   DEFAULT_EXPIRING_SOON_DAYS,

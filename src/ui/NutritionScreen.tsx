@@ -85,6 +85,16 @@ export function NutritionScreen({ today, onLog }: { today: DateOnly; onLog: () =
 
   const [undo, setUndo] = useState<ConsumptionEvent | null>(null)
   const [busy, setBusy] = useState(false)
+  /**
+   * Something the screen has to say out loud rather than swallow.
+   *
+   * Both writes below can refuse. `restoreConsumption` refuses to put back a
+   * portion whose batch has since been removed — that would count the same food
+   * twice — and until this existed the refusal became an unhandled promise
+   * rejection: nothing happened, no message, and the entry silently stayed
+   * gone. A refusal the User cannot see is the same as a silent failure.
+   */
+  const [failure, setFailure] = useState<string | null>(null)
 
   const figures = headlineFigures(events ?? [])
   const groups = mealGroups(events ?? [])
@@ -94,15 +104,23 @@ export function NutritionScreen({ today, onLog }: { today: DateOnly; onLog: () =
     // Today keeps its own stable address so the rail link stays lit on it.
     navigate(target === today ? '/today' : `/day/${target}`)
     setUndo(null)
+    setFailure(null)
+  }
+
+  function describe(error: unknown): string {
+    return error instanceof Error ? error.message : 'Something went wrong.'
   }
 
   async function remove(event: ConsumptionEvent) {
     setBusy(true)
+    setFailure(null)
     try {
       const removed = await deleteConsumption(db, event.id)
       // The whole record is kept for Undo, not just its id: putting it back has
       // to restore the original timestamp and macro snapshot.
       if (removed !== undefined) setUndo(removed.event)
+    } catch (error: unknown) {
+      setFailure(describe(error))
     } finally {
       setBusy(false)
     }
@@ -111,8 +129,14 @@ export function NutritionScreen({ today, onLog }: { today: DateOnly; onLog: () =
   async function undoRemove() {
     if (undo === null) return
     setBusy(true)
+    setFailure(null)
     try {
       await restoreConsumption(db, undo)
+      setUndo(null)
+    } catch (error: unknown) {
+      // The offer is withdrawn along with the explanation. Leaving an Undo
+      // button that has just refused would invite tapping it again.
+      setFailure(describe(error))
       setUndo(null)
     } finally {
       setBusy(false)
@@ -168,6 +192,12 @@ export function NutritionScreen({ today, onLog }: { today: DateOnly; onLog: () =
             Undo
           </button>
         </div>
+      )}
+
+      {failure !== null && (
+        <ul className="errors">
+          <li>{failure}</li>
+        </ul>
       )}
 
       {/*

@@ -479,19 +479,36 @@ describe('planRecipeDeduction', () => {
     ])
   })
 
-  it('reports per-ingredient shortfalls when scaled beyond stock', () => {
+  /*
+   * Parsley is the OPTIONAL garnish in this dish, so running out of it is
+   * reported but does not make the batch incomplete (Jack, 2026-08-22). Before
+   * that decision this said `complete: false`, which made the cook sheet
+   * contradict a recipe card that had already said "you have everything for
+   * this" — optional lines are excluded from the ownership percentage.
+   */
+  it('reports an optional shortfall without calling the batch incomplete', () => {
     const plan = planRecipeDeduction(index, ontology, dish, 4)
-    expect(plan.complete).toBe(false)
+    expect(plan.complete).toBe(true)
     expect(plan.shortfalls).toEqual([
-      { canonicalId: 'parsley', requestedG: 16, shortfallG: 6 },
+      { canonicalId: 'parsley', requestedG: 16, shortfallG: 6, optional: true },
     ])
+  })
+
+  it('a REQUIRED shortfall still makes it incomplete', () => {
+    const thin = buildInventoryIndex(
+      [product({ id: 'p-butter', canonicalId: 'butter' })],
+      [lot({ id: 'l-butter', productId: 'p-butter', remainingG: 10 })],
+    )
+    const plan = planRecipeDeduction(thin, ontology, dish)
+    expect(plan.complete).toBe(false)
+    expect(plan.shortfalls.find((s) => s.canonicalId === 'butter')?.optional).toBe(false)
   })
 
   it('treats an ingredient the ontology does not know as tracked, so it surfaces', () => {
     const mystery = recipe({ id: 'x', ingredients: [recipeIngredient('unobtainium', 10)] })
     const plan = planRecipeDeduction(index, ontology, mystery)
     expect(plan.shortfalls).toEqual([
-      { canonicalId: 'unobtainium', requestedG: 10, shortfallG: 10 },
+      { canonicalId: 'unobtainium', requestedG: 10, shortfallG: 10, optional: false },
     ])
   })
 
@@ -501,6 +518,95 @@ describe('planRecipeDeduction', () => {
 
   it('throws on a negative scale factor', () => {
     expect(() => planRecipeDeduction(index, ontology, dish, -1)).toThrow(RangeError)
+  })
+
+  /*
+   * Two lines of the SAME ingredient — Chakchouka's red and green peppers,
+   * Spanish tortilla's two pours of olive oil. Six of the 150 seed recipes.
+   *
+   * Found 2026-08-22, when Phase 7 became the first thing that ever called this
+   * for real. Planning each line against the untouched inventory handed the
+   * same grams out twice: 150 g planned out of a packet holding 120 g, reported
+   * as complete. Three wrong answers followed — a preview promising no
+   * shortfall, a batch counting food that was never there, and a
+   * `CookEvent.deductions` that hands back more than it took when reversed.
+   *
+   * The lines stay SEPARATE — each is its own handful and its own shortfall.
+   * What they now share is the knowledge of what is left in the packet.
+   */
+  describe('two lines of the same ingredient', () => {
+    const twice = recipe({
+      id: 'chakchouka-ish',
+      ingredients: [recipeIngredient('butter', 100), recipeIngredient('butter', 50)],
+    })
+
+    it('does not spend the same grams twice', () => {
+      const thin = buildInventoryIndex(
+        [product({ id: 'p-butter', canonicalId: 'butter' })],
+        [lot({ id: 'l-butter', productId: 'p-butter', remainingG: 120 })],
+      )
+      const plan = planRecipeDeduction(thin, ontology, twice)
+
+      const total = plan.deductions.reduce((sum, deduction) => sum + deduction.grams, 0)
+      expect(total).toBe(120)
+      expect(plan.complete).toBe(false)
+      // The first line is satisfied and the second one goes short. That is the
+      // truth: 100 g of it went in, then there were 20 g left for the rest.
+      expect(plan.shortfalls).toEqual([
+        { canonicalId: 'butter', requestedG: 50, shortfallG: 30, optional: false },
+      ])
+    })
+
+    it('still deducts both lines in full when there is enough', () => {
+      const plan = planRecipeDeduction(index, ontology, twice)
+      expect(plan.complete).toBe(true)
+      expect(plan.deductions).toEqual([
+        { lotId: 'l-butter', canonicalId: 'butter', grams: 100 },
+        { lotId: 'l-butter', canonicalId: 'butter', grams: 50 },
+      ])
+    })
+
+    it('carries the reservation across packets, soonest-expiring first', () => {
+      const two = buildInventoryIndex(
+        [product({ id: 'p-butter', canonicalId: 'butter' })],
+        [
+          lot({
+            id: 'l-old',
+            productId: 'p-butter',
+            remainingG: 120,
+            expiresOn: '2026-08-20',
+          }),
+          lot({
+            id: 'l-new',
+            productId: 'p-butter',
+            remainingG: 500,
+            expiresOn: '2026-12-01',
+          }),
+        ],
+      )
+      const plan = planRecipeDeduction(two, ontology, twice)
+
+      expect(plan.complete).toBe(true)
+      // The old packet gives 100 g to the first line and its last 20 g to the
+      // second, which then takes the balance from the new one.
+      expect(plan.deductions).toEqual([
+        { lotId: 'l-old', canonicalId: 'butter', grams: 100 },
+        { lotId: 'l-old', canonicalId: 'butter', grams: 20 },
+        { lotId: 'l-new', canonicalId: 'butter', grams: 30 },
+      ])
+    })
+
+    it('never plans more than a packet holds, at any scale', () => {
+      const thin = buildInventoryIndex(
+        [product({ id: 'p-butter', canonicalId: 'butter' })],
+        [lot({ id: 'l-butter', productId: 'p-butter', remainingG: 120 })],
+      )
+      for (const scale of [0.5, 1, 2, 3]) {
+        const plan = planRecipeDeduction(thin, ontology, twice, scale)
+        const total = plan.deductions.reduce((sum, deduction) => sum + deduction.grams, 0)
+        expect(total).toBeLessThanOrEqual(120)
+      }
+    })
   })
 })
 

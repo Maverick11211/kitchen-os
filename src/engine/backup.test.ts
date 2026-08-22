@@ -302,6 +302,69 @@ describe('validateBackupFile — upgrading an older file', () => {
     expect(fromV2).toContain('meal')
     expect(fromV2).not.toContain('cholesterol')
   })
+
+  /**
+   * A backup as version 4 wrote it, carrying a cook event with no `label`.
+   *
+   * No real version 4 file can contain one — nothing wrote a cook event before
+   * version 5 — but a backup is a file that could say anything, and `label` is
+   * required. This is the same defensive reasoning `combineRecipes` uses when it
+   * forces `isSeed` rather than trusting what a restored row claims.
+   */
+  function version4Backup(): Record<string, unknown> {
+    const backup = asParsed(goodBackup()) as Record<string, unknown>
+    backup.schemaVersion = 4
+    ;(backup.meta as Record<string, unknown>).schemaVersion = 4
+    backup.cookEvents = [
+      {
+        id: 'cook_4',
+        recipeId: 'chicken-fried-rice',
+        scaleFactor: 1,
+        cookedAt: '2026-08-21T18:00:00.000Z',
+        deductions: [],
+        batchMacros: {
+          calories: 0,
+          proteinG: 0,
+          carbsG: 0,
+          fatG: 0,
+          fiberG: 0,
+          sugarG: 0,
+          sodiumMg: 0,
+          saturatedFatG: 0,
+          cholesterolMg: 0,
+        },
+        fractionConsumed: 0,
+      },
+    ]
+    return backup
+  }
+
+  it('gives a restored cook event a name rather than leaving it missing', () => {
+    const result = validateBackupFile(version4Backup())
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.backup.cookEvents[0]?.label).toBe('chicken-fried-rice')
+    expect(result.backup.schemaVersion).toBe(SCHEMA_VERSION)
+  })
+
+  it('invents no deduction record on a restored entry from before version 5', () => {
+    const result = validateBackupFile(version4Backup())
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    const source = result.backup.consumptionEvents[0]?.source
+    expect(source === undefined || !('deductions' in source)).toBe(true)
+  })
+
+  it('tells the User what the version 5 conversion did to their file', () => {
+    const fromV4 = validateBackupFile(version4Backup()).warnings.join(' ')
+
+    expect(fromV4).toContain('recipe id')
+    // and does not claim the conversions that belong to older versions
+    expect(fromV4).not.toContain('cholesterol')
+    expect(fromV4).not.toContain('pack count')
+  })
 })
 
 describe('parseBackupFile', () => {

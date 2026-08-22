@@ -11,7 +11,13 @@
  */
 import { useMemo, useState } from 'react'
 import { HashRouter, Link, NavLink, Navigate, Route, Routes } from 'react-router'
-import type { Appliance, ApplianceId, CanonicalIngredient, Recipe } from './types/schema'
+import type {
+  Appliance,
+  ApplianceId,
+  CanonicalIngredient,
+  CookEvent,
+  Recipe,
+} from './types/schema'
 import {
   INGREDIENT_CATEGORIES,
   buildInventoryIndex,
@@ -29,6 +35,7 @@ import {
   type InventoryItem,
 } from './ui/inventory-view'
 import { AddFlow } from './ui/AddFlow'
+import { CookFlow } from './ui/CookFlow'
 import { LogFlow } from './ui/LogFlow'
 import { ItemSheet } from './ui/ItemSheet'
 import { NutritionScreen } from './ui/NutritionScreen'
@@ -39,7 +46,14 @@ import { RecipeDetail } from './ui/RecipeDetail'
 import { RecipeForm } from './ui/RecipeForm'
 import { RecipeScreen } from './ui/RecipeScreen'
 import { SettingsScreen } from './ui/SettingsScreen'
-import { useAppliances, useKitchen, useMeta, useRecipes, useStartup } from './ui/useKitchenData'
+import {
+  useAppliances,
+  useKitchen,
+  useMeta,
+  useOpenCooks,
+  useRecipes,
+  useStartup,
+} from './ui/useKitchenData'
 import { db } from './db/db'
 import { setApplianceOwned } from './db/repo/appliances'
 import { markKitSetUp } from './db/repo/meta'
@@ -170,10 +184,14 @@ function Sidebar({
  */
 const NO_APPLIANCES: ReadonlyMap<ApplianceId, Appliance> = new Map()
 
+/** Stable empty list of batches while the query is still loading. Same reason. */
+const NO_COOKS: readonly CookEvent[] = []
+
 function Shell() {
   const data = useKitchen()
   const recipes = useRecipes()
   const appliances = useAppliances()
+  const openCooks = useOpenCooks()
   const meta = useMeta()
   const today = todayIso()
   const [adding, setAdding] = useState(false)
@@ -183,6 +201,8 @@ function Shell() {
   const [kitHidden, setKitHidden] = useState(false)
   /** null = closed, 'new' = adding, a Recipe = editing that one. */
   const [recipeForm, setRecipeForm] = useState<'new' | Recipe | null>(null)
+  /** The recipe being cooked, or null. Its own state: you can cook a recipe you are also editing. */
+  const [cooking, setCooking] = useState<Recipe | null>(null)
 
   const view = useMemo(() => {
     if (!data) return null
@@ -295,6 +315,7 @@ function Shell() {
                   appliances={appliances ?? NO_APPLIANCES}
                   today={today}
                   onEdit={(recipe) => setRecipeForm(recipe)}
+                  onCook={(recipe) => setCooking(recipe)}
                 />
               )
             }
@@ -391,11 +412,23 @@ function Shell() {
         />
       )}
 
+      {cooking !== null && (
+        <CookFlow
+          recipe={cooking}
+          inventory={view.inventory}
+          ontology={view.ontology}
+          today={today}
+          onClose={() => setCooking(null)}
+        />
+      )}
+
       {logging && (
         <LogFlow
           ingredients={data.ingredients}
           items={items}
+          cooks={openCooks ?? NO_COOKS}
           index={view.inventory}
+          today={today}
           onClose={() => setLogging(false)}
         />
       )}

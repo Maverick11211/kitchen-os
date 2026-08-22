@@ -385,6 +385,15 @@
   color: var(--ink-soft);
 }
 
+/*
+  A cooked batch that has been sitting a while. Marked rather than hidden: the
+  app does not know whether it went in the freezer (Jack, 2026-08-22).
+*/
+.pick-hint-old {
+  color: var(--urgent);
+  font-weight: 600;
+}
+
 /* --- form fields --------------------------------------------------------- */
 
 .field {

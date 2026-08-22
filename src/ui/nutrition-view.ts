@@ -78,9 +78,14 @@ export interface DayEntry {
   /**
    * Whether this row offers a Delete.
    *
-   * Only entries logged directly. Removing a portion of a cooked batch has to
-   * adjust the cook event it belongs to, which is Phase 7's problem —
-   * `deleteConsumption` refuses those outright, so the button must not appear.
+   * Everything except a leftover, which is a v2 feature nothing writes.
+   *
+   * Until Phase 7 this was ingredient entries only: removing a portion of a
+   * cooked batch has to adjust the batch it came out of, and `deleteConsumption`
+   * refused rather than guess. It no longer refuses — the portion goes back onto
+   * `CookEvent.fractionConsumed` and the batch becomes eatable again — so the
+   * button belongs on those rows too. A meal you logged by mistake was exactly
+   * as much of a mistake as an ingredient you logged by mistake.
    */
   readonly canDelete: boolean
 }
@@ -99,7 +104,7 @@ export function dayEntries(events: readonly ConsumptionEvent[]): DayEntry[] {
         ? formatGrams(event.source.grams)
         : fractionDetail(event.source.fraction),
     calories: Math.round(event.macros.calories),
-    canDelete: event.source.type === 'ingredient',
+    canDelete: event.source.type !== 'leftover',
   }))
 }
 

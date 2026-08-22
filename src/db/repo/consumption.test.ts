@@ -12,7 +12,7 @@
  */
 import 'fake-indexeddb/auto'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import type { ConsumptionEvent, Lot, MacroSet, Product } from '../../types/schema'
+import type { ConsumptionEvent, CookEvent, Lot, MacroSet, Product } from '../../types/schema'
 import { localDayRange } from '../../lib/clock'
 import { createDb, type KitchenOsDb } from '../db'
 import { addProduct } from './products'
@@ -21,6 +21,7 @@ import {
   deleteConsumption,
   firstConsumptionAt,
   listConsumptionBetween,
+  logCookPortion,
   logIngredient,
   restoreConsumption,
 } from './consumption'
@@ -64,6 +65,24 @@ const FIFTY_GRAMS: MacroSet = {
   sodiumMg: 310.5,
   saturatedFatG: 9.5,
   cholesterolMg: 52.5,
+}
+
+/**
+ * A cooked batch. `deductions` is empty because these tests are about the
+ * eating half — what leaves inventory when a recipe is cooked is `cooks.test.ts`.
+ */
+function aBatch(overrides: Partial<CookEvent> = {}): CookEvent {
+  return {
+    id: 'cook_1',
+    recipeId: 'chicken-tikka-masala',
+    label: 'Chicken Tikka Masala',
+    scaleFactor: 1,
+    cookedAt: NOW,
+    deductions: [],
+    batchMacros: CHEDDAR_PER_100G,
+    fractionConsumed: 0,
+    ...overrides,
+  }
 }
 
 async function aPacketOfCheddar(
@@ -118,6 +137,9 @@ describe('logIngredient', () => {
       grams: 50,
       productId: product.id,
       lotId: lot.id,
+      // Since schema version 5: exactly what came out of the packet, which here
+      // is the whole 50 g because the packet could cover it.
+      deductions: [{ lotId: lot.id, canonicalId: 'cheddar-shredded', grams: 50 }],
     })
   })
 
@@ -337,8 +359,70 @@ describe('deleteConsumption', () => {
     expect(await deleteConsumption(db, 'cons_nope')).toBeUndefined()
   })
 
-  it('refuses to remove a portion of a cooked batch', async () => {
+  /*
+   * The inaccuracy DECISIONS.md accepted on 2026-08-20 and schema version 5
+   * closed. Eating 50 g out of a packet holding 30 g removes 30 g and logs 50 g
+   * of macros — you ate what you ate. Before `source.deductions` existed the
+   * delete had only the 50 g to go on and handed back 20 g that never left.
+   */
+  it('hands back exactly what came out of a nearly-empty packet', async () => {
     const db = freshDb()
+    const { lot } = await aPacketOfCheddar(db, 30)
+    const { event, deductedG, shortfallG } = await logIngredient(
+      db,
+      {
+        canonicalId: 'cheddar-shredded',
+        grams: 50,
+        label: 'Cheddar',
+        macros: FIFTY_GRAMS,
+        lotId: lot.id,
+      },
+      NOW,
+    )
+    expect(deductedG).toBe(30)
+    expect(shortfallG).toBe(20)
+
+    const undone = await deleteConsumption(db, event.id)
+
+    expect(undone?.restoredG).toBe(30)
+    expect((await getLot(db, lot.id))?.remainingG).toBe(30)
+  })
+
+  it('falls back to the grams eaten for an entry written before version 5', async () => {
+    const db = freshDb()
+    const { lot } = await aPacketOfCheddar(db)
+    // Exactly what schema version 4 would have written: a lotId and no
+    // `deductions`. Absent must go on meaning "fall back to grams", which is
+    // the right answer whenever the packet covered the amount.
+    const legacy: ConsumptionEvent = {
+      id: 'cons_v4',
+      consumedAt: NOW,
+      source: { type: 'ingredient', canonicalId: 'cheddar-shredded', grams: 50, lotId: lot.id },
+      macros: FIFTY_GRAMS,
+      label: 'Cheddar',
+    }
+    await db.consumptionEvents.add(legacy)
+    await db.lots.put({ ...lot, remainingG: 150 })
+
+    const undone = await deleteConsumption(db, legacy.id)
+
+    expect(undone?.restoredG).toBe(50)
+    expect((await getLot(db, lot.id))?.remainingG).toBe(200)
+  })
+
+  /*
+   * Phase 5 asserted that this THREW. Phase 7 is the phase that closes it, and
+   * the behaviour it is closed with is the point: the portion goes back to the
+   * batch, and no grams go back into any packet. The ingredients left the
+   * kitchen when the recipe was cooked — putting them back here would restore
+   * food the cook event still accounts for, and the same food would exist
+   * twice.
+   */
+  it('hands a portion back to its batch, and nothing back to a packet', async () => {
+    const db = freshDb()
+    const { lot } = await aPacketOfCheddar(db)
+    await db.cookEvents.add(aBatch({ fractionConsumed: 0.25 }))
+
     const fromCooking: ConsumptionEvent = {
       id: 'cons_cooked',
       consumedAt: NOW,
@@ -348,10 +432,50 @@ describe('deleteConsumption', () => {
     }
     await db.consumptionEvents.add(fromCooking)
 
-    // Nothing creates these yet. Reaching this is a Phase 7 mistake, and a
-    // silent success would leave CookEvent.fractionConsumed wrong forever.
-    await expect(deleteConsumption(db, fromCooking.id)).rejects.toThrow(/Phase 7/)
-    expect(await db.consumptionEvents.get(fromCooking.id)).toBeDefined()
+    const undone = await deleteConsumption(db, fromCooking.id)
+
+    expect(undone?.restoredFraction).toBeCloseTo(0.25)
+    expect(undone?.restoredG).toBe(0)
+    expect((await db.cookEvents.get('cook_1'))?.fractionConsumed).toBe(0)
+    expect(await db.consumptionEvents.get(fromCooking.id)).toBeUndefined()
+    // The packet is untouched. This is the assertion that would catch a
+    // well-meaning "put the ingredients back too".
+    expect((await getLot(db, lot.id))?.remainingG).toBe(200)
+  })
+
+  it('removes the entry even when its batch has gone missing', async () => {
+    const db = freshDb()
+    const orphan: ConsumptionEvent = {
+      id: 'cons_orphan',
+      consumedAt: NOW,
+      source: { type: 'cook', cookEventId: 'cook_gone', fraction: 0.5 },
+      macros: FIFTY_GRAMS,
+      label: 'Something',
+    }
+    await db.consumptionEvents.add(orphan)
+
+    // A broken reference is the app's mistake, not a reason to trap the entry
+    // on the User's day forever.
+    const undone = await deleteConsumption(db, orphan.id)
+    expect(undone?.restoredFraction).toBe(0)
+    expect(await db.consumptionEvents.get(orphan.id)).toBeUndefined()
+  })
+
+  it('still refuses a leftover, which is a v2 feature nothing writes', async () => {
+    const db = freshDb()
+    const fromLeftover: ConsumptionEvent = {
+      id: 'cons_leftover',
+      consumedAt: NOW,
+      source: { type: 'leftover', leftoverId: 'left_1', fraction: 0.5 },
+      macros: FIFTY_GRAMS,
+      label: 'Yesterday’s stew',
+    }
+    await db.consumptionEvents.add(fromLeftover)
+
+    // Same reasoning the cook arm had until today: nothing writes one, so the
+    // only way to get here is a mistake, and it should be loud.
+    await expect(deleteConsumption(db, fromLeftover.id)).rejects.toThrow(/leftover/)
+    expect(await db.consumptionEvents.get(fromLeftover.id)).toBeDefined()
   })
 })
 
@@ -413,6 +537,221 @@ describe('restoreConsumption', () => {
     await restoreConsumption(db, event)
 
     expect(await db.consumptionEvents.count()).toBe(1)
+  })
+
+  /*
+   * The quieter of the two gaps the handoff named, and the more dangerous for
+   * exactly that reason: before Phase 7 this put the row back and adjusted
+   * nothing, with no error. The batch would go on believing nobody had eaten
+   * that portion while the day's totals counted it.
+   */
+  it('gives the portion back to the batch when a cook entry is un-deleted', async () => {
+    const db = freshDb()
+    await db.cookEvents.add(aBatch({ fractionConsumed: 0.5 }))
+    const portion: ConsumptionEvent = {
+      id: 'cons_cooked',
+      consumedAt: NOW,
+      source: { type: 'cook', cookEventId: 'cook_1', fraction: 0.5 },
+      macros: FIFTY_GRAMS,
+      label: 'Chicken Tikka Masala',
+    }
+    await db.consumptionEvents.add(portion)
+    await deleteConsumption(db, portion.id)
+    expect((await db.cookEvents.get('cook_1'))?.fractionConsumed).toBe(0)
+
+    await restoreConsumption(db, portion)
+
+    expect((await db.cookEvents.get('cook_1'))?.fractionConsumed).toBeCloseTo(0.5)
+    expect(await db.consumptionEvents.get(portion.id)).toEqual(portion)
+  })
+
+  it('never pushes a batch past fully eaten, however many times Undo is tapped', async () => {
+    const db = freshDb()
+    await db.cookEvents.add(aBatch({ fractionConsumed: 0.8 }))
+    const portion: ConsumptionEvent = {
+      id: 'cons_cooked',
+      consumedAt: NOW,
+      source: { type: 'cook', cookEventId: 'cook_1', fraction: 0.5 },
+      macros: FIFTY_GRAMS,
+      label: 'Chicken Tikka Masala',
+    }
+    await db.consumptionEvents.add(portion)
+
+    await restoreConsumption(db, portion)
+    await restoreConsumption(db, portion)
+
+    expect((await db.cookEvents.get('cook_1'))?.fractionConsumed).toBe(1)
+  })
+
+  it('still refuses a leftover', async () => {
+    const db = freshDb()
+    const fromLeftover: ConsumptionEvent = {
+      id: 'cons_leftover',
+      consumedAt: NOW,
+      source: { type: 'leftover', leftoverId: 'left_1', fraction: 0.5 },
+      macros: FIFTY_GRAMS,
+      label: 'Yesterday’s stew',
+    }
+
+    await expect(restoreConsumption(db, fromLeftover)).rejects.toThrow(/leftover/)
+  })
+
+  /*
+   * The back door into the double-count that `deleteCookEvent`'s refusal exists
+   * to prevent (found 2026-08-22). Remove the portion from the food log, then
+   * remove the now-untouched batch — which puts the raw ingredients back on the
+   * shelf — then tap the Undo still sitting on the food log. Restoring would
+   * put the meal back on the day while its ingredients are also back in the
+   * kitchen, and nothing afterwards could tell they are the same food.
+   */
+  it('refuses to put a portion back when its batch has been removed', async () => {
+    const db = freshDb()
+    const portion: ConsumptionEvent = {
+      id: 'cons_cooked',
+      consumedAt: NOW,
+      source: { type: 'cook', cookEventId: 'cook_1', fraction: 0.25 },
+      macros: FIFTY_GRAMS,
+      label: 'Chicken Tikka Masala',
+    }
+
+    await expect(restoreConsumption(db, portion)).rejects.toThrow(/count the same food twice/)
+    expect(await db.consumptionEvents.count()).toBe(0)
+  })
+
+  /*
+   * The deliberate asymmetry. Removing an orphan is always safe — the entry is
+   * the User's to withdraw and a broken reference is the app's mistake, not
+   * theirs. Re-creating one is not.
+   */
+  it('but deleting an orphan is still allowed', async () => {
+    const db = freshDb()
+    const orphan: ConsumptionEvent = {
+      id: 'cons_orphan2',
+      consumedAt: NOW,
+      source: { type: 'cook', cookEventId: 'cook_gone', fraction: 0.5 },
+      macros: FIFTY_GRAMS,
+      label: 'Something',
+    }
+    await db.consumptionEvents.add(orphan)
+
+    await expect(deleteConsumption(db, orphan.id)).resolves.toBeDefined()
+  })
+})
+
+// ---------------------------------------------------------------------------
+
+describe('logCookPortion', () => {
+  it('records the portion and moves the batch, in one go', async () => {
+    const db = freshDb()
+    await db.cookEvents.add(aBatch())
+
+    const result = await logCookPortion(db, { cookEventId: 'cook_1', fraction: 0.25 }, NOW)
+
+    expect(result.fraction).toBe(0.25)
+    expect(result.remainingFraction).toBeCloseTo(0.75)
+    expect((await db.cookEvents.get('cook_1'))?.fractionConsumed).toBe(0.25)
+    expect(await db.consumptionEvents.get(result.event.id)).toBeDefined()
+  })
+
+  it('takes the macros as that fraction of the batch snapshot', async () => {
+    const db = freshDb()
+    // CHEDDAR_PER_100G is the batch total here: 402 calories for the whole lot.
+    await db.cookEvents.add(aBatch())
+
+    const { event } = await logCookPortion(db, { cookEventId: 'cook_1', fraction: 0.5 }, NOW)
+
+    expect(event.macros.calories).toBeCloseTo(201)
+    expect(event.macros.cholesterolMg).toBeCloseTo(52.5)
+  })
+
+  it('names the entry after the batch, not after a recipe lookup', async () => {
+    const db = freshDb()
+    await db.cookEvents.add(aBatch({ label: 'Sunday stew' }))
+
+    const { event } = await logCookPortion(db, { cookEventId: 'cook_1', fraction: 0.5 }, NOW)
+
+    expect(event.label).toBe('Sunday stew')
+  })
+
+  it('takes no food out of any packet', async () => {
+    const db = freshDb()
+    const { lot } = await aPacketOfCheddar(db)
+    await db.cookEvents.add(aBatch())
+
+    await logCookPortion(db, { cookEventId: 'cook_1', fraction: 0.5 }, NOW)
+
+    // The ingredients left when the recipe was cooked. Debiting again here
+    // would take the same food out twice.
+    expect((await getLot(db, lot.id))?.remainingG).toBe(200)
+  })
+
+  it('adds up across several helpings', async () => {
+    const db = freshDb()
+    await db.cookEvents.add(aBatch())
+
+    await logCookPortion(db, { cookEventId: 'cook_1', fraction: 0.25 }, NOW)
+    await logCookPortion(db, { cookEventId: 'cook_1', fraction: 0.25 }, NOW)
+
+    expect((await db.cookEvents.get('cook_1'))?.fractionConsumed).toBeCloseTo(0.5)
+  })
+
+  /*
+   * The stale-screen case. A sheet opened when the batch was whole, tapped
+   * after someone had already had most of it: clamp, record what was actually
+   * there, and hand the difference back so the screen can say so — the same
+   * shape as `shortfallG` on a logged ingredient.
+   */
+  it('takes only what is left, and reports the difference', async () => {
+    const db = freshDb()
+    await db.cookEvents.add(aBatch({ fractionConsumed: 0.8 }))
+
+    const result = await logCookPortion(db, { cookEventId: 'cook_1', fraction: 0.5 }, NOW)
+
+    expect(result.requestedFraction).toBe(0.5)
+    expect(result.fraction).toBeCloseTo(0.2)
+    expect(result.remainingFraction).toBe(0)
+    expect((await db.cookEvents.get('cook_1'))?.fractionConsumed).toBe(1)
+  })
+
+  it('refuses a batch with nothing left rather than logging a zero', async () => {
+    const db = freshDb()
+    await db.cookEvents.add(aBatch({ fractionConsumed: 1 }))
+
+    await expect(
+      logCookPortion(db, { cookEventId: 'cook_1', fraction: 0.25 }, NOW),
+    ).rejects.toThrow(/none of/)
+    expect(await db.consumptionEvents.count()).toBe(0)
+  })
+
+  it('refuses a batch that does not exist', async () => {
+    const db = freshDb()
+    await expect(
+      logCookPortion(db, { cookEventId: 'cook_nope', fraction: 0.25 }, NOW),
+    ).rejects.toThrow(/unknown cook event/)
+  })
+
+  it('refuses a portion that is not a portion', async () => {
+    const db = freshDb()
+    await db.cookEvents.add(aBatch())
+
+    await expect(
+      logCookPortion(db, { cookEventId: 'cook_1', fraction: 0 }, NOW),
+    ).rejects.toThrow(RangeError)
+  })
+
+  it('keeps the meal when one was said, and invents none when it was not', async () => {
+    const db = freshDb()
+    await db.cookEvents.add(aBatch())
+
+    const withMeal = await logCookPortion(
+      db,
+      { cookEventId: 'cook_1', fraction: 0.25, meal: 'dinner' },
+      NOW,
+    )
+    const without = await logCookPortion(db, { cookEventId: 'cook_1', fraction: 0.25 }, NOW)
+
+    expect(withMeal.event.meal).toBe('dinner')
+    expect('meal' in without.event).toBe(false)
   })
 })
 

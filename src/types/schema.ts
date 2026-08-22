@@ -408,6 +408,20 @@ export interface CookEvent {
   id: CookEventId;
   recipeId: RecipeId;
 
+  /**
+   * What the recipe was called when it was cooked.
+   *
+   * Added 2026-08-22 (see DECISIONS.md). `recipeId` alone cannot be relied on to
+   * produce a name: seed recipes live in the bundle rather than in `db.recipes`,
+   * and a User recipe can be DELETED — which would leave a cooked batch in the
+   * log sheet with nothing to call it. Snapshotting the name is the same rule
+   * `ConsumptionEvent.label` already follows, for the same reason.
+   *
+   * `recipeId` is kept alongside it, because it is still the right way to get
+   * back to the recipe when it does still exist.
+   */
+  label: string;
+
   /** 1.0 = as written, 1.5 = one and a half batches. */
   scaleFactor: number;
 
@@ -444,6 +458,20 @@ export type ConsumptionSource =
       /** Which lot to debit. Omit to skip inventory deduction. */
       lotId?: LotId;
       grams: number;
+      /**
+       * What actually came out of the packet, when anything did.
+       *
+       * Added 2026-08-22 (see DECISIONS.md), closing the inaccuracy recorded on
+       * 2026-08-20. `grams` is what was EATEN; when the packet held less than
+       * that, the amount REMOVED was smaller, and with no record of the
+       * difference deleting the entry handed back more than it took.
+       *
+       * Optional because it is unknowable for every entry written before it
+       * existed. Absent means "fall back to `grams`", which is exactly the old
+       * behaviour and is correct whenever the packet covered the amount — which
+       * it did in all but the narrow clamped case.
+       */
+      deductions?: Deduction[];
     }
   | {
       type: 'leftover';
@@ -573,8 +601,20 @@ export interface BackupFile {
  *     no `size` means he has not said how big his is, and no `kitSetUpAt` means
  *     he has never been asked. Inventing either would silence a warning he
  *     never chose to silence.
+ * 5 — 2026-08-22. `CookEvent.label` and `ConsumptionSource`'s
+ *     `deductions` on the ingredient arm, added at the start of Phase 7 — the
+ *     phase that first writes a `CookEvent` at all.
+ *
+ *     `label` is REQUIRED, the first required field any bump has added since
+ *     version 2. It can be, because no row needing a backfill can exist:
+ *     nothing in versions 1-4 ever wrote a cook event. The migration backfills
+ *     from `recipeId` anyway — a hand-edited file or a test fixture can hold
+ *     one, and an id reads badly but is the only truth available.
+ *
+ *     `deductions` is optional and nothing is backfilled, because the
+ *     difference it records was never measured on older rows.
  *
  * Any future change to this file needs the same two things — a migration for
  * the database and a step in the backup upgrade path.
  */
-export const SCHEMA_VERSION = 4;
+export const SCHEMA_VERSION = 5;

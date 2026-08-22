@@ -170,6 +170,35 @@ export function createDb(name: string = DB_NAME): KitchenOsDb {
       })
     })
 
+  /**
+   * Version 5 — `CookEvent.label` and `ConsumptionSource.deductions`
+   * (2026-08-22), at the start of Phase 7.
+   *
+   * `deductions` is optional and nothing is backfilled. It records how much
+   * actually came out of a packet, which is a measurement nobody took on an
+   * older row; absent means "fall back to `grams`", which is what every reader
+   * did before the field existed.
+   *
+   * `label` IS required, and the backfill below is the reason that is safe.
+   * Versions 1-4 never wrote a cook event, so in a real database this loop has
+   * nothing to visit — but a fixture or a hand-edited file can hold one, and a
+   * required field that is sometimes absent is worse than an ugly value. The
+   * recipe id is the only truth available; it reads badly and says so honestly,
+   * rather than inventing a name that looks typed.
+   */
+  db.version(5)
+    .stores({})
+    .upgrade(async (tx) => {
+      await tx.table<StoredRow>('cookEvents').toCollection().modify((row) => {
+        if (typeof row.label !== 'string' || row.label === '') {
+          row.label = typeof row.recipeId === 'string' ? row.recipeId : 'A cooked batch'
+        }
+      })
+      await tx.table<StoredRow>('meta').toCollection().modify((row) => {
+        row.schemaVersion = 5
+      })
+    })
+
   return db
 }
 

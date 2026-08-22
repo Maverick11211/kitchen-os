@@ -97,7 +97,14 @@ describe('dayEntries', () => {
     expect(dayEntries([fromCooking])[0]?.detail).toBe('40% of the batch')
   })
 
-  it('offers Delete only on entries logged directly', () => {
+  /*
+   * Until Phase 7 this asserted the opposite for a cook source, because
+   * `deleteConsumption` refused one. It no longer refuses — the portion goes
+   * back onto the batch and the batch becomes eatable again — so the button
+   * belongs there. A meal logged by mistake is as much a mistake as an
+   * ingredient logged by mistake.
+   */
+  it('offers Delete on anything but a leftover', () => {
     const fromCooking: ConsumptionEvent = {
       id: 'b',
       consumedAt: `${TODAY}T18:00:00.000Z`,
@@ -105,10 +112,19 @@ describe('dayEntries', () => {
       macros: macros(),
       label: 'Chicken Tikka Masala',
     }
+    const fromLeftover: ConsumptionEvent = {
+      id: 'c',
+      consumedAt: `${TODAY}T18:00:00.000Z`,
+      source: { type: 'leftover', leftoverId: 'left_1', fraction: 0.4 },
+      macros: macros(),
+      label: 'Yesterday’s stew',
+    }
 
-    // deleteConsumption refuses a cook source, so the button must not be there.
     expect(dayEntries([ate('a', 50, {})])[0]?.canDelete).toBe(true)
-    expect(dayEntries([fromCooking])[0]?.canDelete).toBe(false)
+    expect(dayEntries([fromCooking])[0]?.canDelete).toBe(true)
+    // Leftovers are a v2 feature nothing writes, and the repository still
+    // refuses one — so the button must not be there.
+    expect(dayEntries([fromLeftover])[0]?.canDelete).toBe(false)
   })
 
   it('keeps the order it was given', () => {

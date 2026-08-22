@@ -200,6 +200,34 @@ export function planDeduction(
   canonicalId: CanonicalId,
   grams: number,
 ): DeductionPlan {
+  return planDeductionReserving(index, canonicalId, grams, new Map())
+}
+
+/**
+ * `planDeduction`, but aware of what an earlier line of the same plan already
+ * claimed.
+ *
+ * `reserved` maps a lot to grams already spoken for, and is UPDATED as this
+ * runs. It exists because a recipe can name the same ingredient on two lines —
+ * Chakchouka's red and green peppers, Spanish tortilla's two pours of olive oil
+ * — and planning each line against the untouched inventory hands the same
+ * grams out twice. That produced a plan claiming to be complete while asking
+ * for 150 g out of a packet holding 120 g, and three separate wrong answers
+ * downstream: a preview promising no shortfall, a `batchMacros` counting food
+ * that was never there, and a `CookEvent.deductions` that would hand back more
+ * than it took when reversed. Found 2026-08-22.
+ *
+ * Note this is NOT the same as pooling the requirement, which is what
+ * `evaluateOwnership` does. Each line is still a separate handful going into
+ * the pan and is still planned, reported and shortfall-checked on its own; what
+ * is shared between them is only the knowledge of what is left in the packet.
+ */
+function planDeductionReserving(
+  index: InventoryIndex,
+  canonicalId: CanonicalId,
+  grams: number,
+  reserved: Map<LotId, number>,
+): DeductionPlan {
   assertRequestable(grams, `planDeduction(${canonicalId})`)
 
   const deductions: Deduction[] = []
@@ -207,9 +235,14 @@ export function planDeduction(
 
   for (const lot of availableLotsFor(index, canonicalId)) {
     if (outstanding <= GRAM_EPSILON) break
-    const take = Math.min(lot.remainingG, outstanding)
+    const alreadyClaimed = reserved.get(lot.id) ?? 0
+    const free = lot.remainingG - alreadyClaimed
+    if (free <= GRAM_EPSILON) continue
+
+    const take = Math.min(free, outstanding)
     if (take <= GRAM_EPSILON) continue
     deductions.push({ lotId: lot.id, canonicalId, grams: take })
+    reserved.set(lot.id, alreadyClaimed + take)
     outstanding -= take
   }
 
@@ -230,6 +263,21 @@ export interface Shortfall {
   readonly canonicalId: CanonicalId
   readonly requestedG: number
   readonly shortfallG: number
+  /**
+   * Whether the line this came from was a garnish.
+   *
+   * Added 2026-08-22 (Jack). An optional line you own none of is NOT a problem
+   * — you simply did not add the garnish — and treating it as one made the cook
+   * preview contradict the recipe card, which had already said "you have
+   * everything for this" because optional lines are excluded from the
+   * percentage. 102 lines across the seed set are tracked and optional, so the
+   * contradiction was not rare.
+   *
+   * It is still REPORTED, because "cooked without the parsley" is worth knowing
+   * and the macros really are lower. It just does not make the batch
+   * incomplete. See `complete` below.
+   */
+  readonly optional: boolean
 }
 
 export interface RecipeDeductionPlan {
@@ -239,7 +287,15 @@ export interface RecipeDeductionPlan {
   readonly lines: readonly DeductionPlan[]
   /** Every deduction flattened, ready to store on `CookEvent.deductions`. */
   readonly deductions: readonly Deduction[]
+  /** Every line that could not be covered, garnishes included. */
   readonly shortfalls: readonly Shortfall[]
+  /**
+   * Whether everything the recipe REQUIRES was covered.
+   *
+   * Ignores optional shortfalls, so this agrees with the ownership percentage
+   * on the recipe card rather than contradicting it (Jack, 2026-08-22). A batch
+   * cooked without its garnish is a complete batch.
+   */
   readonly complete: boolean
 }
 
@@ -251,6 +307,10 @@ export interface RecipeDeductionPlan {
  * inventory (DECISIONS.md). Untracked staples are skipped entirely: salt and
  * water never get a product or a lot, so there is nothing to debit and
  * reporting "short 5g of salt" would be noise, not information.
+ *
+ * Lines share one running record of what has been claimed from each lot, so a
+ * recipe naming the same ingredient twice cannot spend the same grams twice.
+ * See `planDeductionReserving`; six of the 150 seed recipes are affected.
  */
 export function planRecipeDeduction(
   index: InventoryIndex,
@@ -260,19 +320,35 @@ export function planRecipeDeduction(
 ): RecipeDeductionPlan {
   assertRequestable(scaleFactor, `planRecipeDeduction(${recipe.id}) scaleFactor`)
 
+  const reserved = new Map<LotId, number>()
   const lines: DeductionPlan[] = []
+  // Kept alongside `lines` because a `DeductionPlan` is per-canonical and has
+  // no idea which recipe line asked for it — and the same ingredient can be
+  // required on one line and a garnish on another.
+  const optionalByLine: boolean[] = []
+
   for (const ingredient of recipe.ingredients) {
     if (!isTracked(ontology, ingredient.canonicalId)) continue
-    lines.push(planDeduction(index, ingredient.canonicalId, ingredient.quantityG * scaleFactor))
+    lines.push(
+      planDeductionReserving(
+        index,
+        ingredient.canonicalId,
+        ingredient.quantityG * scaleFactor,
+        reserved,
+      ),
+    )
+    optionalByLine.push(ingredient.optional)
   }
 
   const deductions = lines.flatMap((line) => line.deductions)
   const shortfalls: Shortfall[] = lines
-    .filter((line) => !line.complete)
-    .map((line) => ({
-      canonicalId: line.canonicalId,
-      requestedG: line.requestedG,
-      shortfallG: line.shortfallG,
+    .map((line, position) => ({ line, optional: optionalByLine[position] ?? false }))
+    .filter((entry) => !entry.line.complete)
+    .map((entry) => ({
+      canonicalId: entry.line.canonicalId,
+      requestedG: entry.line.requestedG,
+      shortfallG: entry.line.shortfallG,
+      optional: entry.optional,
     }))
 
   return {
@@ -280,8 +356,8 @@ export function planRecipeDeduction(
     scaleFactor,
     lines,
     deductions,
+    complete: shortfalls.every((shortfall) => shortfall.optional),
     shortfalls,
-    complete: shortfalls.length === 0,
   }
 }
 

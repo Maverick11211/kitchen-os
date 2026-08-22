@@ -5,6 +5,14 @@
  * you were looking at, the same as the add flow, because logging lunch is not a
  * reason to lose your place.
  *
+ * Phase 7 gave it a second kind of answer. A stew cooked on Sunday is eaten on
+ * Monday and on Tuesday, and something had to make that batch findable days
+ * later — so batches with anything left sit at the TOP of the picker, above the
+ * kitchen (Jack, 2026-08-22). Not a screen of their own: the question "what did
+ * I eat" has one place to be answered, and a portion of Sunday's stew is an
+ * answer to it. What differs is only the second step — a fraction of a batch
+ * rather than a weight of an ingredient.
+ *
  * The defaults are the whole design (Jack, 2026-08-20). Search, tap the thing,
  * type a number, done: the packet you are eating out of is already chosen —
  * first-expiring first — its label supplies the calories, and the food comes
@@ -15,13 +23,16 @@
  * engine to do it (CLAUDE.md).
  */
 import { useMemo, useState } from 'react'
-import type { CanonicalIngredient, Product } from '../types/schema'
+import type { CanonicalIngredient, CookEvent, DateOnly, Product } from '../types/schema'
 import type { InventoryIndex } from '../engine'
 import { convertibleUnits } from '../engine'
 import { db } from '../db/db'
+import { deleteCookEvent } from '../db/repo/cooks'
 import { logIngredient } from '../db/repo/consumption'
-import { formatDate, nowIso } from '../lib/clock'
+import { formatDate, localDayOf, nowIso } from '../lib/clock'
 import { IngredientStep } from './AddFlow'
+import { BatchPortion } from './BatchPortion'
+import { batchAgeWarning, batchLeftLabel } from './cook-view'
 import { rankSearch, type FieldIssue } from './entry-forms'
 import { formatGrams, lotAmountText, type InventoryItem } from './inventory-view'
 import {
@@ -33,12 +44,13 @@ import {
   type LogDraft,
   type LogOptions,
 } from './log-forms'
-import { MEAL_LABELS, MEAL_SLOTS } from './nutrition-view'
+import { MEAL_LABELS, MEAL_SLOTS, relativeDayName } from './nutrition-view'
 
 type Step =
   | { readonly name: 'pick' }
   | { readonly name: 'ingredient'; readonly initialName: string }
   | { readonly name: 'amount'; readonly ingredient: CanonicalIngredient }
+  | { readonly name: 'portion'; readonly cook: CookEvent }
 
 function issueFor(issues: readonly FieldIssue[], field: string): string | undefined {
   return issues.find((issue) => issue.field === field)?.message
@@ -48,23 +60,50 @@ function issueFor(issues: readonly FieldIssue[], field: string): string | undefi
 // Step 1 — what was it
 // ---------------------------------------------------------------------------
 
+/** "Cooked yesterday · 60% left" — enough to recognise a batch by. */
+function batchHint(cook: CookEvent, today: DateOnly): string {
+  const day = localDayOf(cook.cookedAt)
+  const when = relativeDayName(day, today)?.toLowerCase() ?? `on ${formatDate(day)}`
+  return `Cooked ${when} · ${batchLeftLabel(cook)}`
+}
+
 /**
- * What is in the kitchen comes first, then everything else once you type.
+ * Whether a batch is old enough to say so, and the words for it.
+ *
+ * Nothing ages a batch out of this list — it stays offered until it is finished
+ * — so this marker is the only thing between a three-week-old stew and a
+ * portion logged without a second thought. The app says what it knows and lets
+ * Jack decide (Jack, 2026-08-22): hiding it would be the app inventing a shelf
+ * life for food it has never seen, and it cannot know what went in the freezer.
+ */
+function batchAge(cook: CookEvent, today: DateOnly): string | null {
+  return batchAgeWarning(localDayOf(cook.cookedAt), today)
+}
+
+/**
+ * Batches you have not finished come first, then what is in the kitchen, then
+ * everything else once you type.
  *
  * Same reasoning as the add sheet's Recent products (DECISIONS.md,
  * 2026-08-20): a list is worth showing unprompted only when it is short and
- * yours. What you own is both, and it is what you are most likely to be eating.
- * The full 310-entry ontology is not, so it waits for a search.
+ * yours. Both of these are. The full 310-entry ontology is not, so it waits for
+ * a search.
  */
 function PickStep({
   ingredients,
   onHand,
+  cooks,
+  today,
   onPick,
+  onPickBatch,
   onAddIngredient,
 }: {
   ingredients: readonly CanonicalIngredient[]
   onHand: readonly InventoryItem[]
+  cooks: readonly CookEvent[]
+  today: DateOnly
   onPick: (ingredient: CanonicalIngredient) => void
+  onPickBatch: (cook: CookEvent) => void
   onAddIngredient: (name: string) => void
 }) {
   const [query, setQuery] = useState('')
@@ -85,6 +124,32 @@ function PickStep({
         autoFocus
         onChange={(event) => setQuery(event.target.value)}
       />
+
+      {/*
+        Above the kitchen, because a batch you cooked is the most likely answer
+        to "what did you eat" and the hardest one to reconstruct any other way
+        (Jack, 2026-08-22). Unprompted for the same reason "In your kitchen" is:
+        the list is short and it is yours. A finished batch is not here — it is
+        kept, but there is none of it to serve.
+      */}
+      {!searching && cooks.length > 0 && (
+        <>
+          <div className="list-heading">Cooked and not finished</div>
+          <ul className="pick-list">
+            {cooks.map((cook) => (
+              <li key={cook.id}>
+                <button type="button" className="pick" onClick={() => onPickBatch(cook)}>
+                  <span className="pick-name">{cook.label}</span>
+                  <span className="pick-hint">{batchHint(cook, today)}</span>
+                  {batchAge(cook, today) !== null && (
+                    <span className="pick-hint pick-hint-old">{batchAge(cook, today)}</span>
+                  )}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
       {!searching && onHand.length > 0 && (
         <>
@@ -121,7 +186,7 @@ function PickStep({
         </>
       )}
 
-      {!searching && onHand.length === 0 && (
+      {!searching && onHand.length === 0 && cooks.length === 0 && (
         <p className="empty">Type what you ate — it does not have to be something you own.</p>
       )}
 
@@ -428,17 +493,100 @@ function AmountStep({
 }
 
 // ---------------------------------------------------------------------------
+// Step 2, the other kind — a portion of something you cooked
+// ---------------------------------------------------------------------------
+
+function BatchStep({
+  cook,
+  today,
+  onLogged,
+  onBack,
+}: {
+  cook: CookEvent
+  today: DateOnly
+  onLogged: () => void
+  onBack: () => void
+}) {
+  const [busy, setBusy] = useState(false)
+  const [failure, setFailure] = useState<string | null>(null)
+
+  /**
+   * Removing a batch nobody has eaten from — a cook recorded by mistake, found
+   * after the undo window on the cook sheet has closed (Jack, 2026-08-22).
+   *
+   * No confirmation step, because `deleteCookEvent` is the confirmation: it
+   * refuses a batch with anything logged against it and names the entries in
+   * the way. Nothing here decides whether it is safe; the transaction does.
+   */
+  async function remove() {
+    setBusy(true)
+    setFailure(null)
+    try {
+      await deleteCookEvent(db, cook.id)
+      onLogged()
+    } catch (error: unknown) {
+      setFailure(error instanceof Error ? error.message : 'Something went wrong.')
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="sheet-body">
+      <p className="sheet-context">
+        A portion of <strong>{cook.label}</strong>
+      </p>
+      <p className="field-hint">{batchHint(cook, today)}</p>
+      {batchAge(cook, today) !== null && (
+        <ul className="warnings">
+          <li>You cooked this {batchAge(cook, today)}</li>
+        </ul>
+      )}
+
+      <BatchPortion
+        cook={cook}
+        onLogged={onLogged}
+        secondary={
+          <button type="button" disabled={busy} onClick={onBack}>
+            Back
+          </button>
+        }
+        footer={
+          <>
+            {failure !== null && (
+              <ul className="errors">
+                <li>{failure}</li>
+              </ul>
+            )}
+            <div className="undo">
+              <span>Did not actually cook this?</span>
+              <button type="button" disabled={busy} onClick={() => void remove()}>
+                Remove this batch
+              </button>
+            </div>
+          </>
+        }
+      />
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
 
 export function LogFlow({
   ingredients,
   items,
+  cooks,
   index,
+  today,
   onClose,
 }: {
   ingredients: readonly CanonicalIngredient[]
   /** What is in the kitchen, for the unprompted list. */
   items: readonly InventoryItem[]
+  /** Batches with something left. Empty until something has been cooked. */
+  cooks: readonly CookEvent[]
   index: InventoryIndex
+  today: DateOnly
   onClose: () => void
 }) {
   const [step, setStep] = useState<Step>({ name: 'pick' })
@@ -447,6 +595,7 @@ export function LogFlow({
     pick: 'Log something eaten',
     ingredient: 'New ingredient',
     amount: 'How much',
+    portion: 'How much of it',
   }
 
   return (
@@ -463,8 +612,20 @@ export function LogFlow({
           <PickStep
             ingredients={ingredients}
             onHand={items}
+            cooks={cooks}
+            today={today}
             onPick={(ingredient) => setStep({ name: 'amount', ingredient })}
+            onPickBatch={(cook) => setStep({ name: 'portion', cook })}
             onAddIngredient={(initialName) => setStep({ name: 'ingredient', initialName })}
+          />
+        )}
+
+        {step.name === 'portion' && (
+          <BatchStep
+            cook={step.cook}
+            today={today}
+            onLogged={onClose}
+            onBack={() => setStep({ name: 'pick' })}
           />
         )}
 

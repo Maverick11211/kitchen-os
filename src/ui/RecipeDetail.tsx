@@ -5,9 +5,9 @@
  * card; its own address (`#/recipes/chicken-fried-rice`) so a reload keeps you
  * where you were and the back gesture works.
  *
- * Phase 6 SHOWS. There is no "made it" button here on purpose — cooking,
- * scaling and deduction are Phase 7, and a button that half-worked would be
- * worse than no button.
+ * Phase 6 showed. Phase 7 added the "Made it" button, which is the whole
+ * point of the screen having been built: this is where you stand when you
+ * decide to cook something.
  */
 import { useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
@@ -66,6 +66,7 @@ export interface RecipeDetailProps {
   readonly appliances: ReadonlyMap<ApplianceId, Appliance>
   readonly today: DateOnly
   readonly onEdit: (recipe: Recipe) => void
+  readonly onCook: (recipe: Recipe) => void
 }
 
 export function RecipeDetail({
@@ -75,6 +76,7 @@ export function RecipeDetail({
   appliances,
   today,
   onEdit,
+  onCook,
 }: RecipeDetailProps) {
   const { recipeId } = useParams<{ recipeId: string }>()
   const navigate = useNavigate()
@@ -173,6 +175,18 @@ export function RecipeDetail({
         <p className="stand-notes">
           {[missing, batch, expiring, ...warnings].filter((note) => note !== null).join(' · ')}
         </p>
+
+        {/*
+          Always live, never disabled (Jack, 2026-08-22). Cooking while short of
+          something is allowed — the sheet shows the gap before anything
+          happens, and records what actually left the kitchen. A button that
+          refused would be refusing a meal he had already cooked.
+        */}
+        <div className="actions">
+          <button type="button" className="primary" onClick={() => onCook(recipe)}>
+            Made it
+          </button>
+        </div>
       </div>
 
       <h2 className="section-head">Ingredients</h2>

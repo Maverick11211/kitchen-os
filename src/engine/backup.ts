@@ -147,6 +147,17 @@ function mapMacrosOn(rows: unknown, field: string): unknown {
   return rows.map((row) => (isRecord(row) ? { ...row, [field]: withCholesterol(row[field]) } : row))
 }
 
+/** Give every stored cook event the name field it predates. Version 4 -> 5. */
+function withCookLabels(rows: unknown): unknown {
+  if (!Array.isArray(rows)) return rows
+  return rows.map((row) => {
+    if (!isRecord(row)) return row
+    if (typeof row.label === 'string' && row.label !== '') return row
+    const fallback = typeof row.recipeId === 'string' ? row.recipeId : 'A cooked batch'
+    return { ...row, label: fallback }
+  })
+}
+
 /**
  * Convert a backup written by an older version of the app into today's shape.
  *
@@ -190,6 +201,20 @@ function upgradeBackup(value: Record<string, unknown>, from: number): Record<str
     // and asking is cheaper than assuming.
   }
 
+  if (from < 5) {
+    // Version 5 added CookEvent.label and ConsumptionSource.deductions.
+    //
+    // `deductions` is optional and is left absent, which every reader treats as
+    // "fall back to grams" — the behaviour the file was written under.
+    //
+    // `label` is required, so it is filled in here rather than left to break a
+    // reader. No file from an older app can actually contain a cook event —
+    // nothing wrote one before this version — but a backup is a file that could
+    // say anything, and this is the same defensive reasoning `combineRecipes`
+    // uses when it forces `isSeed`. The recipe id is the only name available.
+    current = { ...current, cookEvents: withCookLabels(current.cookEvents) }
+  }
+
   const meta = isRecord(current.meta)
     ? { ...current.meta, schemaVersion: SCHEMA_VERSION }
     : current.meta
@@ -216,6 +241,9 @@ function upgradeNotes(from: number): string[] {
   }
   if (from < 4) {
     notes.push('the app will ask again what you cook with, since the file was saved before it asked')
+  }
+  if (from < 5) {
+    notes.push('anything cooked before the file was saved is named by its recipe id rather than its title')
   }
   return notes
 }

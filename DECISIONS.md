@@ -2319,3 +2319,228 @@ routes through `availableGramsForLine`, so it stays a change to one function.
 Suite **6705** passing, lint and build clean, twenty-three browser steps green
 in `qa/smoke-phase6.cjs`, and `qa/smoke-phase5.cjs` still passes. Bundle is
 808 KB raw, 201 KB gzipped.
+
+---
+
+## 2026-08-22 — Phase 7: the cook flow. Schema version 5.
+
+The phase that first writes a `CookEvent`. `PHASE7-HANDOFF.md` listed eight
+genuinely open questions; seven were put to Jack before any code was written,
+and the eighth — the schema bump — was put to him with the plan.
+
+### Decisions confirmed with Jack before writing code
+
+**How Sunday's batch is eaten on Tuesday: in the LOG SHEET.** The existing "Log
+something eaten" sheet gained a section above "In your kitchen" listing batches
+with anything left. Not a screen of its own, and not the recipe detail. The
+reasoning that settled it: "what did I eat" should have ONE place to be
+answered, and a portion of Sunday's stew is an answer to it. Only the second
+step differs — a fraction of a batch rather than a weight of an ingredient.
+Finding it from the recipe was rejected for the case that actually happens: you
+are standing at the fridge and cannot remember which recipe it was.
+
+**"Made it" asks about eating straight away**, with "None yet — it's for later"
+as a first-class answer rather than a skip. Cooking and eating stay two events
+in the data; this only settles that the two questions are asked in one sitting,
+because cooking lunch and eating lunch is the common case.
+
+**Cooking while short is allowed.** Warn and proceed. The same answer this file
+already gave the log flow on 2026-08-20: take what is there, record what left,
+say the gap out loud. Blocking was considered and rejected — inventory drifts,
+and refusing a meal he had already cooked is worse than recording it with a
+warning. The size buttons MARK a batch the kitchen cannot cover; they do not
+disable it.
+
+**`batchMacros` reflects what was DEDUCTED, not what the recipe asked for.**
+Named as an accuracy question in the handoff and decided deliberately: a batch
+cooked short of the oil reads lighter than it was. It is honest about what left
+the kitchen, it is usually inside the ±15% tolerance, and the alternative —
+filling the gap from the last-known product — invents calories from a packet he
+does not own. The shortfall is on screen both before and after the cook.
+
+**Scale is ½ / 1 / 2 / 3 steps**, the shape Reconcile uses, each re-checked
+against `maxBatchScale` so "there is only enough for a ½ batch" appears at the
+moment of choosing rather than after.
+
+**A portion is ¼ / ½ / ¾ / the rest, plus a typed percentage.** Fractions are of
+the WHOLE batch, never of what is left — the schema says so, and it is what
+makes two helpings add up and "half" mean the same thing on Sunday and on
+Tuesday. The last button is "the rest" rather than "all", which is the honest
+answer to "I finished it" and closes a batch exactly instead of leaving a crumb
+that keeps it on the list forever. Over-asking is clamped with a warning, the
+same treatment a logged ingredient gets when the packet cannot cover it.
+
+**Undoing a cook is an undo WINDOW, not a delete.** Undo sits on the cook
+confirmation; a batch nobody has eaten from can also be removed from its row in
+the log sheet. Once anything has been logged against it, `deleteCookEvent`
+REFUSES and names the entries in the way. A cascade delete was rejected: it
+would remove meals he correctly recorded eating days ago. Reverting after a
+portion is eaten would put raw ingredients back that are already counted as a
+meal on some day's totals — the same food twice, with nothing afterwards able
+to tell.
+
+### Schema version 5
+
+Phase 7 needed no bump. Two things rode along because they are cheap now and
+awkward later, and Jack approved both with the plan:
+
+- **`CookEvent.label`, required.** `recipeId` cannot be relied on for a name:
+  seed recipes live in the bundle rather than `db.recipes`, and a User recipe
+  can be deleted — which would leave a batch in the log sheet with nothing to
+  call it. `ConsumptionEvent.label` already snapshots for the same reason.
+  Required is safe because versions 1-4 never wrote a cook event; the migration
+  backfills from `recipeId` anyway, for fixtures and hand-edited files.
+- **`deductions?` on the ingredient arm of `ConsumptionSource`.** This closes
+  the inaccuracy accepted on 2026-08-20: an entry clamped by a nearly-empty
+  packet recorded the grams EATEN, so deleting it handed back more than it took.
+  Optional, nothing backfilled — absent goes on meaning "fall back to `grams`",
+  which is the old behaviour and the exact answer whenever the packet covered
+  the amount.
+
+### The three refusals, closed
+
+`deleteConsumption` no longer throws on a cook source: the portion goes back
+onto `fractionConsumed`, and NO grams go back into any packet — the ingredients
+left the kitchen when the recipe was cooked. `restoreConsumption` — the quieter
+and more dangerous gap — puts the portion back on the batch. `fractionConsumed`
+is now maintained by `logCookPortion`, which writes the consumption event and
+moves the batch in one transaction.
+
+The `leftover` arm still refuses everywhere, loudly. It is a v2 feature nothing
+writes, so the only way to reach it is a mistake.
+
+### `commitCook` plans inside its own transaction
+
+Worth recording because the obvious alternative is wrong. The preview the User
+approves is computed from a snapshot; committing THAT plan would write a
+`CookEvent.deductions` that does not match what happened, and the schema calls
+that field "the source of truth for reversal" — it can only be that if it is
+measured at the moment of the write. So the commit re-reads the kitchen,
+re-plans, and returns the plan it actually used; the confirmation compares the
+two and says so when they differ.
+
+Only lots that moved are written back. `applyDeductions` returns the ORIGINAL
+object for a lot it did not touch, so identity is an exact "did this move" test
+— no comparing floats, and no rewriting the whole inventory to debit two
+packets.
+
+### Two things the browser caught that the tests did not
+
+Both are the Phase 4/5/6 lesson again: a green suite says the arithmetic is
+right, not that the screen makes sense.
+
+1. The recipe detail's button and the cook sheet's commit button BOTH read
+   "Made it" — one phrase meaning "start this" and "yes, commit". Exactly the
+   two-"Something else" mistake from Phase 5. The commit button now reads
+   "Cook it · 2 packets", verb plus consequence, the shape "Log it · 201 cal"
+   already uses.
+2. "Assumed in the cupboard" rendered in the red missing-ingredient style, so a
+   preview of a perfectly stocked recipe looked like something was wrong with
+   it. A staple is not a problem; it now uses the quiet staple tag, as the
+   recipe detail's list always did.
+
+A third was found by the smoke test's own assertion text: `scaleNote` said
+"there is only enough for a 2 batches". The article belongs on the singular
+sizes only.
+
+### Phase 7 is complete
+
+Suite **6802** passing, lint and build clean, seventeen browser steps green in
+`qa/smoke-phase7.cjs`, with `qa/smoke-phase6.cjs` and `qa/smoke-phase5.cjs`
+still passing. Bundle is 825 KB raw, 205 KB gzipped — Vite's 500 KB warning
+still fires, and the dynamic-import answer is still Phase 8's.
+
+New files: `src/engine/cooking.ts` (what is left of a batch),
+`src/db/repo/cooks.ts`, `src/ui/cook-view.ts`, `src/ui/CookFlow.tsx`,
+`src/ui/BatchPortion.tsx` (the portion question, shared by the cook sheet and
+the log sheet because it is one question and two copies would drift on what a
+portion MEANS).
+
+---
+
+## 2026-08-22, later — Three bugs found by reading the Phase 7 seams
+
+A deliberate hunt through the code Phase 7 had just made reachable, rather than
+waiting to meet these in the kitchen. All three are verified, fixed and pinned
+by tests.
+
+### 1. A recipe naming one ingredient twice spent the same grams twice
+
+`planRecipeDeduction` planned each line against the untouched inventory, so two
+lines of the same ingredient could each be promised the whole packet.
+Chakchouka wanting 150 g of peppers out of a packet holding 120 g came back
+**complete, with no shortfall**.
+
+Three wrong answers followed from one cause: a preview promising a cook it could
+not deliver; a `batchMacros` counting 150 g of food when 120 g existed; and a
+`CookEvent.deductions` recording more than left the kitchen, so reverting the
+cook would put back grams that were never taken — the same class of bug schema
+version 5 had just closed for the ingredient log.
+
+Six of the 150 seed recipes name an ingredient twice: Chakchouka, Spanish
+Tortilla, Beef and Broccoli Stir-Fry, Pad See Ew, Montreal Smoked Meat and
+Rigatoni with Fennel Sausage Sauce.
+
+The fix is a running reservation shared between the lines of one plan. The lines
+stay SEPARATE — each is its own handful, its own row and its own shortfall,
+which is what the Phase 6 handoff meant by "planRecipeDeduction does not pool".
+What they now share is only the knowledge of what is left in the packet. This is
+a different thing from `evaluateOwnership` pooling the REQUIREMENT, and both are
+correct.
+
+Latent since Phase 3. It could not bite until Phase 7 became the first caller.
+
+### 2. A stale Undo could put the same food in two places
+
+`deleteCookEvent` refuses once a batch has been eaten from, because putting raw
+ingredients back that are already counted as a meal would be the same food
+twice. There was a back door into exactly that:
+
+1. Remove the portion from the food log. The batch goes back to untouched.
+2. Open the log sheet and remove the now-untouched batch. Refused? No — nothing
+   points at it any more. The ingredients go back on the shelf.
+3. Tap the Undo still sitting on the food log.
+
+The meal returns to the day's totals while its ingredients are also back in the
+kitchen. `restoreConsumption` now refuses when a cook-sourced entry's batch has
+gone, and says why.
+
+Note the deliberate asymmetry: `deleteConsumption` still happily removes an
+entry whose batch is missing. Removing an orphan is always safe. Re-creating one
+is not.
+
+### 3. The food log swallowed refusals
+
+`NutritionScreen` had no `catch` on either write. Once `restoreConsumption`
+could refuse, that refusal became an unhandled promise rejection: nothing
+happened, no message, and the entry silently stayed gone. Both writes now report
+what went wrong, and a refused Undo withdraws its own offer rather than sitting
+there inviting another tap.
+
+### Two decisions taken with Jack while fixing these
+
+**An optional garnish you own none of is no longer a shortfall.** The recipe
+card said "you have everything for this" — optional lines are excluded from the
+percentage — and the cook sheet then said "5.0 g short of Parsley" and marked
+the batch incomplete. Two screens contradicting each other, on any of the 102
+tracked-and-optional lines in the seed set.
+
+`Shortfall` now carries `optional`, and `RecipeDeductionPlan.complete` ignores
+optional ones. It is still REPORTED — "No parsley for the garnish, so it will be
+cooked without it" — because the batch really will have fewer calories in it.
+It just is not a problem. This does not overturn "optional ingredients ARE
+deducted": that decision is about a garnish you USED leaving your inventory, and
+one you own none of was never used.
+
+**A batch that has been sitting is marked, not hidden** (Jack). Nothing ages a
+cooked batch out of the log sheet, so a three-week-old stew with 20% left is
+still offered. Past four days the row says "12 days ago — still good?" in the
+urgent colour. Hiding it would be the app inventing a shelf life for food it has
+never seen — it cannot know what went in the freezer — and marking it follows
+the pattern the rest of the app uses: say what is known, let Jack decide. Real
+leftovers with real expiry are still a v2 feature.
+
+### After the fixes
+
+Suite **6818** passing, lint and build clean, all three browser suites
+(`smoke-phase5`, `smoke-phase6`, `smoke-phase7`) still green.

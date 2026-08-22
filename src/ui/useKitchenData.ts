@@ -16,6 +16,7 @@ import type {
   AppMeta,
   CanonicalIngredient,
   ConsumptionEvent,
+  CookEvent,
   DateOnly,
   Lot,
   Product,
@@ -27,6 +28,7 @@ import { combineRecipes } from '../engine'
 import { listAppliances } from '../db/repo/appliances'
 import { readMeta } from '../db/repo/meta'
 import { firstConsumptionAt, listConsumptionBetween } from '../db/repo/consumption'
+import { listOpenCooks } from '../db/repo/cooks'
 import { listUserRecipes } from '../db/repo/recipes'
 import { runStartupSeedMerge } from '../db/seed'
 import { localDayOf, localDayRange } from '../lib/clock'
@@ -149,6 +151,19 @@ export function useFirstLoggedDay(): DateOnly | undefined {
     const earliest = await firstConsumptionAt(db)
     return earliest === undefined ? undefined : localDayOf(earliest)
   }, [])
+}
+
+/**
+ * Batches with something left to eat, most recent first.
+ *
+ * What makes Sunday's stew findable on Tuesday. Live, so the list shrinks the
+ * moment a batch is finished and grows the moment something is cooked — the log
+ * sheet is often open while both are happening.
+ *
+ * Undefined on the first render, before the read finishes.
+ */
+export function useOpenCooks(): CookEvent[] | undefined {
+  return useLiveQuery(() => listOpenCooks(db), [])
 }
 
 /** App metadata, kept live so the backup screen updates the moment you export. */

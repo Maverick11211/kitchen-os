@@ -374,3 +374,133 @@ describe('opening a version 3 database with today’s code', () => {
     second.close()
   })
 })
+
+// ---------------------------------------------------------------------------
+// Version 4 -> 5
+// ---------------------------------------------------------------------------
+
+/**
+ * The version 4 store layout, frozen like the three above it.
+ *
+ * Still identical to version 1's. Five bumps and no table or index has changed.
+ */
+const V4_STORES = {
+  canonicalIngredients: 'id, name, category',
+  products: 'id, canonicalId, name',
+  lots: 'id, productId, expiresOn, acquiredOn',
+  recipes: 'id, name, *cuisines',
+  appliances: 'id',
+  cookEvents: 'id, recipeId, cookedAt',
+  consumptionEvents: 'id, consumedAt',
+  leftovers: 'id, cookEventId',
+  meta: '',
+}
+
+const V4_MACROS = { ...V1_MACROS, cholesterolMg: 88 }
+
+/**
+ * Build and populate a database the way version 4 of the app would have.
+ *
+ * The cook event here is the interesting row, and it is worth being honest
+ * about what it is: versions 1-4 never wrote one, so a real version 4 database
+ * cannot contain it. It is here because `CookEvent.label` is REQUIRED, and a
+ * required field is only safe if the migration fills it in wherever a row
+ * somehow exists — a fixture, a hand-edited file, a restore.
+ */
+async function writeVersion4Database(name: string): Promise<void> {
+  const legacy = new Dexie(name)
+  legacy.version(1).stores(V1_STORES)
+  legacy.version(2).stores(V2_STORES)
+  legacy.version(3).stores(V3_STORES)
+  legacy.version(4).stores(V4_STORES)
+  await legacy.open()
+
+  await legacy.table('cookEvents').add({
+    id: 'cook_4',
+    recipeId: 'chicken-fried-rice',
+    scaleFactor: 1,
+    cookedAt: '2026-08-21T18:00:00.000Z',
+    deductions: [],
+    batchMacros: { ...V4_MACROS },
+    fractionConsumed: 0,
+  })
+  await legacy.table('consumptionEvents').add({
+    id: 'ate_4',
+    consumedAt: '2026-08-21T18:30:00.000Z',
+    source: { type: 'ingredient', canonicalId: 'cheddar-shredded', grams: 50, lotId: 'lot_x' },
+    macros: { ...V4_MACROS },
+    label: 'Cheddar',
+    meal: 'dinner',
+  })
+  await legacy.table('meta').put({ schemaVersion: 4, seedVersion: '2026-08-19-ontology-310' }, META_KEY)
+
+  legacy.close()
+}
+
+describe('opening a version 4 database with today’s code', () => {
+  it('moves the recorded schema version forward', async () => {
+    const name = freshName()
+    await writeVersion4Database(name)
+
+    const db = createDb(name)
+    const meta = await readMeta(db)
+    expect(meta.schemaVersion).toBe(SCHEMA_VERSION)
+    expect(meta.seedVersion).toBe('2026-08-19-ontology-310')
+    db.close()
+  })
+
+  /*
+   * The point of version 5's one required field. An id reads badly, and that is
+   * the intention: it is the only truth available about a batch cooked before
+   * the app recorded what it was called, and a made-up title would be
+   * indistinguishable from one that came off a real recipe.
+   */
+  it('gives a cook event a name rather than leaving the field missing', async () => {
+    const name = freshName()
+    await writeVersion4Database(name)
+
+    const db = createDb(name)
+    const cook = await db.cookEvents.get('cook_4')
+
+    expect(cook?.label).toBe('chicken-fried-rice')
+    expect(cook?.batchMacros.cholesterolMg).toBe(88)
+    expect(cook?.fractionConsumed).toBe(0)
+    db.close()
+  })
+
+  /*
+   * The other half of version 5, and the opposite decision. `deductions` records
+   * how much actually came out of a packet — a measurement nobody took on an
+   * older row. Absent means "fall back to grams", which is what every reader did
+   * before the field existed and is exactly right whenever the packet covered
+   * the amount. Inventing one would claim a measurement that was never made.
+   */
+  it('invents no deduction record on an entry logged before it existed', async () => {
+    const name = freshName()
+    await writeVersion4Database(name)
+
+    const db = createDb(name)
+    const event = await db.consumptionEvents.get('ate_4')
+
+    expect(event?.source.type).toBe('ingredient')
+    expect(event && 'deductions' in event.source).toBe(false)
+    // and leaves what WAS there alone
+    expect(event?.meal).toBe('dinner')
+    db.close()
+  })
+
+  it('is safe to open twice', async () => {
+    const name = freshName()
+    await writeVersion4Database(name)
+
+    const first = createDb(name)
+    await first.open()
+    first.close()
+
+    const second = createDb(name)
+    expect((await readMeta(second)).schemaVersion).toBe(SCHEMA_VERSION)
+    expect((await second.cookEvents.get('cook_4'))?.label).toBe('chicken-fried-rice')
+    expect(await second.cookEvents.count()).toBe(1)
+    second.close()
+  })
+})

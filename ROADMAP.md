@@ -2,8 +2,9 @@
 
 ## Current status
 Phase 0 complete. Phase 1 complete. Phase 2 complete. Phase 3 complete.
-Phase 4 complete. Phase 5 complete. Phase 6 complete. Phase 7 next.
-Last updated: 2026-08-21
+Phase 4 complete. Phase 5 complete. Phase 6 complete. Phase 7 complete.
+Phase 8 next.
+Last updated: 2026-08-22
 
 ## Environment (done)
 - Repo: github.com/Maverick11211/kitchen-os
@@ -238,12 +239,39 @@ seed recipes do) read as owned with half of it there. Requirements are now
 pooled per ingredient, and the counts are per distinct ingredient rather than
 per line.
 
-## Phase 7 — Cook flow
-Cooking mode -> "Made it" -> scale confirm -> deduction preview ->
-commit -> "how much did you eat" -> consumption logged.
+## Phase 7 — Cook flow — DONE
+"Made it" on the recipe detail -> batch size -> deduction preview ->
+commit -> "how much did you eat" -> consumption logged. Built as briefed in
+`PHASE7-HANDOFF.md`; the eight open questions it listed were settled with Jack
+on 2026-08-22 and are recorded in DECISIONS.md.
 
-## Phase 8 — Polish and deploy
+**How a batch cooked on Sunday is eaten on Tuesday:** batches with anything left
+sit at the top of the log sheet, above the kitchen. Tap one, say what fraction
+of it you ate. The `Leftover` table is still untouched — leftovers stay a v2
+feature and `CookEvent.fractionConsumed` does this job.
+
+Schema is now version 5: `CookEvent.label` and `deductions` on the ingredient
+arm of `ConsumptionSource`. The three places that refused a cook-sourced event
+are closed; the `leftover` arm still refuses, loudly, because nothing writes one.
+
+Output: `src/engine/cooking.ts`, `src/db/repo/cooks.ts`, `src/ui/cook-view.ts`,
+`src/ui/CookFlow.tsx`, `src/ui/BatchPortion.tsx`, plus `qa/smoke-phase7.cjs`.
+Suite 6818 passing, lint and build clean, seventeen browser steps green.
+A bug hunt through the new seams the same day found three real defects — see
+DECISIONS.md, "2026-08-22, later" — all fixed and pinned by tests.
+
+## Phase 8 — Polish and deploy — NEXT
 PWA install, offline verification, real iPad testing.
+
+Briefed in `PHASE8-HANDOFF.md` (written 2026-08-22): where Phases 6 and 7 got
+to, what the bundle split actually changes, the engine to use rather than
+reimplement, and the open questions to settle with Jack first.
+
+The one to think about before anything else: **the bundle split is not a build
+change, it changes when data arrives.** `src/data/bundled.ts` is imported
+synchronously and three things assume the recipes are simply there on first
+render. And measure before splitting — 205 KB gzipped may not be a problem at
+all.
 
 ## Phase 9 — Two-week live trial
 Use it. Fix what annoys you. That is v1.
