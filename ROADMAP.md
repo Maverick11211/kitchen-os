@@ -2,7 +2,7 @@
 
 ## Current status
 Phase 0 complete. Phase 1 complete. Phase 2 complete. Phase 3 complete.
-Phase 4 complete. Phase 5 complete. Phase 6 not started.
+Phase 4 complete. Phase 5 complete. Phase 6 complete. Phase 7 next.
 Last updated: 2026-08-21
 
 ## Environment (done)
@@ -189,9 +189,54 @@ Schema note: `SCHEMA_VERSION` is now **3** — `ConsumptionEvent.meal` and
 backup upgrade step. Nothing is backfilled; absent is the truth about both on
 older rows.
 
-## Phase 6 — Recipe UI
+## Phase 6 — Recipe UI — DONE
 Card grid with ownership rings, Missing One tier, filters and sorts,
 recipe detail, manual add form.
+
+Decisions are in DECISIONS.md — "Phase 6: the recipe library" and the entry
+after it, both 2026-08-21. The ones that shape everything else: seed recipes
+are read from the bundle and never copied into IndexedDB; nothing seeds the kit
+table, he is asked once and an absent row means unknown rather than unowned;
+the ring shows ownership and nothing else; equipment sizes are checked only
+when the recipe states one; the add form is designed after the browse side has
+been used.
+
+**Done (chunks 1-4):**
+1. **Recipes reach the app.** `BUNDLED_RECIPES`, `combineRecipes` in the engine
+   (a User recipe shadows a seed of the same id), `listUserRecipes`,
+   `useRecipes`.
+2. **The grid.** `src/ui/recipe-view.ts` plus `RecipeScreen.tsx` — rings, the
+   Missing One tier lifted above the list, cuisine and expiring-soon filters,
+   ownership/A-Z sort, and a rail badge counting what needs nothing bought.
+3. **Recipe detail** at `#/recipes/:recipeId`. Every line shown, staples and
+   garnishes included. No cooking: that is Phase 7.
+4. **The kit question** on Settings (renamed from Backup), grown on 2026-08-21
+   into a full kit list: appliances, cookware and tools, derived from what the
+   library actually names, with the biggest size he owns on the kinds where
+   size decides whether a recipe fits. `src/engine/equipment.ts` reads the
+   free-text tools; a recipe is warned about, never hidden.
+
+Suite 6705 passing, lint and build clean, twenty-three browser steps green in
+`qa/smoke-phase6.cjs`. Schema is now **version 4** (`Appliance.size`,
+`AppMeta.kitSetUpAt`).
+
+Decisions for the entry form are in DECISIONS.md (2026-08-21, "Chunk 5").
+Still deferred: `interchangeableWith`, which Phase 9's live trial is what will
+actually produce the list for.
+
+5. **Typing a recipe in.** `src/engine/recipe-entry.ts` plus `RecipeForm.tsx`.
+   The sheet opens on a paste box: `parseIngredientLines` reads amounts, units,
+   fractions, ranges and preparation notes out of a pasted list and matches each
+   line to the ontology, leaving what it cannot match for him to fix rather than
+   guessing. His recipes are editable and deletable; editing keeps the id. The
+   "can't find it? add it" path is `IngredientStep` from `AddFlow.tsx` itself.
+   A "Only what I can make now" filter joined the grid at the same time.
+
+**Fixed since:** `evaluateOwnership` used to judge each recipe line
+independently, so a recipe listing the same ingredient twice (six of the 150
+seed recipes do) read as owned with half of it there. Requirements are now
+pooled per ingredient, and the counts are per distinct ingredient rather than
+per line.
 
 ## Phase 7 — Cook flow
 Cooking mode -> "Made it" -> scale confirm -> deduction preview ->

@@ -274,3 +274,103 @@ describe('opening a version 2 database with today’s code', () => {
     second.close()
   })
 })
+
+// ---------------------------------------------------------------------------
+// Version 3 -> 4
+// ---------------------------------------------------------------------------
+
+/**
+ * The version 3 store layout, frozen like the two above it.
+ *
+ * Still identical to version 1's. Four bumps and no table or index has changed
+ * — every one of them has added optional fields inside stored objects.
+ */
+const V3_STORES = {
+  canonicalIngredients: 'id, name, category',
+  products: 'id, canonicalId, name',
+  lots: 'id, productId, expiresOn, acquiredOn',
+  recipes: 'id, name, *cuisines',
+  appliances: 'id',
+  cookEvents: 'id, recipeId, cookedAt',
+  consumptionEvents: 'id, consumedAt',
+  leftovers: 'id, cookEventId',
+  meta: '',
+}
+
+/** Build and populate a database the way version 3 of the app would have. */
+async function writeVersion3Database(name: string): Promise<void> {
+  const legacy = new Dexie(name)
+  legacy.version(1).stores(V1_STORES)
+  legacy.version(2).stores(V2_STORES)
+  legacy.version(3).stores(V3_STORES)
+  await legacy.open()
+
+  // Version 3 knew about appliances, but not about sizes and not about
+  // cookware. These two rows are exactly what it could have written.
+  await legacy.table('appliances').add({ id: 'oven', name: 'Oven', owned: true })
+  await legacy.table('appliances').add({ id: 'grill-bbq', name: 'Barbecue', owned: false })
+  await legacy.table('meta').put(
+    { schemaVersion: 3, seedVersion: '2026-08-19-ontology-310', lastExportAt: '2026-08-21T09:00:00.000Z' },
+    META_KEY,
+  )
+
+  legacy.close()
+}
+
+describe('opening a version 3 database with today’s code', () => {
+  it('moves the recorded schema version forward and leaves the rest alone', async () => {
+    const name = freshName()
+    await writeVersion3Database(name)
+
+    const db = createDb(name)
+    const meta = await readMeta(db)
+    expect(meta.schemaVersion).toBe(SCHEMA_VERSION)
+    expect(meta.seedVersion).toBe('2026-08-19-ontology-310')
+    expect(meta.lastExportAt).toBe('2026-08-21T09:00:00.000Z')
+    db.close()
+  })
+
+  /*
+   * The point of version 4. `kitSetUpAt` absent is what makes the app ask what
+   * he cooks with — so a migration that stamped it would silence a question he
+   * has never been asked, permanently and invisibly.
+   */
+  it('does not pretend he has been asked about his kit', async () => {
+    const name = freshName()
+    await writeVersion3Database(name)
+
+    const db = createDb(name)
+    const meta = await readMeta(db)
+    expect('kitSetUpAt' in meta).toBe(false)
+    db.close()
+  })
+
+  it('keeps the appliance answers he had already given, without inventing sizes', async () => {
+    const name = freshName()
+    await writeVersion3Database(name)
+
+    const db = createDb(name)
+    const oven = await db.appliances.get('oven')
+    const bbq = await db.appliances.get('grill-bbq')
+
+    expect(oven?.owned).toBe(true)
+    expect(bbq?.owned).toBe(false)
+    // No size on either: he was never asked how big his oven is.
+    expect(oven && 'size' in oven).toBe(false)
+    db.close()
+  })
+
+  it('is safe to open twice', async () => {
+    const name = freshName()
+    await writeVersion3Database(name)
+
+    const first = createDb(name)
+    await first.open()
+    first.close()
+
+    const second = createDb(name)
+    expect((await readMeta(second)).schemaVersion).toBe(SCHEMA_VERSION)
+    expect(await second.appliances.count()).toBe(2)
+    second.close()
+  })
+})

@@ -146,6 +146,30 @@ export function createDb(name: string = DB_NAME): KitchenOsDb {
       })
     })
 
+  /**
+   * Version 4 — `Appliance.size` and `AppMeta.kitSetUpAt` (2026-08-21).
+   *
+   * The appliance question grew into the kit list: cookware and tools as well
+   * as appliances, and a size on the kinds where size decides whether a recipe
+   * will fit.
+   *
+   * Optional again, and nothing is backfilled — but here the absences are read
+   * by the app rather than merely tolerated. A row with no `size` means he has
+   * not said how big his pot is, so no size warning can fire; `kitSetUpAt`
+   * absent means he has never been asked, which is what puts the questions on
+   * screen. Stamping either would silence something he never chose to silence.
+   *
+   * The four appliance rows a version 3 database may already hold stay exactly
+   * as they are: still valid, still owned or not, simply without a size.
+   */
+  db.version(4)
+    .stores({})
+    .upgrade(async (tx) => {
+      await tx.table<StoredRow>('meta').toCollection().modify((row) => {
+        row.schemaVersion = 4
+      })
+    })
+
   return db
 }
 

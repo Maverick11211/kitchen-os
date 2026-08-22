@@ -55,6 +55,15 @@ async function main() {
   await step('open the app', async () => {
     await page.goto(BASE, { waitUntil: 'networkidle' })
     await page.waitForSelector('.brand', { timeout: 20000 })
+
+    // Phase 6 added a one-off "what do you cook with" pass that opens over a
+    // database which has never answered it. Dismissing it is what a person
+    // would do to get on with logging lunch, so this run does the same.
+    const kitPass = page.locator('.sheet:has(.kit-list)')
+    if ((await kitPass.count()) > 0) {
+      await kitPass.locator('.sheet-head button').click()
+      await kitPass.waitFor({ state: 'detached', timeout: 10000 })
+    }
     await page.waitForSelector('h1', { timeout: 20000 })
     const heading = await page.textContent('h1')
     if (heading.trim() !== 'Today') throw new Error(`landed on "${heading}", expected Today`)

@@ -181,6 +181,15 @@ function upgradeBackup(value: Record<string, unknown>, from: number): Record<str
     // indistinguishable from one the User typed.
   }
 
+  if (from < 4) {
+    // Version 4 added Appliance.size and AppMeta.kitSetUpAt, when the appliance
+    // question grew into the kit list. Nothing to convert — but note what
+    // restoring an older file therefore does: `kitSetUpAt` comes back absent,
+    // so the kit questions appear again afterwards. That is correct rather than
+    // annoying. The file predates the question and genuinely holds no answer,
+    // and asking is cheaper than assuming.
+  }
+
   const meta = isRecord(current.meta)
     ? { ...current.meta, schemaVersion: SCHEMA_VERSION }
     : current.meta
@@ -204,6 +213,9 @@ function upgradeNotes(from: number): string[] {
   }
   if (from < 3) {
     notes.push('entries from before have no meal on them, and products no pack count')
+  }
+  if (from < 4) {
+    notes.push('the app will ask again what you cook with, since the file was saved before it asked')
   }
   return notes
 }

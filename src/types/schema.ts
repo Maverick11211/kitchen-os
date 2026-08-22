@@ -283,9 +283,21 @@ export interface Lot {
 }
 
 // ---------------------------------------------------------------------------
-// Appliances
+// Kit — appliances, cookware, tools
 // ---------------------------------------------------------------------------
 
+/**
+ * One piece of kit: an appliance, a pot, a baking tray, a sieve.
+ *
+ * The type name is historical. This table was created in Phase 0 for appliances
+ * and grew to cover cookware and tools on 2026-08-21; it was not renamed
+ * because a rename is a data migration bought for a nicer word, and `Recipe`
+ * already points at these ids through `requiredAppliances`.
+ *
+ * A row exists ONLY once the User has answered about that item. An absent row
+ * means "never asked", which is not the same as `owned: false`, and the two are
+ * treated differently: unknown says nothing, not-owned warns.
+ */
 export interface Appliance {
   id: ApplianceId;
   name: string;
@@ -295,6 +307,19 @@ export interface Appliance {
    * still shown, with a warning — never hidden.
    */
   owned: boolean;
+
+  /**
+   * The size of the biggest one they own. Absent means they have not said.
+   *
+   * The UNIT is fixed by the item and not stored here: pots and casseroles in
+   * quarts, pans, tins and dishes in inches — the longest side, or the
+   * diameter. `src/engine/equipment.ts` holds the catalogue that says which.
+   *
+   * "The biggest one" is the whole idea. One number per kind answers the only
+   * question a recipe ever asks — will this fit — and someone who owns a 6 qt
+   * pot does not also need to record the 2 qt one.
+   */
+  size?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -502,6 +527,16 @@ export interface AppMeta {
   lastExportAt?: Timestamp;
 
   seedVersion?: string;
+
+  /**
+   * When the User finished the one-off "what do you cook with" pass.
+   *
+   * Absent means it has never been finished, which is what makes the kit
+   * questions appear on opening the app. It is a timestamp rather than a
+   * boolean so that a future change to the kit catalogue can decide, on the
+   * date, whether it is worth asking again.
+   */
+  kitSetUpAt?: Timestamp;
 }
 
 /** Shape of the JSON produced by Export and accepted by Import. */
@@ -532,8 +567,14 @@ export interface BackupFile {
  *     with one migration — two bumps for two same-day decisions would be a
  *     self-inflicted wound. Nothing is backfilled: both fields are absent on
  *     older rows, which is the truth about them.
+ * 4 — 2026-08-21. `Appliance.size` and `AppMeta.kitSetUpAt` added, both
+ *     optional, when the appliance question grew into the kit list. Nothing is
+ *     backfilled again, and this time the absences carry meaning the app reads:
+ *     no `size` means he has not said how big his is, and no `kitSetUpAt` means
+ *     he has never been asked. Inventing either would silence a warning he
+ *     never chose to silence.
  *
  * Any future change to this file needs the same two things — a migration for
  * the database and a step in the backup upgrade path.
  */
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;

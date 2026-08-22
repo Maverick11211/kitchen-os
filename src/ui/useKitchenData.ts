@@ -1,8 +1,9 @@
 /**
  * Kitchen OS — Getting data into the screens
  *
- * Two hooks. `useStartup` runs the seed merge once when the app opens;
- * `useKitchen` keeps the current inventory in sync with the database.
+ * `useStartup` runs the seed merge once when the app opens; the rest keep a
+ * slice of the database — the kitchen, a day's entries, the recipe list, the
+ * metadata row — in sync with what is stored.
  *
  * Screens use these rather than touching Dexie themselves — the repository layer
  * stays the only thing that reads and writes.
@@ -10,16 +11,23 @@
 import { useEffect, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import type {
+  Appliance,
+  ApplianceId,
   AppMeta,
   CanonicalIngredient,
   ConsumptionEvent,
   DateOnly,
   Lot,
   Product,
+  Recipe,
 } from '../types/schema'
 import { db } from '../db/db'
+import { BUNDLED_RECIPES } from '../data/bundled'
+import { combineRecipes } from '../engine'
+import { listAppliances } from '../db/repo/appliances'
 import { readMeta } from '../db/repo/meta'
 import { firstConsumptionAt, listConsumptionBetween } from '../db/repo/consumption'
+import { listUserRecipes } from '../db/repo/recipes'
 import { runStartupSeedMerge } from '../db/seed'
 import { localDayOf, localDayRange } from '../lib/clock'
 
@@ -85,6 +93,31 @@ export function useKitchen(): KitchenData | undefined {
     ])
     return { ingredients, products, lots }
   }, [])
+}
+
+/**
+ * Every recipe the app knows: the bundled seed set joined with the User's own.
+ *
+ * The seed half never changes while the app is running, so the join happens
+ * inside the query — it is redone when the recipes table changes, not on every
+ * render. A User recipe carrying a seed's id shadows it rather than appearing
+ * twice; `combineRecipes` is where that rule lives.
+ *
+ * Undefined on the very first render, before the read finishes.
+ */
+export function useRecipes(): Recipe[] | undefined {
+  return useLiveQuery(async () => combineRecipes(BUNDLED_RECIPES, await listUserRecipes(db)), [])
+}
+
+/**
+ * The appliances the User has answered about, keyed by id.
+ *
+ * Empty until they have been asked. A recipe card reads an absent entry as
+ * "unknown" and says nothing, so an empty table is a working state rather than
+ * a missing one.
+ */
+export function useAppliances(): Map<ApplianceId, Appliance> | undefined {
+  return useLiveQuery(() => listAppliances(db), [])
 }
 
 /**

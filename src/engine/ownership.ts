@@ -7,6 +7,8 @@
  * The rules come from DECISIONS.md, not from taste:
  *  - Ownership is BINARY. You have enough of an ingredient or you don't.
  *  - It is evaluated at 1x scale. Scaling happens after you pick a recipe.
+ *  - An ingredient named on two lines is ONE ingredient needing the sum of
+ *    both. See `pooledRequirements`.
  *  - Untracked staples (salt, pepper, water) and `optional` garnishes are
  *    excluded from the percentage. They are still shown, and still deducted
  *    when you cook.
@@ -41,8 +43,18 @@ export const LOW_QUANTITY_THRESHOLD = 0.9
 
 export interface IngredientOwnership {
   readonly canonicalId: CanonicalId
-  /** Grams the recipe calls for at 1x scale. */
+  /** Grams THIS LINE calls for at 1x scale. What the recipe has written on it. */
   readonly requiredG: number
+  /**
+   * Grams of this ingredient the whole recipe calls for at 1x scale, summed
+   * across every counted line that names it.
+   *
+   * Usually identical to `requiredG`. It differs when a recipe lists the same
+   * ingredient twice — Chakchouka calls for one red bell pepper on one line and
+   * one green on another — and it is the figure ownership is judged against.
+   * See `pooledRequirements` below for why.
+   */
+  readonly requiredTotalG: number
   readonly availableG: number
   /** Enough on hand for a full 1x batch. */
   readonly owned: boolean
@@ -63,7 +75,13 @@ export interface RecipeOwnership {
   readonly recipeName: string
   /** One entry per recipe ingredient, in recipe order, including excluded ones. */
   readonly lines: readonly IngredientOwnership[]
-  /** How many lines count toward the percentage. */
+  /**
+   * How many distinct ingredients count toward the percentage.
+   *
+   * Distinct, not per line: a recipe naming bell pepper twice needs one
+   * ingredient, not two, and "3 of 9" should not become "3 of 10" because the
+   * source wrote the peppers on separate lines.
+   */
   readonly countedCount: number
   readonly ownedCount: number
   /** 0..1. Exactly 1 when everything countable is on hand. */
@@ -104,36 +122,73 @@ export interface OwnershipOptions {
   readonly expiringSoonWithinDays?: number
 }
 
+function isCounted(ontology: OntologyIndex, ingredient: RecipeIngredient): boolean {
+  // An ingredient the ontology does not know is treated as tracked, so an
+  // unknown id shows up as missing instead of quietly making a recipe look
+  // more makeable than it is.
+  const tracked = ontology.get(ingredient.canonicalId)?.tracked ?? true
+  return tracked && !ingredient.optional
+}
+
+/**
+ * Grams of each ingredient the recipe needs IN TOTAL, across all its lines.
+ *
+ * Six of the 150 seed recipes name the same ingredient twice — Chakchouka's red
+ * and green bell peppers, Spanish tortilla's two pours of olive oil, the sherry
+ * and soy in beef and broccoli. Judging each line on its own against the whole
+ * kitchen said you owned both peppers when you had one, so the recipe read 100%
+ * and "ready" with half the peppers it needs. That is the exact surprise the
+ * max-batch decision exists to prevent (Jack, 2026-08-21).
+ *
+ * Only counted lines are pooled. An optional garnish of the same ingredient is
+ * a bonus, not part of what the recipe requires, and an untracked staple is not
+ * measured at all.
+ */
+function pooledRequirements(
+  recipe: Recipe,
+  ontology: OntologyIndex,
+): Map<CanonicalId, number> {
+  const totals = new Map<CanonicalId, number>()
+  for (const ingredient of recipe.ingredients) {
+    if (!isCounted(ontology, ingredient)) continue
+    const soFar = totals.get(ingredient.canonicalId) ?? 0
+    totals.set(ingredient.canonicalId, soFar + ingredient.quantityG)
+  }
+  return totals
+}
+
 function evaluateLine(
   index: InventoryIndex,
   ontology: OntologyIndex,
   ingredient: RecipeIngredient,
+  totals: ReadonlyMap<CanonicalId, number>,
   today: DateOnly | undefined,
   withinDays: number,
 ): IngredientOwnership {
-  const entry = ontology.get(ingredient.canonicalId)
-  // An ingredient the ontology does not know is treated as tracked, so an
-  // unknown id shows up as missing instead of quietly making a recipe look
-  // more makeable than it is.
-  const tracked = entry?.tracked ?? true
-  const counted = tracked && !ingredient.optional
+  const counted = isCounted(ontology, ingredient)
+  const tracked = ontology.get(ingredient.canonicalId)?.tracked ?? true
 
   const requiredG = ingredient.quantityG
+  // A line that is not counted has no pooled total, so it is judged on its own
+  // — which is what its display needs, and nothing else reads it.
+  const requiredTotalG = totals.get(ingredient.canonicalId) ?? requiredG
   const availableG = availableGramsForLine(index, ingredient.canonicalId)
 
-  const owned = availableG + GRAM_EPSILON >= requiredG
+  const owned = availableG + GRAM_EPSILON >= requiredTotalG
   const lowQuantity =
-    !owned && requiredG > 0 && availableG >= requiredG * LOW_QUANTITY_THRESHOLD
+    !owned && requiredTotalG > 0 && availableG >= requiredTotalG * LOW_QUANTITY_THRESHOLD
 
   const expiringSoon =
     today !== undefined &&
     expiringSoonLotsFor(index, ingredient.canonicalId, today, withinDays).length > 0
 
-  const maxScale = requiredG > 0 ? availableG / requiredG : Number.POSITIVE_INFINITY
+  const maxScale =
+    requiredTotalG > 0 ? availableG / requiredTotalG : Number.POSITIVE_INFINITY
 
   return {
     canonicalId: ingredient.canonicalId,
     requiredG,
+    requiredTotalG,
     availableG,
     owned,
     lowQuantity,
@@ -143,6 +198,20 @@ function evaluateLine(
     expiringSoon,
     maxScale,
   }
+}
+
+/** First entry per canonical id, in recipe order. */
+function distinctByCanonical(
+  lines: readonly IngredientOwnership[],
+): IngredientOwnership[] {
+  const seen = new Set<CanonicalId>()
+  const distinct: IngredientOwnership[] = []
+  for (const line of lines) {
+    if (seen.has(line.canonicalId)) continue
+    seen.add(line.canonicalId)
+    distinct.push(line)
+  }
+  return distinct
 }
 
 /**
@@ -158,11 +227,17 @@ export function evaluateOwnership(
   options: OwnershipOptions = {},
 ): RecipeOwnership {
   const withinDays = options.expiringSoonWithinDays ?? DEFAULT_EXPIRING_SOON_DAYS
+  const totals = pooledRequirements(recipe, ontology)
+
   const lines = recipe.ingredients.map((ingredient) =>
-    evaluateLine(index, ontology, ingredient, options.today, withinDays),
+    evaluateLine(index, ontology, ingredient, totals, options.today, withinDays),
   )
 
-  const counted = lines.filter((line) => line.counted)
+  // Every figure below is per distinct INGREDIENT, not per line. The two are
+  // the same for 144 of the 150 seed recipes; where they differ, an ingredient
+  // written on two lines is still one thing to have, one thing to be missing,
+  // and one thing to count toward the percentage.
+  const counted = distinctByCanonical(lines.filter((line) => line.counted))
   const ownedCount = counted.filter((line) => line.owned).length
   const missing = counted.filter((line) => !line.owned).map((line) => line.canonicalId)
   const lowQuantity = counted.filter((line) => line.lowQuantity).map((line) => line.canonicalId)

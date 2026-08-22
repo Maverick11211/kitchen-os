@@ -509,3 +509,78 @@ describe('v1 matches on exact canonicalId only', () => {
     expect(result.missing).toEqual(['mozzarella-block'])
   })
 })
+
+describe('an ingredient named on more than one line', () => {
+  // Six of the 150 seed recipes do this. Chakchouka calls for one red bell
+  // pepper on one line and one green on another; Spanish tortilla pours olive
+  // oil twice. Judging each line on its own against the whole kitchen said you
+  // owned both peppers when you had one (found and fixed 2026-08-21).
+  const twice = recipe({
+    id: 'twice',
+    ingredients: [line('chicken', 100), line('chicken', 150), line('rice', 200)],
+  })
+
+  it('needs the sum of the lines, not the largest of them', () => {
+    // 250 g of chicken between the two lines, and 200 g in the kitchen.
+    const result = evaluateOwnership(twice, stockedWith({ chicken: 200, rice: 200 }), ontology)
+    expect(result.ownershipFraction).toBe(0.5)
+    expect(result.missing).toEqual(['chicken'])
+  })
+
+  it('is satisfied by the total', () => {
+    const result = evaluateOwnership(twice, stockedWith({ chicken: 250, rice: 200 }), ontology)
+    expect(result.ownershipFraction).toBe(1)
+    expect(result.missing).toEqual([])
+  })
+
+  it('counts as ONE ingredient, on both sides of the fraction', () => {
+    const result = evaluateOwnership(twice, stockedWith({ chicken: 250, rice: 200 }), ontology)
+    expect(result.countedCount).toBe(2)
+    expect(result.ownedCount).toBe(2)
+    // Still one row per line for the detail view to render.
+    expect(result.lines.length).toBe(3)
+  })
+
+  it('names the ingredient once when it is missing, so Missing One still works', () => {
+    const result = evaluateOwnership(twice, stockedWith({ rice: 200 }), ontology)
+    expect(result.missing).toEqual(['chicken'])
+    expect(result.isMissingOne).toBe(true)
+  })
+
+  it('limits the batch by the total as well', () => {
+    // 500 g of chicken is two batches of the 250 g it really needs, not five
+    // batches of the 100 g on the first line.
+    const result = evaluateOwnership(twice, stockedWith({ chicken: 500, rice: 800 }), ontology)
+    expect(result.maxBatchScale).toBe(2)
+  })
+
+  it('carries both figures on the line, for the detail view to explain itself', () => {
+    const result = evaluateOwnership(twice, stockedWith({ chicken: 200, rice: 200 }), ontology)
+    expect(result.lines[0].requiredG).toBe(100)
+    expect(result.lines[0].requiredTotalG).toBe(250)
+    expect(result.lines[2].requiredG).toBe(200)
+    expect(result.lines[2].requiredTotalG).toBe(200)
+  })
+
+  it('does not pool an optional line into what the recipe requires', () => {
+    // A garnish of the same thing is a bonus, not part of the requirement.
+    const garnished = recipe({
+      id: 'garnished',
+      ingredients: [line('chicken', 100), line('chicken', 900, true)],
+    })
+    const result = evaluateOwnership(garnished, stockedWith({ chicken: 100 }), ontology)
+    expect(result.ownershipFraction).toBe(1)
+    expect(result.lines[0].requiredTotalG).toBe(100)
+  })
+
+  it('leaves untracked staples alone', () => {
+    // Montreal smoked meat lists salt twice. Salt is never counted either way.
+    const salty = recipe({
+      id: 'salty',
+      ingredients: [line('salt', 10), line('salt', 20), line('rice', 100)],
+    })
+    const result = evaluateOwnership(salty, stockedWith({ rice: 100 }), ontology)
+    expect(result.ownershipFraction).toBe(1)
+    expect(result.countedCount).toBe(1)
+  })
+})

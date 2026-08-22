@@ -1,20 +1,28 @@
 /**
- * Kitchen OS — Backup and restore
+ * Kitchen OS — Settings: backup, restore, and what he cooks with
  *
- * Browser storage is the only copy of this data (CLAUDE.md), so this screen is
- * not a settings afterthought — it is the entire safety net.
+ * Backup comes first and stays first. Browser storage is the only copy of this
+ * data (CLAUDE.md), so it is not a settings afterthought — it is the entire
+ * safety net, and it keeps the top of the screen.
  *
  * Restoring REPLACES everything. The confirmation says so in those words, and
  * offers to export first, because the one situation where someone taps Restore
  * carelessly is the one where they lose a month of entries.
+ *
+ * The kit list at the bottom is the one thing here that is not about data
+ * safety. It is the same list as the one-off pass on first run (`KitList`), and
+ * this is where it is edited afterwards — when a pan is bought or thrown out
+ * (Jack, 2026-08-21).
  */
 import { useRef, useState } from 'react'
-import type { BackupFile } from '../types/schema'
-import { describeBackupContents, parseBackupFile } from '../engine'
+import type { Appliance, ApplianceId, BackupFile, Recipe } from '../types/schema'
+import { describeBackupContents, kitQuestions, parseBackupFile, type KitQuestion } from '../engine'
 import { db } from '../db/db'
+import { setApplianceOwned } from '../db/repo/appliances'
 import { backupFilename, readBackupJson, restoreBackup } from '../db/repo/backup'
 import { markExported } from '../db/repo/meta'
 import { nowIso } from '../lib/clock'
+import { KitList, type KitAnswer } from './KitList'
 
 interface PendingRestore {
   readonly backup: BackupFile
@@ -29,7 +37,13 @@ function formatWhen(timestamp: string | undefined): string {
   return parsed.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
 }
 
-export function SettingsScreen({ lastExportAt }: { lastExportAt?: string }) {
+export interface SettingsScreenProps {
+  readonly lastExportAt?: string
+  readonly recipes: readonly Recipe[]
+  readonly appliances: ReadonlyMap<ApplianceId, Appliance>
+}
+
+export function SettingsScreen({ lastExportAt, recipes, appliances }: SettingsScreenProps) {
   const fileInput = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
@@ -103,10 +117,21 @@ export function SettingsScreen({ lastExportAt }: { lastExportAt?: string }) {
     if (fileInput.current) fileInput.current.value = ''
   }
 
+  async function answerKit(question: KitQuestion, answer: KitAnswer) {
+    setErrors([])
+    try {
+      await setApplianceOwned(db, question.item.id, question.item.name, answer.owned, answer.size)
+    } catch (error: unknown) {
+      setErrors([error instanceof Error ? error.message : 'That answer was not saved.'])
+    }
+  }
+
+  const questions = kitQuestions(recipes)
+
   return (
     <section className="screen">
       <header className="screen-head">
-        <h1>Backup</h1>
+        <h1>Settings</h1>
         <p className="screen-count">Last export: {formatWhen(lastExportAt)}</p>
       </header>
 
@@ -147,6 +172,23 @@ export function SettingsScreen({ lastExportAt }: { lastExportAt?: string }) {
           }}
         />
       </div>
+
+      {questions.length > 0 && (
+        <div className="panel">
+          <h2>What do you cook with?</h2>
+          <p>
+            Recipes needing something you have not got will say so; anything left unanswered
+            stays quiet rather than guessing. Sizes are the biggest you own, so a recipe asking
+            for a 6 quart pot can tell you it will not fit in a 3. A recipe is never hidden for
+            any of this.
+          </p>
+          <KitList
+            questions={questions}
+            kit={appliances}
+            onAnswer={(question, answer) => void answerKit(question, answer)}
+          />
+        </div>
+      )}
 
       {pending !== null && (
         <div className="panel panel-warn">

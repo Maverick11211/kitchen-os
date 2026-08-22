@@ -812,3 +812,656 @@ button.item:active {
   margin-left: 10px;
   font-size: 14px;
 }
+
+/* --- recipe library ------------------------------------------------------- */
+
+/*
+  Wider than the reading column the lists use. A card grid needs two columns to
+  be a grid at all, and the iPad in landscape has the room.
+*/
+.screen-wide {
+  max-width: 1040px;
+}
+
+.filters {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 0 4px;
+}
+
+.filter {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filter-label {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.filter select {
+  min-height: var(--tap);
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  /* 16px minimum or Safari zooms the page in on focus. */
+  font-size: 16px;
+  color: var(--ink);
+}
+
+.filter-toggle {
+  min-height: var(--tap);
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+.filter-toggle.is-on {
+  border-color: var(--rail);
+  background: var(--rail);
+  color: #fff;
+}
+
+.tier {
+  margin-top: 22px;
+}
+
+.tier-head {
+  padding-bottom: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recipe-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+  min-height: 96px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  text-align: left;
+  color: inherit;
+  font: inherit;
+}
+
+.recipe-card:active {
+  background: #f3efe8;
+}
+
+/* Everything on hand. The one state worth marking on the card itself. */
+.recipe-card-ready {
+  border-color: #b9c9a5;
+  background: #f7faf1;
+}
+
+.recipe-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.recipe-name {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.recipe-sub {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.recipe-notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 5px;
+  empty-cells: hide;
+}
+
+.note {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #ece5da;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.note-missing {
+  background: #efe7de;
+  color: var(--ink);
+}
+
+.note-soon {
+  background: var(--soon);
+  color: #fff;
+}
+
+.note-warn {
+  background: var(--urgent);
+  color: #fff;
+}
+
+/* --- the ownership ring --------------------------------------------------- */
+
+.ring {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ring-track {
+  stroke: var(--line);
+}
+
+.ring-arc {
+  stroke: var(--accent);
+}
+
+.ring-ready .ring-arc {
+  stroke: #5f7a3a;
+}
+
+.ring-label {
+  position: absolute;
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- one recipe ----------------------------------------------------------- */
+
+.crumb {
+  padding-bottom: 6px;
+}
+
+.crumb a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-size: 15px;
+}
+
+.section-head {
+  padding: 26px 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* The card's ring, said in words. There is room here to explain it. */
+.stand {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.stand-ready {
+  border-color: #b9c9a5;
+  background: #f7faf1;
+}
+
+.stand-headline {
+  font-weight: 600;
+}
+
+.stand-notes:empty {
+  display: none;
+}
+
+.stand-notes {
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.ings {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ing {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-height: 46px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.ing-amount {
+  flex: 0 0 96px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.ing-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ing-prep {
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.ing-state {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.ing-stock {
+  font-size: 13px;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.ing-tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #ece5da;
+  color: var(--ink-soft);
+}
+
+.ing-tag-missing {
+  background: var(--expired);
+  color: #fff;
+}
+
+.ing-tag-low {
+  background: var(--soon);
+  color: #fff;
+}
+
+/* Staples and garnishes are shown but sit back: they are not the shopping list. */
+.ing-staple,
+.ing-optional {
+  color: var(--ink-soft);
+}
+
+.tools {
+  padding-top: 14px;
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+.tools-label {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.steps li {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.step-number {
+  flex: 0 0 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: #ece5da;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 26px;
+  color: var(--ink-soft);
+}
+
+.step-text {
+  flex: 1 1 auto;
+}
+
+.recipe-note {
+  padding: 20px 0 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+/* --- what he cooks on ----------------------------------------------------- */
+
+.appliances {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.appliance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+
+.appliance-main {
+  display: flex;
+  flex-direction: column;
+}
+
+.appliance-name {
+  font-weight: 500;
+}
+
+.appliance-count {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.appliance-answer {
+  display: flex;
+  gap: 8px;
+}
+
+.appliance-answer .step {
+  flex: 0 0 auto;
+  min-height: var(--tap);
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  font-size: 15px;
+}
+
+/* --- the kit list --------------------------------------------------------- */
+
+.kit-list {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.kit-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 6px 0;
+  border-top: 1px solid var(--line);
+}
+
+.kit-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.kit-name {
+  font-weight: 500;
+}
+
+.kit-count {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.kit-answer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kit-choice {
+  min-width: 62px;
+  min-height: var(--tap);
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  font-size: 15px;
+}
+
+.kit-choice.is-chosen {
+  border-color: var(--rail);
+  background: #eef2e6;
+  font-weight: 600;
+}
+
+.kit-size {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 4px;
+}
+
+.kit-size-label,
+.kit-size-unit {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.kit-size input {
+  width: 76px;
+  min-height: var(--tap);
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  /* 16px minimum or Safari zooms on focus. */
+  font-size: 16px;
+  text-align: right;
+}
+
+/*
+  A sheet footer that sits below the scrolling body rather than inside it, so
+  the button that closes a long list is always on screen.
+*/
+.sheet-foot {
+  flex: 0 0 auto;
+  padding: 12px 20px;
+  border-top: 1px solid var(--line);
+  background: var(--panel);
+}
+
+/* --- typing a recipe in --------------------------------------------------- */
+
+/* The recipe form needs the room: five controls to a row. */
+.sheet-wide {
+  width: min(940px, 100%);
+}
+
+.paste-box {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  /* 16px minimum or Safari zooms on focus. */
+  font-size: 16px;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.lines {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.line-bad {
+  border-bottom-color: var(--expired);
+}
+
+.line-pick {
+  flex: 1 1 190px;
+  min-width: 0;
+  min-height: var(--tap);
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  text-align: left;
+  font-size: 15px;
+}
+
+.line-unmatched {
+  color: var(--expired);
+}
+
+.line-amount {
+  display: flex;
+  gap: 6px;
+}
+
+.line-amount input {
+  width: 76px;
+  min-height: var(--tap);
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  font-size: 16px;
+  text-align: right;
+}
+
+.line-amount select,
+.line-prep {
+  min-height: var(--tap);
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  font-size: 16px;
+}
+
+.line-prep {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+
+.line-optional {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.line-optional input {
+  width: 20px;
+  height: 20px;
+}
+
+.line-remove {
+  min-width: var(--tap);
+  min-height: var(--tap);
+  border: 0;
+  background: transparent;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--ink-soft);
+}
+
+.line-error {
+  flex: 1 0 100%;
+  padding-bottom: 4px;
+  font-size: 13px;
+  color: var(--expired);
+}
+
+.filter-add {
+  min-height: var(--tap);
+  margin-left: auto;
+  padding: 0 16px;
+  border: 1px solid var(--rail);
+  border-radius: var(--radius);
+  background: var(--rail);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* --- a recipe of your own ------------------------------------------------- */
+
+.own-recipe {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.own-recipe-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.own-recipe button {
+  min-height: var(--tap);
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  font-size: 15px;
+}

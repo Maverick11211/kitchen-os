@@ -1965,3 +1965,357 @@ area, and the screen's own heading already says which day you are looking at, so
 having both say "Today" was one word doing two jobs. Nutrition now sits above
 the kitchen, and "+ Add to the kitchen" moved down beside the kitchen list it
 belongs to — it is the thing done once after a shop, not the app's main action.
+
+---
+
+## 2026-08-21 — Phase 6: the recipe library
+
+Card grid, Missing One tier, filters, recipe detail, and the appliance
+question. The manual add form is deliberately not here — see the end.
+
+### Decisions confirmed with Jack before writing code
+
+**1. Seed recipes are READ FROM THE BUNDLE. They are never copied into
+IndexedDB.** `db.recipes` holds only recipes he types in; `combineRecipes` in
+`src/engine/recipe-source.ts` joins the two, and a User recipe carrying a seed's
+id shadows it rather than appearing twice.
+
+This closes the question Phase 4 left open (2026-08-19, item 5). The deciding
+argument was the trap named in the Phase 6 handoff. A restore replaces `meta`
+wholesale, `seedVersion` included. Had the recipes been merged into the table
+and then left out of backup files to keep them small, a restore would clear the
+table AND write back a version the running app already matched — the startup
+merge would conclude it was up to date and 150 recipes would silently never come
+back. Reading them from the bundle removes that failure mode rather than
+guarding against it.
+
+Consequences, all good: no recipe merge to write, no second seed version, no
+schema version 4, and backups carry exactly the recipes a redeploy cannot
+reproduce. `BUNDLED_SEED_VERSION` goes on meaning the ontology alone, and there
+is deliberately no `BUNDLED_RECIPE_VERSION` — a stamp exists so a merge knows
+whether to run, and nothing merges these.
+
+The cost, recorded so it is not a surprise: a seed recipe is a frozen object in
+the bundle and a User recipe is a row, so a seed recipe cannot be EDITED in
+place. The escape hatch is already in the join — save the edit as a User recipe
+with the seed's id and it shadows the seed. That is copy-on-write in one line,
+and v1 has no seed-recipe editing anyway.
+
+**2. Nothing seeds the appliance table. He is asked, on Settings.**
+An absent `Appliance` row means UNKNOWN, not "not owned", and a recipe needing
+an unknown appliance says nothing. Rejected creating the four rows as `owned:
+true` at startup: 57 of the 150 seed recipes need a hob, so guessing wrong in
+that direction is a warning on a third of the library, and guessing right is
+still a guess made on his behalf — the rule that has held since Phase 5.
+
+The questions are DERIVED from the library (`applianceQuestions`), not
+hard-coded, so a recipe typed in later that needs a pressure cooker adds its own
+question. Today the seed set yields four: hob (57), oven (40), barbecue (1),
+broiler (1).
+
+The Backup screen is therefore now **Settings**, in the rail and in its heading.
+Backup keeps the top of the screen and the reminder banner still points straight
+at it, but the rail entry has to name a screen that does two things.
+
+**3. The ring shows ownership and nothing else.**
+One mark, one meaning. Max batch size, expiring stock and appliance warnings are
+words on the card underneath. Rejected tinting expiring-soon into the same arc
+(two variables in one mark get read as one) and capping the arc at
+`maxBatchScale` (it conflates "missing an ingredient" with "short on one", which
+DECISIONS.md separates on purpose).
+
+**4. Browse first; the manual add form comes after he has used it.**
+Chunks 1-4 are done. The form is chunk 5 and starts with a conversation, not
+code — typing ten lines against a 310-entry ontology is a different
+entry-friction problem from the add-product form, and he will have opinions
+after using the browse side that neither of us has now.
+
+### The Missing One tier LIFTS recipes out of the list
+
+They do not also appear below. Lifting is the point: ranking is by fraction, so
+a recipe needing 11 of its 12 ingredients sits below a three-ingredient one you
+happen to have all of, and would never be seen otherwise. Sorting A-Z drops the
+tier entirely — lifting a tier out of an alphabetical list breaks the one thing
+an alphabetical list promises.
+
+### Two things found while building this
+
+**The DECISIONS.md max-batch example is unreachable as the engine was built.**
+The Recipes section gives the example *"You have everything, but only enough for
+a ½ batch"* and calls it "a 100% recipe you can't actually make". `owned` means
+`availableG >= requiredG` at 1x, so if every counted line is owned then every
+`maxScale` is at least 1 and `maxBatchScale` cannot be below it. The decision
+itself is untouched and still useful — the mirror image is what happens in
+practice, and is what the card now says: a recipe that is NOT fully owned can
+still have some of everything, so `maxBatchScale` of 0.6 means a half batch is
+genuinely on the table. Only the example was impossible.
+
+**A recipe that lists the same ingredient twice is evaluated wrongly.**
+`evaluateOwnership` checks each line independently against the total in the
+kitchen, so Chakchouka — one red bell pepper on one line, one green on another —
+reads as fully owned with a single pepper in the fridge, and `maxBatchScale`
+says 1 when it is really ½. Six of the 150 seed recipes repeat an ingredient
+(chakchouka, spanish-tortilla, beef-and-broccoli-stir-fry, pad-see-ew,
+montreal-smoked-meat, rigatoni-fennel-sausage-sauce).
+
+This is a Phase 3 engine bug, not a Phase 6 one, and it produces exactly the
+surprise the max-batch decision exists to prevent: a 100% recipe you cannot
+cook. **Left as found, flagged for Jack**, because it changes ownership numbers
+and belongs to the engine rather than to this phase. The fix is contained: total
+the requirement per `canonicalId` inside `evaluateOwnership` and compare each
+line against that total, leaving `lines` one-per-recipe-line for display.
+
+### What was built
+
+1. **Recipes reach the app.** `BUNDLED_RECIPES` in `src/data/bundled.ts`,
+   `combineRecipes` in the engine, `listUserRecipes` in the repository layer,
+   and a `useRecipes` hook that joins them inside the query rather than on every
+   render.
+2. **The grid.** `src/ui/recipe-view.ts` (pure: the labels, the tiers, the
+   cuisine list, the percentage) and `src/ui/RecipeScreen.tsx`. Cuisine filter,
+   expiring-soon toggle, ownership/alphabetical sort. The rail carries the
+   count of recipes needing nothing bought — unfiltered, because the rail
+   describes the kitchen and not what the screen is currently showing.
+3. **The detail view.** `src/ui/RecipeDetail.tsx` at `#/recipes/:recipeId`.
+   Every line is listed, staples and garnishes included, because the list on
+   screen has to be the recipe. No "made it" button: cooking is Phase 7.
+4. **The appliance question.** `src/db/repo/appliances.ts` and a panel on
+   Settings.
+
+Suite **6620** passing, lint and build clean, and fifteen browser steps green in
+`qa/smoke-phase6.cjs`. `qa/smoke-phase5.cjs` still passes unchanged.
+
+### Bundle size
+
+458 KB → 778 KB raw, 133 KB → 192 KB gzipped, now that `recipes.json` is
+actually reachable from a rendered screen. Fine for an installed PWA and known
+about in advance. Vite's 500 KB warning now fires; the answer when Phase 8
+measures offline load is a dynamic import of the recipe bundle, which needs
+`recipes.json` split out of `bundled.ts` into its own module. Not done now
+because it buys nothing until there is a service worker.
+
+---
+
+## 2026-08-21, later — Repeated ingredients, and the kit list
+
+Two pieces of work either side of the Phase 6 commit: the ownership bug flagged
+in the entry above, now fixed, and the appliance question grown into a proper
+kit list.
+
+### 1. An ingredient on two lines is one ingredient
+
+`evaluateOwnership` judged every recipe line on its own against the whole
+kitchen. Six of the 150 seed recipes name the same ingredient twice —
+Chakchouka's red and green bell peppers, Spanish tortilla's two pours of olive
+oil, the sherry, soy and cornstarch in beef and broccoli, plus pad see ew,
+Montreal smoked meat and the rigatoni — and for those, one pepper in the fridge
+satisfied both pepper lines. The recipe read 100% and "ready" with half of what
+it needs: the exact surprise the max-batch decision exists to prevent.
+
+`pooledRequirements` now totals the requirement per `canonicalId` before any
+line is judged, and every line carries both figures — `requiredG` (what the
+recipe wrote on that line) and `requiredTotalG` (what the recipe needs
+altogether). Ownership, low quantity and `maxScale` all measure against the
+total.
+
+Two consequences worth naming:
+
+**The counts are now per distinct INGREDIENT, not per line.** Chakchouka needs
+8 ingredients, not 9. "Percentage of required ingredients owned" was always the
+wording in DECISIONS.md, and an ingredient written on two lines is one thing to
+buy, one thing to be missing, and one thing to count. `missing` is deduplicated
+too, so Missing One still works on a recipe that names its single missing
+ingredient twice.
+
+**Only counted lines are pooled.** An optional garnish of the same ingredient is
+a bonus rather than part of the requirement, and untracked staples are not
+measured at all — which is why Montreal smoked meat's two salt lines change
+nothing.
+
+The detail view says "119 g of 238 g needed in total" on those rows, because a
+row reading "119 g of 119 g" while marked Missing is a bug report waiting to
+happen.
+
+### 2. The appliance question is now a kit list
+
+Decisions taken with Jack before building:
+
+**The catalogue is derived from the library, not from an idea of a complete
+kitchen.** `src/engine/equipment.ts` holds ~50 canonical items with alias
+patterns; `kitQuestions` asks only about what the recipes in front of him
+actually mention, most needed first. The seed set yields 35 questions, led by
+frying pan (62 recipes), stovetop (57), oven (40), pot (26), wok (20). Rejected
+asking about everything a kitchen might have: forty-five questions is the kind
+of chore that gets abandoned half-answered, and a half-answered list is
+indistinguishable from an unanswered one.
+
+The parser reads `Recipe.tools` free text — 208 of the 225 tool strings across
+the seed set match something in the catalogue. The 17 that do not are "two
+forks", "kitchen string", "cheesecloth" and friends, and they produce NO
+requirement: an unrecognised string is the parser failing, not equipment
+missing, and a warning invented out of one teaches him to ignore warnings.
+
+`or` is a choice. "Wok or large frying pan" is satisfied by either, and stays
+silent unless he has said no to both — an unanswered alternative counts as
+"might have", because unknown is not a problem.
+
+**Sizes are checked only when the recipe states one.** Rejected estimating the
+volume a recipe needs from `estimatedYieldG` and comparing it with his biggest
+pot: it would have fired on all 150 recipes and been wrong on plenty of them,
+since finished weight is not volume, water boils off, and a roasting tin is not
+judged by what it holds. Seven seed recipes state a size outright ("6 qt pot",
+"12-inch skillet", "20cm non-stick frying pan", "10x14x2-inch baking pan"); six
+of those are comparable and are checked. The seventh, a "1.5-litre gratin dish",
+is dropped rather than converted through an invented depth — a baking dish is
+measured across, and a litre figure cannot answer that question honestly.
+
+He records the BIGGEST of each kind he owns, one number, in the unit that kind
+is measured in — pots and casseroles in quarts, pans, tins and dishes in inches
+(longest side or diameter). One number answers the only question a recipe asks,
+which is whether the thing fits, and someone with a 6 qt pot does not also need
+to record the 2 qt one. Half a unit of slack, because 20 cm is 7.87 inches and
+pans are not machined parts.
+
+**Asked once on first run, edited on Settings.** The same `KitList` component
+serves both, so the two cannot drift. Every tap saves immediately: a pass
+abandoned halfway keeps what was answered. "Not now" stamps nothing and asks
+again next time — treating a dismissal as an answer would leave the app unable
+to warn him about equipment while looking as though it had been set up.
+
+**Known trade-off, flagged for Jack.** The pass opens over the app until it is
+finished, so an existing database gets a modal in front of the food log on the
+next launch. This broke `qa/smoke-phase5.cjs` until that run learned to dismiss
+it, which is a fair preview of how it feels. If it grates, the switch is small:
+render it as a banner beside the backup reminder rather than a sheet, and let
+tapping the banner open the same list.
+
+### Schema version 4
+
+`Appliance.size` and `AppMeta.kitSetUpAt`, both optional, one bump for one
+day's work — the version 3 precedent. `db.version(4)` stamps the version and
+changes nothing else; `upgradeBackup` and `upgradeNotes` have their step;
+`migration.test.ts` builds a real version 3 database and asserts what comes out.
+
+Unlike versions 2 and 3, the absences here are READ by the app rather than
+merely tolerated. No `size` means he has not said how big his is, so no size
+warning can fire. No `kitSetUpAt` means he has never been asked, which is what
+puts the questions on screen. Backfilling either would silence something he
+never chose to silence — including after a restore, where an older file
+correctly brings back "never asked".
+
+The `Appliance` type keeps its name while holding colanders and baking trays. A
+rename is a data migration bought for a nicer word, and `Recipe` already points
+at these ids through `requiredAppliances`.
+
+Suite **6663** passing, lint and build clean, seventeen browser steps green in
+`qa/smoke-phase6.cjs`, and `qa/smoke-phase5.cjs` still passes.
+
+---
+
+## 2026-08-21, later still — Chunk 5: typing a recipe in. Phase 6 closed.
+
+The last piece of Phase 6, and the one the handoff called the big unknown.
+
+### Decisions confirmed with Jack before writing code
+
+**1. His recipes are editable and deletable.** Canonical ingredients are
+add-only; recipes are not. The add-only rule of 2026-08-19 exists to keep the
+seed MERGE safe, and there is no recipe merge — seed recipes are read from the
+bundle and never written to the table. A typo in a ten-line recipe with no way
+to fix it would be its own argument.
+
+Editing keeps the recipe's id, so its address survives and so will the
+`CookEvent`s that point at it from Phase 7. `saveUserRecipe` is a `put` for
+exactly that reason.
+
+**2. No steps required.** A recipe you know by heart is a real recipe. Saving
+without a method produces a warning, never an error — and the warning says why
+it is harmless: ranking uses the ingredients.
+
+**3. Cuisine is picked from the ones already in the library, plus Other.**
+`OTHER_CUISINE` is offered alongside the 30 the seed set brought, so "Tuesday
+dinner" has somewhere to go without inventing a tag that then sits alone in the
+filter menu forever.
+
+**4. Tools are free text.** The kit parser reads them, so a typed "large pot"
+warns exactly as a bundled one does. Rejected picking from the kit catalogue:
+it would be more exact and slower, and being slower is the thing that loses.
+
+**5. Finished weight is asked for and optional.** Nothing reads it until
+leftovers land in v2. Asking costs one field; asking later would mean revisiting
+every recipe he had already typed.
+
+**6. Pasting a list is in.** This is the decision that shaped the whole form.
+
+### The paste path
+
+Ten lines, each needing a canonical ingredient, a quantity and a unit, is thirty
+interactions — DECISIONS.md's "entry friction" risk in its purest form. So the
+sheet opens on a box to paste into, and typing it out by hand is one tap away
+for a recipe that only exists in his head.
+
+`parseIngredientLines` in `src/engine/recipe-entry.ts` reads the shapes recipes
+are actually written in: "2 lb", "1½ cups", "1 1/2", "½", "2-3 cloves", "400g",
+units written out in full and pluralised, preparation after a comma or inside
+brackets, list bullets, and section headings ("For the sauce:") which are
+dropped. A bare number with no unit is a COUNT — "3 eggs" — which is the
+commonest line in any recipe.
+
+Two rules worth naming:
+
+**A range takes the top of it.** "2-3 cloves" needs three. A recipe you thought
+you could cook is the failure worth avoiding.
+
+**It gives up rather than guessing.** `matchIngredient` tries the exact name, an
+exact alias, both again without plurals, and finally the longest ontology name
+appearing inside what was written — which is what lands "boneless skinless
+chicken thighs" on the right entry. Anything weaker returns null and the form
+asks. A wrong match is silently wrong in the ownership figures for as long as
+the recipe exists; a blank is visibly blank. Against a realistic paste it
+matched 13 of 14 lines, and the one it refused was a bare "coriander", which is
+genuinely ambiguous between the herb and the ground spice.
+
+An unmatched row keeps the pasted text and shows it, so the error can say
+*Nothing in the ingredient list matches "a handful of sumac"* rather than
+pointing at row four.
+
+### The rest of the form
+
+`quantityG` is computed once at save time by `createUserRecipe`, exactly as the
+seed importer did it, so a typed recipe and a bundled one are the same kind of
+object by the time anything ranks them. A line whose unit cannot be converted
+for its ingredient is an ERROR, not a dropped line: a recipe silently missing an
+ingredient would rank as though it did not need it.
+
+Unit menus are per ingredient (`convertibleUnits`), so cups are not offered for
+something with no cup weight — offering a unit that cannot convert is offering
+an error. Picking an ingredient keeps the unit the parser already read, when
+that ingredient can be measured in it.
+
+The "can't find it? add it" path is `IngredientStep` from `AddFlow.tsx` — the
+component itself, not a copy. Hitting an unknown ingredient while typing a
+recipe is the same moment that form was built for.
+
+### The makeable filter
+
+"Only what I can make now" joins the cuisine and expiring-soon filters. Opt-in
+is not the same as hiding: DECISIONS.md forbids HIDING a recipe you lack the kit
+for, and this is Jack asking for a shorter list. It counts kit as well as
+ingredients — every ingredient present but no wok is not a recipe you can cook
+tonight, and a filter that said otherwise would send him to the kitchen to find
+out.
+
+### Still deferred: `interchangeableWith`
+
+Raised again and left alone, deliberately. It is populated on none of the 310
+ontology entries, and the question it answers — which substitutions Jack
+actually accepts — is one the app cannot invent and he cannot usefully answer in
+the abstract. Phase 9's two-week live trial is what will produce the list, from
+the recipes he wanted to cook and couldn't. Every ownership question still
+routes through `availableGramsForLine`, so it stays a change to one function.
+
+### Phase 6 is complete
+
+Suite **6705** passing, lint and build clean, twenty-three browser steps green
+in `qa/smoke-phase6.cjs`, and `qa/smoke-phase5.cjs` still passes. Bundle is
+808 KB raw, 201 KB gzipped.

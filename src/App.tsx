@@ -11,9 +11,16 @@
  */
 import { useMemo, useState } from 'react'
 import { HashRouter, Link, NavLink, Navigate, Route, Routes } from 'react-router'
-import type { CanonicalIngredient } from './types/schema'
-import { INGREDIENT_CATEGORIES, buildInventoryIndex, buildOntologyIndex } from './engine'
-import { todayIso } from './lib/clock'
+import type { Appliance, ApplianceId, CanonicalIngredient, Recipe } from './types/schema'
+import {
+  INGREDIENT_CATEGORIES,
+  buildInventoryIndex,
+  buildOntologyIndex,
+  fullyOwned,
+  kitQuestions,
+  rankRecipes,
+} from './engine'
+import { nowIso, todayIso } from './lib/clock'
 import {
   CATEGORY_LABELS,
   buildInventoryItems,
@@ -27,8 +34,15 @@ import { ItemSheet } from './ui/ItemSheet'
 import { NutritionScreen } from './ui/NutritionScreen'
 import { backupReminderMessage, needsBackupReminder } from './ui/backup-status'
 import { CategoryScreen, InventoryScreen } from './ui/InventoryScreen'
+import { KitSetup } from './ui/KitList'
+import { RecipeDetail } from './ui/RecipeDetail'
+import { RecipeForm } from './ui/RecipeForm'
+import { RecipeScreen } from './ui/RecipeScreen'
 import { SettingsScreen } from './ui/SettingsScreen'
-import { useKitchen, useMeta, useStartup } from './ui/useKitchenData'
+import { useAppliances, useKitchen, useMeta, useRecipes, useStartup } from './ui/useKitchenData'
+import { db } from './db/db'
+import { setApplianceOwned } from './db/repo/appliances'
+import { markKitSetUp } from './db/repo/meta'
 import './App.css'
 
 function navClass({ isActive }: { isActive: boolean }): string {
@@ -45,9 +59,11 @@ function Splash({ message, bad = false }: { message: string; bad?: boolean }) {
 
 function Sidebar({
   items,
+  readyCount,
   onAdd,
 }: {
   items: readonly InventoryItem[]
+  readyCount: number | null
   onAdd: () => void
 }) {
   const counts = countByCategory(items)
@@ -73,6 +89,21 @@ function Sidebar({
         <li>
           <NavLink to="/today" className={navClass}>
             <span>Food log</span>
+          </NavLink>
+        </li>
+        {/*
+          Recipes is the third top-level area, between the log and the kitchen:
+          the log is what you ate, recipes is what to cook, the kitchen is what
+          is in it. The count is how many you could cook right now with nothing
+          missing — the one number this whole app exists to produce, so it earns
+          its place in the rail rather than only appearing once you open the
+          screen. It is deliberately unfiltered: the rail describes the kitchen,
+          not whatever the recipe screen is currently showing.
+        */}
+        <li>
+          <NavLink to="/recipes" className={navClass}>
+            <span>Recipes</span>
+            {readyCount !== null && <span className="count">{readyCount}</span>}
           </NavLink>
         </li>
       </ul>
@@ -117,7 +148,13 @@ function Sidebar({
       <ul className="nav nav-foot">
         <li>
           <NavLink to="/settings" className={navClass}>
-            <span>Backup</span>
+            {/*
+              Renamed from "Backup" when the appliance question moved in
+              (2026-08-21). Backup is still the first thing on that screen and
+              the reminder banner still points straight at it — but the rail
+              entry now has to name a screen that does two things.
+            */}
+            <span>Settings</span>
           </NavLink>
         </li>
       </ul>
@@ -125,30 +162,73 @@ function Sidebar({
   )
 }
 
+/**
+ * Stable empty map for the appliance lookup while it is still loading.
+ *
+ * A fresh `new Map()` on every render would change the identity of a `useMemo`
+ * dependency and re-rank 150 recipes for nothing.
+ */
+const NO_APPLIANCES: ReadonlyMap<ApplianceId, Appliance> = new Map()
+
 function Shell() {
   const data = useKitchen()
+  const recipes = useRecipes()
+  const appliances = useAppliances()
   const meta = useMeta()
   const today = todayIso()
   const [adding, setAdding] = useState(false)
   const [logging, setLogging] = useState(false)
   const [selected, setSelected] = useState<CanonicalIngredient | null>(null)
   const [reminderHidden, setReminderHidden] = useState(false)
+  const [kitHidden, setKitHidden] = useState(false)
+  /** null = closed, 'new' = adding, a Recipe = editing that one. */
+  const [recipeForm, setRecipeForm] = useState<'new' | Recipe | null>(null)
 
   const view = useMemo(() => {
     if (!data) return null
     const inventory = buildInventoryIndex(data.products, data.lots)
+    const ontology = buildOntologyIndex(data.ingredients)
     return {
       inventory,
-      items: buildInventoryItems(buildOntologyIndex(data.ingredients), inventory, today),
+      ontology,
+      items: buildInventoryItems(ontology, inventory, today),
     }
   }, [data, today])
+
+  /**
+   * How many recipes need nothing bought — the rail badge.
+   *
+   * Ranked here rather than read off the recipe screen because the rail is
+   * visible from everywhere, and because the badge is deliberately unfiltered:
+   * it answers "what could I cook right now", not "what does the list on screen
+   * currently show". Null until the recipes have loaded, so the badge appears
+   * with a real number rather than flashing a zero.
+   */
+  const readyCount = useMemo(() => {
+    if (view === null || recipes === undefined) return null
+    return fullyOwned(rankRecipes(recipes, view.inventory, view.ontology, { today })).length
+  }, [view, recipes, today])
+
+  /**
+   * The one-off kit pass, shown when the app has never been told what he cooks
+   * with (Jack, 2026-08-21). "Not now" hides it for this sitting only and
+   * stamps nothing, so an app that has never been answered keeps asking rather
+   * than quietly deciding it knows.
+   */
+  const kitQuestionList = useMemo(() => (recipes === undefined ? [] : kitQuestions(recipes)), [recipes])
+  const askAboutKit =
+    !kitHidden &&
+    meta !== undefined &&
+    meta.kitSetUpAt === undefined &&
+    appliances !== undefined &&
+    kitQuestionList.length > 0
 
   if (!data || view === null) return <Splash message="Opening the kitchen…" />
   const items = view.items
 
   return (
     <div className="app">
-      <Sidebar items={items} onAdd={() => setAdding(true)} />
+      <Sidebar items={items} readyCount={readyCount} onAdd={() => setAdding(true)} />
       <main className="pane-right">
         {/*
           The backup reminder DECISIONS.md calls "not optional". Dismissing it
@@ -186,6 +266,40 @@ function Shell() {
             element={<NutritionScreen today={today} onLog={() => setLogging(true)} />}
           />
           <Route
+            path="/recipes"
+            element={
+              recipes === undefined ? (
+                <Splash message="Reading the recipes…" />
+              ) : (
+                <RecipeScreen
+                  recipes={recipes}
+                  inventory={view.inventory}
+                  ontology={view.ontology}
+                  appliances={appliances ?? NO_APPLIANCES}
+                  today={today}
+                  onAdd={() => setRecipeForm('new')}
+                />
+              )
+            }
+          />
+          <Route
+            path="/recipes/:recipeId"
+            element={
+              recipes === undefined ? (
+                <Splash message="Reading the recipes…" />
+              ) : (
+                <RecipeDetail
+                  recipes={recipes}
+                  inventory={view.inventory}
+                  ontology={view.ontology}
+                  appliances={appliances ?? NO_APPLIANCES}
+                  today={today}
+                  onEdit={(recipe) => setRecipeForm(recipe)}
+                />
+              )
+            }
+          />
+          <Route
             path="/inventory"
             element={
               <InventoryScreen
@@ -213,7 +327,16 @@ function Shell() {
               <CategoryScreen items={items} onSelect={(item) => setSelected(item.ingredient)} />
             }
           />
-          <Route path="/settings" element={<SettingsScreen lastExportAt={meta?.lastExportAt} />} />
+          <Route
+            path="/settings"
+            element={
+              <SettingsScreen
+                lastExportAt={meta?.lastExportAt}
+                recipes={recipes ?? []}
+                appliances={appliances ?? NO_APPLIANCES}
+              />
+            }
+          />
           <Route path="*" element={<Navigate to="/inventory" replace />} />
         </Routes>
       </main>
@@ -234,6 +357,37 @@ function Shell() {
           products={data.products}
           today={today}
           onClose={() => setAdding(false)}
+        />
+      )}
+
+      {recipeForm !== null && recipes !== undefined && (
+        <RecipeForm
+          ingredients={data.ingredients}
+          recipes={recipes}
+          editing={recipeForm === 'new' ? undefined : recipeForm}
+          onClose={() => setRecipeForm(null)}
+          onSaved={() => setRecipeForm(null)}
+        />
+      )}
+
+      {askAboutKit && appliances !== undefined && (
+        <KitSetup
+          questions={kitQuestionList}
+          kit={appliances}
+          onAnswer={(question, answer) => {
+            void setApplianceOwned(
+              db,
+              question.item.id,
+              question.item.name,
+              answer.owned,
+              answer.size,
+            )
+          }}
+          onDone={() => {
+            void markKitSetUp(db, nowIso())
+            setKitHidden(true)
+          }}
+          onLater={() => setKitHidden(true)}
         />
       )}
 

@@ -38,6 +38,18 @@ export async function writeMeta(db: KitchenOsDb, patch: Partial<AppMeta>): Promi
   return next
 }
 
+/**
+ * Record that the kit questions have been through once.
+ *
+ * Written only when he says he is done — not when he dismisses the pass, and
+ * not when he answers a single row. It decides one thing: whether the app
+ * raises the subject when it opens. What he has actually answered is in the
+ * appliances table, and the warnings read that.
+ */
+export async function markKitSetUp(db: KitchenOsDb, now: Timestamp): Promise<AppMeta> {
+  return writeMeta(db, { kitSetUpAt: now })
+}
+
 /** Record that a backup was successfully written. Drives the reminder banner. */
 export async function markExported(db: KitchenOsDb, now: Timestamp): Promise<AppMeta> {
   return writeMeta(db, { lastExportAt: now })

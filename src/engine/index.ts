@@ -14,6 +14,9 @@
  *   inventory   — FEFO deduction, availability, expiry
  *   macros      — MacroSet arithmetic and batch/portion totals
  *   ownership   — "what can I cook right now?" and recipe ranking
+ *   recipe-source — the bundled seed recipes joined with the User's own
+ *   equipment   — what a recipe needs to cook it, against what he owns
+ *   recipe-entry — reading a pasted list, and building a recipe he typed
  *   ingredients — validating and creating a User-added canonical ingredient
  *   seed-merge  — folding a redeployed ontology.json into existing data
  *   backup      — assembling and checking an export/import file
@@ -106,6 +109,41 @@ export type {
   RecipeOwnership,
   RecipeSort,
 } from './ownership'
+
+export { combineRecipes } from './recipe-source'
+
+export {
+  OTHER_CUISINE,
+  createUserRecipe,
+  draftLinesFromParse,
+  emptyRecipeDraft,
+  emptyRecipeLine,
+  generateRecipeId,
+  matchIngredient,
+  parseIngredientLines,
+  recipeDraftFrom,
+  validateRecipeDraft,
+} from './recipe-entry'
+export type {
+  CreateRecipeResult,
+  ParsedLine,
+  RecipeDraft,
+  RecipeIssue,
+  RecipeIssueField,
+  RecipeLineDraft,
+  RecipeValidation,
+} from './recipe-entry'
+
+export {
+  KIT_CATALOGUE,
+  equipmentNeeds,
+  findKitItem,
+  kitProblems,
+  kitQuestions,
+  parseStatedSize,
+  sizeUnitLabel,
+} from './equipment'
+export type { KitItem, KitProblem, KitProblemKind, KitQuestion, KitRequirement, SizeUnit } from './equipment'
 
 export {
   INGREDIENT_CATEGORIES,
