@@ -305,6 +305,41 @@ build clean, all four browser suites green.
 the first time, and deciding whether the kit pass should stay a modal or become
 a banner. That one needs the device in hand.
 
+## Phase 8.5 — Reference macros — DONE
+Pulled forward from v2 after the first hour of live testing. Decisions in
+DECISIONS.md, 2026-08-23 ("Reference macros").
+
+Jack could not load his kitchen: over twenty seconds an item, and produce with
+no label on it could not be logged at all without searching the internet for
+nine numbers. The entry-friction target in DECISIONS.md was always "under 20
+seconds to add a REPEAT product" — the cold start of a first-time add was never
+designed for.
+
+**What changed:** `CanonicalIngredient.referenceMacrosPer100g`, optional, on 122
+of the 310 entries. The rule for which is Jack's and is about packaging rather
+than nutrition — *does this arrive with a label on it?* Loose carrots yes, a bag
+of baby carrots no. Produce, the fish, butcher and deli counters, the bakery
+case, and bulk bins.
+
+USDA SR28, extracted at build time and committed as data, traceable to an NDB
+number through `tools/reference-macros/mapping.json`. No runtime fetch.
+
+**Why it barely touched anything:** the reference PRE-FILLS the product form
+rather than teaching the macro engine to fall back. A `Lot` points at a
+`Product`, so one has to exist either way — so the three-tier model, the engine,
+the cook path and history immutability are all untouched. Two optional schema
+fields and a pre-filled form. Measured: 0.6 seconds to add three sweet potatoes.
+
+Estimates are always marked. `Product.macrosSource` records where figures came
+from and the food log shows a quiet "est." — the change is only defensible while
+an estimate is visibly an estimate.
+
+**Not built:** barcode scanning, because a barcode is a number and turning it
+into nutrition needs a network; and label OCR, because its failure mode is a
+wrong number entered silently. Both stay v2. See DECISIONS.md.
+
+Schema is version 6. Suite 6857 passing.
+
 ## Phase 9 — Two-week live trial
 Use it. Fix what annoys you. That is v1.
 

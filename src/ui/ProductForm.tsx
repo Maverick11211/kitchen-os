@@ -18,6 +18,33 @@ import { Field, NumberInput } from './FormControls'
 import { issueFor } from './form-behaviour'
 import { MACRO_FIELDS, type FieldIssue, type MacroBasis, type MacroKey, type ProductDraft } from './entry-forms'
 
+/**
+ * Change what the figures are measured against.
+ *
+ * Only interesting in one case, and it is a trap worth naming. The app's
+ * reference figures are per 100g. Switching the basis to "a serving" while
+ * those numbers sit in the boxes would relabel USDA's per-100g values as
+ * per-serving ones, and the app would then scale them by the serving size —
+ * silently wrong by whatever factor, on every meal made from that product
+ * afterwards.
+ *
+ * So moving off per-100g while the figures are the app's own clears them. There
+ * is nothing to lose: they were not typed, they can be had back by switching
+ * the basis again, and choosing a different basis means a label is being read.
+ *
+ * A draft whose figures were TYPED is never cleared. That is the existing
+ * behaviour and the reason for it stands — deleting numbers somebody may only
+ * be passing through is worse than letting them check.
+ */
+function changeBasis(draft: ProductDraft, basis: MacroBasis): ProductDraft {
+  if (basis === draft.basis) return draft
+  if (draft.macrosSource !== 'reference') return { ...draft, basis }
+
+  const macros = {} as Record<MacroKey, string>
+  for (const field of MACRO_FIELDS) macros[field.key] = ''
+  return { ...draft, basis, macros, macrosSource: 'label' }
+}
+
 export function ProductFields({
   ingredient,
   draft,
@@ -31,12 +58,37 @@ export function ProductFields({
   errors: readonly FieldIssue[]
   warnings: readonly FieldIssue[]
 }) {
+  /*
+   * Touching any nutrition field means the figures are no longer the app's
+   * generic reference, so the draft stops claiming they are.
+   *
+   * One-way on purpose: it never flips back. Typing a number that happens to
+   * match USDA's would be a coincidence rather than a provenance, and this
+   * field is only worth having if "estimate" means the app supplied the figure,
+   * not that the figure looks familiar.
+   */
   function setMacro(key: MacroKey, value: string) {
-    setDraft((current) => ({ ...current, macros: { ...current.macros, [key]: value } }))
+    setDraft((current) => ({
+      ...current,
+      macros: { ...current.macros, [key]: value },
+      macrosSource: 'label',
+    }))
   }
 
   return (
     <>
+      {/*
+        Said once, at the top, rather than repeated beside nine fields. It is
+        the difference between the app helping and the app pretending to have
+        read a label that does not exist.
+      */}
+      {draft.macrosSource === 'reference' && (
+        <p className="reference-note">
+          Standard figures for {ingredient.name.toLowerCase()} — not off a label, because there
+          isn’t one. Change any of them if you know better.
+        </p>
+      )}
+
       <Field label="Product name" error={issueFor(errors, 'name')}>
         <input
           type="text"
@@ -59,7 +111,7 @@ export function ProductFields({
         <Field label="Label figures are per">
           <select
             value={draft.basis}
-            onChange={(event) => setDraft((current) => ({ ...current, basis: event.target.value as MacroBasis }))}
+            onChange={(event) => setDraft((current) => changeBasis(current, event.target.value as MacroBasis))}
           >
             <option value="package">the package</option>
             <option value="serving">a serving</option>

@@ -18,6 +18,7 @@ import type {
   DateOnly,
   IngredientCategory,
   MacroSet,
+  MacroSource,
   Product,
   ProductId,
   TrackBy,
@@ -125,6 +126,18 @@ export interface ProductDraft {
    */
   readonly unitsPerPackage: string
   readonly macros: Readonly<Record<MacroKey, string>>
+
+  /**
+   * Whether these figures were read off a label or supplied by the app from the
+   * ingredient's generic reference.
+   *
+   * Carried on the draft rather than worked out at save time, because only the
+   * form knows. Once a number is sitting in a box nothing downstream can tell a
+   * USDA figure from a coincidence, and guessing would either put the word
+   * "estimate" on a real label reading or leave it off an estimate. Both are
+   * worse than saying nothing.
+   */
+  readonly macrosSource: MacroSource
 }
 
 export function emptyProductDraft(): ProductDraft {
@@ -139,6 +152,40 @@ export function emptyProductDraft(): ProductDraft {
     servingsPerPackage: '',
     unitsPerPackage: '',
     macros,
+    macrosSource: 'label',
+  }
+}
+
+/**
+ * The product form already filled in from the ingredient's generic figures.
+ *
+ * This is the case the whole reference-macro change exists for: something
+ * bought without packaging, so there is no label to read and nothing to copy
+ * off it. A loose sweet potato still needs a `Product` — that is what a `Lot`
+ * points at, and the three-tier model is not being disturbed — but it no longer
+ * needs nine numbers found on the internet first.
+ *
+ * Returns null when the ingredient has no reference, which is 188 of the 310.
+ * The caller shows the ordinary blank form in that case.
+ *
+ * Named after the ingredient and left brandless, because there is no brand:
+ * the point is that it came out of a bin. Per-100g basis, since that is how the
+ * reference is stored — so nothing is converted and nothing rounds on the way
+ * in.
+ */
+export function referenceProductDraft(ingredient: CanonicalIngredient): ProductDraft | null {
+  const reference = ingredient.referenceMacrosPer100g
+  if (reference === undefined) return null
+
+  const macros = {} as Record<MacroKey, string>
+  for (const key of MACRO_KEYS) macros[key] = String(reference[key])
+
+  return {
+    ...emptyProductDraft(),
+    name: ingredient.name,
+    basis: 'per100g',
+    macros,
+    macrosSource: 'reference',
   }
 }
 
@@ -170,6 +217,12 @@ export function productDraftFrom(product: Product): ProductDraft {
     unitsPerPackage:
       product.unitsPerPackage === undefined ? '' : String(product.unitsPerPackage),
     macros,
+    // Carried through rather than reset. Correcting a reference-derived
+    // product's NAME must not quietly promote its figures to a label reading;
+    // the form flips this to 'label' when a macro field is actually touched.
+    // A product stored before the field existed reads as 'label', which is what
+    // it was — every figure in the app was typed off packaging back then.
+    macrosSource: product.macrosSource ?? 'label',
   }
 }
 
@@ -304,7 +357,7 @@ export function validateProductDraft(
         ? packageSizeG
         : undefined
 
-  const product: NewProduct = { canonicalId, name, macrosPer100g }
+  const product: NewProduct = { canonicalId, name, macrosPer100g, macrosSource: draft.macrosSource }
   const brand = draft.brand.trim()
   if (brand !== '') product.brand = brand
   if (draft.basis === 'serving' && servingSizeG !== null && servingSizeG > 0) {

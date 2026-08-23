@@ -330,6 +330,21 @@
   color: var(--ink-soft);
 }
 
+/*
+  Said at the top of the product form when the app filled the nutrition panel in
+  itself. Not a warning — it is the normal path for anything bought loose — so
+  it reads as a note rather than as the amber banner treatment.
+*/
+.reference-note {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-left: 3px solid var(--accent);
+  background: #f6f2ea;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  color: var(--ink-soft);
+  font-size: 15px;
+}
+
 /* --- search and pick lists ----------------------------------------------- */
 
 .search {
@@ -734,6 +749,22 @@ button.item:active {
 
 .entry-name {
   display: block;
+}
+
+/*
+  Marks a row whose figures are the app's generic ones rather than a label's.
+
+  Quiet on purpose. It has to be legible at a glance and completely
+  uninteresting at every other moment: most of the produce in the kitchen will
+  carry it, and a marker that reads as a warning would make the ordinary state
+  of the app look broken. Grey, small, and set apart by space rather than by
+  colour.
+*/
+.entry-estimate {
+  margin-left: 8px;
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.02em;
 }
 
 .entry-detail {

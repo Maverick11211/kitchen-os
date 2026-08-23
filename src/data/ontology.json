@@ -238,7 +238,18 @@
       "skinless chicken breast",
       "chicken breasts"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 120,
+      "proteinG": 22.5,
+      "carbsG": 0,
+      "fatG": 2.62,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 45,
+      "saturatedFatG": 0.563,
+      "cholesterolMg": 73
+    }
   },
   {
     "id": "chicken-thighs-boneless-skinless",
@@ -254,7 +265,18 @@
       "boneless chicken thighs",
       "skinless chicken thighs"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 121,
+      "proteinG": 19.66,
+      "carbsG": 0,
+      "fatG": 4.12,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 95,
+      "saturatedFatG": 1.097,
+      "cholesterolMg": 94
+    }
   },
   {
     "id": "ground-beef-80-20",
@@ -270,7 +292,18 @@
       "regular ground beef",
       "ground chuck"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 254,
+      "proteinG": 17.17,
+      "carbsG": 0,
+      "fatG": 20,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 66,
+      "saturatedFatG": 7.581,
+      "cholesterolMg": 71
+    }
   },
   {
     "id": "ground-beef-93-7",
@@ -286,7 +319,18 @@
       "extra lean ground beef",
       "lean minced beef"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 152,
+      "proteinG": 20.85,
+      "carbsG": 0,
+      "fatG": 7,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 66,
+      "saturatedFatG": 2.878,
+      "cholesterolMg": 63
+    }
   },
   {
     "id": "ground-turkey",
@@ -300,7 +344,18 @@
       "ground turkey",
       "93% lean ground turkey"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 143,
+      "proteinG": 21.64,
+      "carbsG": 0.13,
+      "fatG": 5.64,
+      "fiberG": 0,
+      "sugarG": 0.07,
+      "sodiumMg": 112,
+      "saturatedFatG": 1.461,
+      "cholesterolMg": 72
+    }
   },
   {
     "id": "bacon",
@@ -332,7 +387,18 @@
       "pork loin chop"
     ],
     "defaultShelfLifeDays": 3,
-    "unitWeightG": 170
+    "unitWeightG": 170,
+    "referenceMacrosPer100g": {
+      "calories": 194,
+      "proteinG": 19.56,
+      "carbsG": 0,
+      "fatG": 12.27,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 69,
+      "saturatedFatG": 4.27,
+      "cholesterolMg": 63
+    }
   },
   {
     "id": "salmon-fillet",
@@ -347,7 +413,18 @@
       "salmon fillets",
       "fresh salmon"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 208,
+      "proteinG": 20.42,
+      "carbsG": 0,
+      "fatG": 13.42,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 59,
+      "saturatedFatG": 3.05,
+      "cholesterolMg": 55
+    }
   },
   {
     "id": "shrimp-peeled-deveined",
@@ -367,7 +444,18 @@
       "raw king prawns",
       "tiger prawns"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 85,
+      "proteinG": 20.1,
+      "carbsG": 0,
+      "fatG": 0.51,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 119,
+      "saturatedFatG": 0.101,
+      "cholesterolMg": 161
+    }
   },
   {
     "id": "tuna-canned-water",
@@ -398,7 +486,18 @@
       "sliced turkey breast",
       "turkey lunch meat"
     ],
-    "defaultShelfLifeDays": 5
+    "defaultShelfLifeDays": 5,
+    "referenceMacrosPer100g": {
+      "calories": 109,
+      "proteinG": 21.81,
+      "carbsG": 3.51,
+      "fatG": 0.83,
+      "fiberG": 0.5,
+      "sugarG": 3.51,
+      "sodiumMg": 772,
+      "saturatedFatG": 0.197,
+      "cholesterolMg": 44
+    }
   },
   {
     "id": "steak-sirloin",
@@ -415,7 +514,18 @@
       "top sirloin",
       "beef fillet"
     ],
-    "defaultShelfLifeDays": 3
+    "defaultShelfLifeDays": 3,
+    "referenceMacrosPer100g": {
+      "calories": 201,
+      "proteinG": 20.3,
+      "carbsG": 0,
+      "fatG": 12.71,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 52,
+      "saturatedFatG": 5.127,
+      "cholesterolMg": 75
+    }
   },
   {
     "id": "sausage-italian",
@@ -461,7 +571,18 @@
       "sliced ham",
       "ham lunch meat"
     ],
-    "defaultShelfLifeDays": 5
+    "defaultShelfLifeDays": 5,
+    "referenceMacrosPer100g": {
+      "calories": 163,
+      "proteinG": 16.6,
+      "carbsG": 3.83,
+      "fatG": 8.6,
+      "fiberG": 1.3,
+      "sugarG": 0,
+      "sodiumMg": 1143,
+      "saturatedFatG": 2.936,
+      "cholesterolMg": 57
+    }
   },
   {
     "id": "chicken-drumsticks",
@@ -476,7 +597,18 @@
       "chicken drumsticks",
       "drumsticks"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 149,
+      "proteinG": 23.93,
+      "carbsG": 0,
+      "fatG": 5.95,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 117,
+      "saturatedFatG": 1.601,
+      "cholesterolMg": 132
+    }
   },
   {
     "id": "onion-yellow",
@@ -493,7 +625,18 @@
       "cooking onion"
     ],
     "defaultShelfLifeDays": 30,
-    "cupWeightG": 160
+    "cupWeightG": 160,
+    "referenceMacrosPer100g": {
+      "calories": 40,
+      "proteinG": 1.1,
+      "carbsG": 9.34,
+      "fatG": 0.1,
+      "fiberG": 1.7,
+      "sugarG": 4.24,
+      "sodiumMg": 4,
+      "saturatedFatG": 0.042,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "garlic-clove",
@@ -509,7 +652,18 @@
       "garlic cloves",
       "clove of garlic"
     ],
-    "defaultShelfLifeDays": 21
+    "defaultShelfLifeDays": 21,
+    "referenceMacrosPer100g": {
+      "calories": 149,
+      "proteinG": 6.36,
+      "carbsG": 33.06,
+      "fatG": 0.5,
+      "fiberG": 2.1,
+      "sugarG": 1,
+      "sodiumMg": 17,
+      "saturatedFatG": 0.089,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "carrot",
@@ -525,7 +679,18 @@
       "carrots",
       "carrot"
     ],
-    "defaultShelfLifeDays": 21
+    "defaultShelfLifeDays": 21,
+    "referenceMacrosPer100g": {
+      "calories": 41,
+      "proteinG": 0.93,
+      "carbsG": 9.58,
+      "fatG": 0.24,
+      "fiberG": 2.8,
+      "sugarG": 4.74,
+      "sodiumMg": 69,
+      "saturatedFatG": 0.037,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "spinach-fresh",
@@ -541,7 +706,18 @@
       "baby spinach",
       "fresh spinach"
     ],
-    "defaultShelfLifeDays": 7
+    "defaultShelfLifeDays": 7,
+    "referenceMacrosPer100g": {
+      "calories": 23,
+      "proteinG": 2.86,
+      "carbsG": 3.63,
+      "fatG": 0.39,
+      "fiberG": 2.2,
+      "sugarG": 0.42,
+      "sodiumMg": 79,
+      "saturatedFatG": 0.063,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "cilantro",
@@ -557,7 +733,18 @@
       "fresh cilantro",
       "coriander leaves"
     ],
-    "defaultShelfLifeDays": 7
+    "defaultShelfLifeDays": 7,
+    "referenceMacrosPer100g": {
+      "calories": 23,
+      "proteinG": 2.13,
+      "carbsG": 3.67,
+      "fatG": 0.52,
+      "fiberG": 2.8,
+      "sugarG": 0.87,
+      "sodiumMg": 46,
+      "saturatedFatG": 0.014,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "potato-russet",
@@ -575,7 +762,18 @@
       "russet potato",
       "baking potato"
     ],
-    "defaultShelfLifeDays": 21
+    "defaultShelfLifeDays": 21,
+    "referenceMacrosPer100g": {
+      "calories": 79,
+      "proteinG": 2.14,
+      "carbsG": 18.07,
+      "fatG": 0.08,
+      "fiberG": 1.3,
+      "sugarG": 0.62,
+      "sodiumMg": 5,
+      "saturatedFatG": 0.026,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "sweet-potato",
@@ -591,7 +789,18 @@
       "sweet potatoes",
       "yam"
     ],
-    "defaultShelfLifeDays": 21
+    "defaultShelfLifeDays": 21,
+    "referenceMacrosPer100g": {
+      "calories": 86,
+      "proteinG": 1.57,
+      "carbsG": 20.12,
+      "fatG": 0.05,
+      "fiberG": 3,
+      "sugarG": 4.18,
+      "sodiumMg": 55,
+      "saturatedFatG": 0.018,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "tomato",
@@ -607,7 +816,18 @@
       "tomatoes",
       "roma tomato"
     ],
-    "defaultShelfLifeDays": 7
+    "defaultShelfLifeDays": 7,
+    "referenceMacrosPer100g": {
+      "calories": 18,
+      "proteinG": 0.88,
+      "carbsG": 3.89,
+      "fatG": 0.2,
+      "fiberG": 1.2,
+      "sugarG": 2.63,
+      "sodiumMg": 5,
+      "saturatedFatG": 0.028,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "bell-pepper",
@@ -625,7 +845,18 @@
       "peppers",
       "yellow pepper"
     ],
-    "defaultShelfLifeDays": 10
+    "defaultShelfLifeDays": 10,
+    "referenceMacrosPer100g": {
+      "calories": 31,
+      "proteinG": 0.99,
+      "carbsG": 6.03,
+      "fatG": 0.3,
+      "fiberG": 2.1,
+      "sugarG": 4.2,
+      "sodiumMg": 4,
+      "saturatedFatG": 0.027,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "cucumber",
@@ -641,7 +872,18 @@
       "cucumbers",
       "english cucumber"
     ],
-    "defaultShelfLifeDays": 7
+    "defaultShelfLifeDays": 7,
+    "referenceMacrosPer100g": {
+      "calories": 15,
+      "proteinG": 0.65,
+      "carbsG": 3.63,
+      "fatG": 0.11,
+      "fiberG": 0.5,
+      "sugarG": 1.67,
+      "sodiumMg": 2,
+      "saturatedFatG": 0.037,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "zucchini",
@@ -657,7 +899,18 @@
       "courgette",
       "courgettes"
     ],
-    "defaultShelfLifeDays": 5
+    "defaultShelfLifeDays": 5,
+    "referenceMacrosPer100g": {
+      "calories": 17,
+      "proteinG": 1.21,
+      "carbsG": 3.11,
+      "fatG": 0.32,
+      "fiberG": 1,
+      "sugarG": 2.5,
+      "sodiumMg": 8,
+      "saturatedFatG": 0.084,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "jalapeno",
@@ -676,7 +929,18 @@
       "green chilli",
       "red chilli"
     ],
-    "defaultShelfLifeDays": 14
+    "defaultShelfLifeDays": 14,
+    "referenceMacrosPer100g": {
+      "calories": 29,
+      "proteinG": 0.91,
+      "carbsG": 6.5,
+      "fatG": 0.37,
+      "fiberG": 2.8,
+      "sugarG": 4.12,
+      "sodiumMg": 3,
+      "saturatedFatG": 0.092,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "lemon",
@@ -691,7 +955,18 @@
       "lemon",
       "lemons"
     ],
-    "defaultShelfLifeDays": 21
+    "defaultShelfLifeDays": 21,
+    "referenceMacrosPer100g": {
+      "calories": 29,
+      "proteinG": 1.1,
+      "carbsG": 9.32,
+      "fatG": 0.3,
+      "fiberG": 2.8,
+      "sugarG": 2.5,
+      "sodiumMg": 2,
+      "saturatedFatG": 0.039,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "lime",
@@ -706,7 +981,18 @@
       "lime",
       "limes"
     ],
-    "defaultShelfLifeDays": 21
+    "defaultShelfLifeDays": 21,
+    "referenceMacrosPer100g": {
+      "calories": 30,
+      "proteinG": 0.7,
+      "carbsG": 10.54,
+      "fatG": 0.2,
+      "fiberG": 2.8,
+      "sugarG": 1.69,
+      "sodiumMg": 2,
+      "saturatedFatG": 0.022,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "avocado",
@@ -722,7 +1008,18 @@
       "avocados",
       "hass avocado"
     ],
-    "defaultShelfLifeDays": 5
+    "defaultShelfLifeDays": 5,
+    "referenceMacrosPer100g": {
+      "calories": 160,
+      "proteinG": 2,
+      "carbsG": 8.53,
+      "fatG": 14.66,
+      "fiberG": 6.7,
+      "sugarG": 0.66,
+      "sodiumMg": 7,
+      "saturatedFatG": 2.126,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "banana",
@@ -737,7 +1034,18 @@
       "banana",
       "bananas"
     ],
-    "defaultShelfLifeDays": 6
+    "defaultShelfLifeDays": 6,
+    "referenceMacrosPer100g": {
+      "calories": 89,
+      "proteinG": 1.09,
+      "carbsG": 22.84,
+      "fatG": 0.33,
+      "fiberG": 2.6,
+      "sugarG": 12.23,
+      "sodiumMg": 1,
+      "saturatedFatG": 0.112,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "apple",
@@ -752,7 +1060,18 @@
       "apple",
       "apples"
     ],
-    "defaultShelfLifeDays": 28
+    "defaultShelfLifeDays": 28,
+    "referenceMacrosPer100g": {
+      "calories": 52,
+      "proteinG": 0.26,
+      "carbsG": 13.81,
+      "fatG": 0.17,
+      "fiberG": 2.4,
+      "sugarG": 10.39,
+      "sodiumMg": 1,
+      "saturatedFatG": 0.028,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "orange",
@@ -767,7 +1086,18 @@
       "orange",
       "oranges"
     ],
-    "defaultShelfLifeDays": 21
+    "defaultShelfLifeDays": 21,
+    "referenceMacrosPer100g": {
+      "calories": 47,
+      "proteinG": 0.94,
+      "carbsG": 11.75,
+      "fatG": 0.12,
+      "fiberG": 2.4,
+      "sugarG": 9.35,
+      "sodiumMg": 0,
+      "saturatedFatG": 0.015,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "celery",
@@ -784,7 +1114,18 @@
       "celery stalk",
       "stalk of celery"
     ],
-    "defaultShelfLifeDays": 14
+    "defaultShelfLifeDays": 14,
+    "referenceMacrosPer100g": {
+      "calories": 16,
+      "proteinG": 0.69,
+      "carbsG": 2.97,
+      "fatG": 0.17,
+      "fiberG": 1.6,
+      "sugarG": 1.34,
+      "sodiumMg": 80,
+      "saturatedFatG": 0.042,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "cabbage",
@@ -801,7 +1142,18 @@
       "head of cabbage",
       "red cabbage"
     ],
-    "defaultShelfLifeDays": 21
+    "defaultShelfLifeDays": 21,
+    "referenceMacrosPer100g": {
+      "calories": 25,
+      "proteinG": 1.28,
+      "carbsG": 5.8,
+      "fatG": 0.1,
+      "fiberG": 2.5,
+      "sugarG": 3.2,
+      "sodiumMg": 18,
+      "saturatedFatG": 0.034,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "corn-on-the-cob",
@@ -818,7 +1170,18 @@
       "ear of corn",
       "sweet corn"
     ],
-    "defaultShelfLifeDays": 5
+    "defaultShelfLifeDays": 5,
+    "referenceMacrosPer100g": {
+      "calories": 86,
+      "proteinG": 3.27,
+      "carbsG": 18.7,
+      "fatG": 1.35,
+      "fiberG": 2,
+      "sugarG": 6.26,
+      "sodiumMg": 15,
+      "saturatedFatG": 0.325,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "broccoli",
@@ -834,7 +1197,18 @@
       "broccoli florets",
       "broccoli crowns"
     ],
-    "defaultShelfLifeDays": 7
+    "defaultShelfLifeDays": 7,
+    "referenceMacrosPer100g": {
+      "calories": 34,
+      "proteinG": 2.82,
+      "carbsG": 6.64,
+      "fatG": 0.37,
+      "fiberG": 2.6,
+      "sugarG": 1.7,
+      "sodiumMg": 33,
+      "saturatedFatG": 0.039,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "cauliflower",
@@ -849,7 +1223,18 @@
       "cauliflower",
       "cauliflower florets"
     ],
-    "defaultShelfLifeDays": 7
+    "defaultShelfLifeDays": 7,
+    "referenceMacrosPer100g": {
+      "calories": 25,
+      "proteinG": 1.92,
+      "carbsG": 4.97,
+      "fatG": 0.28,
+      "fiberG": 2,
+      "sugarG": 1.91,
+      "sodiumMg": 30,
+      "saturatedFatG": 0.13,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "mushroom-white",
@@ -866,7 +1251,18 @@
       "button mushrooms",
       "sliced mushrooms"
     ],
-    "defaultShelfLifeDays": 7
+    "defaultShelfLifeDays": 7,
+    "referenceMacrosPer100g": {
+      "calories": 22,
+      "proteinG": 3.09,
+      "carbsG": 3.26,
+      "fatG": 0.34,
+      "fiberG": 1,
+      "sugarG": 1.98,
+      "sodiumMg": 5,
+      "saturatedFatG": 0.05,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "romaine-lettuce",
@@ -882,7 +1278,18 @@
       "lettuce",
       "romaine"
     ],
-    "defaultShelfLifeDays": 10
+    "defaultShelfLifeDays": 10,
+    "referenceMacrosPer100g": {
+      "calories": 17,
+      "proteinG": 1.23,
+      "carbsG": 3.29,
+      "fatG": 0.3,
+      "fiberG": 2.1,
+      "sugarG": 1.19,
+      "sodiumMg": 8,
+      "saturatedFatG": 0.039,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "strawberries",
@@ -897,7 +1304,18 @@
       "strawberries",
       "fresh strawberries"
     ],
-    "defaultShelfLifeDays": 5
+    "defaultShelfLifeDays": 5,
+    "referenceMacrosPer100g": {
+      "calories": 32,
+      "proteinG": 0.67,
+      "carbsG": 7.68,
+      "fatG": 0.3,
+      "fiberG": 2,
+      "sugarG": 4.89,
+      "sodiumMg": 1,
+      "saturatedFatG": 0.015,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "blueberries",
@@ -912,7 +1330,18 @@
       "blueberries",
       "fresh blueberries"
     ],
-    "defaultShelfLifeDays": 10
+    "defaultShelfLifeDays": 10,
+    "referenceMacrosPer100g": {
+      "calories": 57,
+      "proteinG": 0.74,
+      "carbsG": 14.49,
+      "fatG": 0.33,
+      "fiberG": 2.4,
+      "sugarG": 9.96,
+      "sodiumMg": 1,
+      "saturatedFatG": 0.028,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "parsley",
@@ -929,7 +1358,18 @@
       "flat-leaf parsley",
       "italian parsley"
     ],
-    "defaultShelfLifeDays": 7
+    "defaultShelfLifeDays": 7,
+    "referenceMacrosPer100g": {
+      "calories": 36,
+      "proteinG": 2.97,
+      "carbsG": 6.33,
+      "fatG": 0.79,
+      "fiberG": 3.3,
+      "sugarG": 0.85,
+      "sodiumMg": 56,
+      "saturatedFatG": 0.132,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "basil",
@@ -946,7 +1386,18 @@
       "fresh basil",
       "sweet basil"
     ],
-    "defaultShelfLifeDays": 5
+    "defaultShelfLifeDays": 5,
+    "referenceMacrosPer100g": {
+      "calories": 23,
+      "proteinG": 3.15,
+      "carbsG": 2.65,
+      "fatG": 0.64,
+      "fiberG": 1.6,
+      "sugarG": 0.3,
+      "sodiumMg": 4,
+      "saturatedFatG": 0.041,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "ginger",
@@ -962,7 +1413,18 @@
       "fresh ginger",
       "ginger root"
     ],
-    "defaultShelfLifeDays": 21
+    "defaultShelfLifeDays": 21,
+    "referenceMacrosPer100g": {
+      "calories": 80,
+      "proteinG": 1.82,
+      "carbsG": 17.77,
+      "fatG": 0.75,
+      "fiberG": 2,
+      "sugarG": 1.7,
+      "sodiumMg": 13,
+      "saturatedFatG": 0.203,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "rice-white",
@@ -978,7 +1440,18 @@
       "white rice",
       "long grain rice",
       "long-grain white rice"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 365,
+      "proteinG": 7.13,
+      "carbsG": 79.95,
+      "fatG": 0.66,
+      "fiberG": 1.3,
+      "sugarG": 0.12,
+      "sodiumMg": 5,
+      "saturatedFatG": 0.18,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "rice-brown",
@@ -991,7 +1464,18 @@
     "cupWeightG": 190,
     "aliases": [
       "brown rice"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 367,
+      "proteinG": 7.54,
+      "carbsG": 76.25,
+      "fatG": 3.2,
+      "fiberG": 3.6,
+      "sugarG": 0.66,
+      "sodiumMg": 5,
+      "saturatedFatG": 0.591,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "rice-jasmine",
@@ -1004,7 +1488,18 @@
     "cupWeightG": 185,
     "aliases": [
       "jasmine rice"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 365,
+      "proteinG": 7.13,
+      "carbsG": 79.95,
+      "fatG": 0.66,
+      "fiberG": 1.3,
+      "sugarG": 0.12,
+      "sodiumMg": 5,
+      "saturatedFatG": 0.18,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "rice-basmati",
@@ -1017,7 +1512,18 @@
     "cupWeightG": 180,
     "aliases": [
       "basmati rice"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 365,
+      "proteinG": 7.13,
+      "carbsG": 79.95,
+      "fatG": 0.66,
+      "fiberG": 1.3,
+      "sugarG": 0.12,
+      "sodiumMg": 5,
+      "saturatedFatG": 0.18,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "quinoa",
@@ -1031,7 +1537,18 @@
     "aliases": [
       "quinoa",
       "quinoa grain"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 368,
+      "proteinG": 14.12,
+      "carbsG": 64.16,
+      "fatG": 6.07,
+      "fiberG": 7,
+      "sugarG": 0,
+      "sodiumMg": 5,
+      "saturatedFatG": 0.706,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "oats-rolled",
@@ -1048,7 +1565,18 @@
       "old-fashioned oats",
       "old fashioned oats",
       "oatmeal"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 379,
+      "proteinG": 13.15,
+      "carbsG": 67.7,
+      "fatG": 6.52,
+      "fiberG": 10.1,
+      "sugarG": 0.99,
+      "sodiumMg": 6,
+      "saturatedFatG": 1.11,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "oats-steel-cut",
@@ -1063,7 +1591,18 @@
       "steel-cut oats",
       "steel cut oats",
       "irish oats"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 379,
+      "proteinG": 13.15,
+      "carbsG": 67.7,
+      "fatG": 6.52,
+      "fiberG": 10.1,
+      "sugarG": 0.99,
+      "sodiumMg": 6,
+      "saturatedFatG": 1.11,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "pasta-spaghetti",
@@ -1117,7 +1656,18 @@
     "cupWeightG": 173,
     "aliases": [
       "couscous"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 376,
+      "proteinG": 12.76,
+      "carbsG": 77.43,
+      "fatG": 0.64,
+      "fiberG": 5,
+      "sugarG": 0,
+      "sodiumMg": 10,
+      "saturatedFatG": 0.117,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "barley-pearled",
@@ -1131,7 +1681,18 @@
     "aliases": [
       "barley",
       "pearled barley"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 352,
+      "proteinG": 9.91,
+      "carbsG": 77.72,
+      "fatG": 1.16,
+      "fiberG": 15.6,
+      "sugarG": 0.8,
+      "sodiumMg": 9,
+      "saturatedFatG": 0.244,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "farro",
@@ -1144,7 +1705,18 @@
     "cupWeightG": 190,
     "aliases": [
       "farro"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 338,
+      "proteinG": 14.57,
+      "carbsG": 70.19,
+      "fatG": 2.43,
+      "fiberG": 10.7,
+      "sugarG": 6.82,
+      "sodiumMg": 8,
+      "saturatedFatG": 0.406,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "breadcrumbs-panko",
@@ -1236,7 +1808,18 @@
       "bagel",
       "bagels"
     ],
-    "defaultShelfLifeDays": 5
+    "defaultShelfLifeDays": 5,
+    "referenceMacrosPer100g": {
+      "calories": 287,
+      "proteinG": 11.14,
+      "carbsG": 57.39,
+      "fatG": 1.43,
+      "fiberG": 1.8,
+      "sugarG": 9.14,
+      "sodiumMg": 457,
+      "saturatedFatG": 0.229,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "english-muffin",
@@ -1372,7 +1955,18 @@
       "green lentils",
       "brown lentils",
       "dry lentils"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 352,
+      "proteinG": 24.63,
+      "carbsG": 63.35,
+      "fatG": 1.06,
+      "fiberG": 10.7,
+      "sugarG": 2.03,
+      "sodiumMg": 6,
+      "saturatedFatG": 0.154,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "lentils-red",
@@ -1387,7 +1981,18 @@
       "red lentils",
       "split red lentils",
       "french lentils"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 358,
+      "proteinG": 23.91,
+      "carbsG": 63.1,
+      "fatG": 2.17,
+      "fiberG": 10.8,
+      "sugarG": 0,
+      "sodiumMg": 7,
+      "saturatedFatG": 0.379,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "edamame-frozen",
@@ -1419,7 +2024,18 @@
       "dried split peas",
       "yellow split peas",
       "toor dal"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 352,
+      "proteinG": 23.82,
+      "carbsG": 63.74,
+      "fatG": 1.16,
+      "fiberG": 25.5,
+      "sugarG": 8,
+      "sodiumMg": 15,
+      "saturatedFatG": 0.161,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "olive-oil",
@@ -1576,7 +2192,7 @@
     "tracked": true,
     "perishable": false,
     "isSeed": true,
-    "densityGPerMl": 1.0,
+    "densityGPerMl": 1,
     "aliases": [
       "mustard",
       "yellow mustard",
@@ -1634,7 +2250,7 @@
     "tracked": true,
     "perishable": false,
     "isSeed": true,
-    "densityGPerMl": 1.0,
+    "densityGPerMl": 1,
     "aliases": [
       "hot sauce",
       "tabasco",
@@ -1677,7 +2293,7 @@
     "tracked": true,
     "perishable": true,
     "isSeed": true,
-    "densityGPerMl": 1.0,
+    "densityGPerMl": 1,
     "aliases": [
       "ranch dressing",
       "ranch"
@@ -2379,7 +2995,7 @@
     "tracked": true,
     "perishable": false,
     "isSeed": true,
-    "densityGPerMl": 1.0,
+    "densityGPerMl": 1,
     "aliases": [
       "sparkling water",
       "seltzer",
@@ -2474,7 +3090,18 @@
       "almonds",
       "raw almonds",
       "whole almonds"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 579,
+      "proteinG": 21.15,
+      "carbsG": 21.55,
+      "fatG": 49.93,
+      "fiberG": 12.5,
+      "sugarG": 4.35,
+      "sodiumMg": 1,
+      "saturatedFatG": 3.802,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "walnuts",
@@ -2488,7 +3115,18 @@
     "aliases": [
       "walnuts",
       "walnut halves"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 654,
+      "proteinG": 15.23,
+      "carbsG": 13.71,
+      "fatG": 65.21,
+      "fiberG": 6.7,
+      "sugarG": 2.61,
+      "sodiumMg": 2,
+      "saturatedFatG": 6.126,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "peanuts-raw",
@@ -2503,7 +3141,18 @@
       "peanuts",
       "raw peanuts",
       "roasted peanuts"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 567,
+      "proteinG": 25.8,
+      "carbsG": 16.13,
+      "fatG": 49.24,
+      "fiberG": 8.5,
+      "sugarG": 4.72,
+      "sodiumMg": 18,
+      "saturatedFatG": 6.279,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "cashews",
@@ -2518,7 +3167,18 @@
       "cashews",
       "raw cashews",
       "roasted cashews"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 553,
+      "proteinG": 18.22,
+      "carbsG": 30.19,
+      "fatG": 43.85,
+      "fiberG": 3.3,
+      "sugarG": 5.91,
+      "sodiumMg": 12,
+      "saturatedFatG": 7.783,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "sunflower-seeds",
@@ -2532,7 +3192,18 @@
     "aliases": [
       "sunflower seeds",
       "shelled sunflower seeds"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 584,
+      "proteinG": 20.78,
+      "carbsG": 20,
+      "fatG": 51.46,
+      "fiberG": 8.6,
+      "sugarG": 2.62,
+      "sodiumMg": 9,
+      "saturatedFatG": 4.455,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "chia-seeds",
@@ -2545,7 +3216,18 @@
     "cupWeightG": 170,
     "aliases": [
       "chia seeds"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 486,
+      "proteinG": 16.54,
+      "carbsG": 42.12,
+      "fatG": 30.74,
+      "fiberG": 34.4,
+      "sugarG": 0,
+      "sodiumMg": 16,
+      "saturatedFatG": 3.33,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "flax-seed-ground",
@@ -2560,7 +3242,18 @@
       "ground flaxseed",
       "flax seed",
       "flaxseed meal"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 534,
+      "proteinG": 18.29,
+      "carbsG": 28.88,
+      "fatG": 42.16,
+      "fiberG": 27.3,
+      "sugarG": 1.55,
+      "sodiumMg": 30,
+      "saturatedFatG": 3.663,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "chicken-broth",
@@ -2570,7 +3263,7 @@
     "tracked": true,
     "perishable": false,
     "isSeed": true,
-    "densityGPerMl": 1.0,
+    "densityGPerMl": 1,
     "aliases": [
       "chicken broth",
       "chicken stock"
@@ -2584,7 +3277,7 @@
     "tracked": true,
     "perishable": false,
     "isSeed": true,
-    "densityGPerMl": 1.0,
+    "densityGPerMl": 1,
     "aliases": [
       "vegetable broth",
       "vegetable stock",
@@ -2599,7 +3292,7 @@
     "tracked": true,
     "perishable": false,
     "isSeed": true,
-    "densityGPerMl": 1.0,
+    "densityGPerMl": 1,
     "aliases": [
       "beef broth",
       "beef stock"
@@ -2689,7 +3382,7 @@
     "tracked": false,
     "perishable": false,
     "isSeed": true,
-    "densityGPerMl": 1.0,
+    "densityGPerMl": 1,
     "aliases": [
       "water",
       "tap water"
@@ -2709,7 +3402,18 @@
       "feta cheese",
       "crumbled feta"
     ],
-    "defaultShelfLifeDays": 14
+    "defaultShelfLifeDays": 14,
+    "referenceMacrosPer100g": {
+      "calories": 264,
+      "proteinG": 14.21,
+      "carbsG": 4.09,
+      "fatG": 21.28,
+      "fiberG": 0,
+      "sugarG": 4.09,
+      "sodiumMg": 917,
+      "saturatedFatG": 14.946,
+      "cholesterolMg": 89
+    }
   },
   {
     "id": "swiss-cheese-sliced",
@@ -2737,7 +3441,18 @@
     "aliases": [
       "ground chicken"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 143,
+      "proteinG": 17.44,
+      "carbsG": 0.04,
+      "fatG": 8.1,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 60,
+      "saturatedFatG": 2.301,
+      "cholesterolMg": 86
+    }
   },
   {
     "id": "cod-fillet",
@@ -2754,7 +3469,18 @@
       "tilapia",
       "haddock"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 72,
+      "proteinG": 17.54,
+      "carbsG": 0,
+      "fatG": 0.2,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 109,
+      "saturatedFatG": 0.039,
+      "cholesterolMg": 46
+    }
   },
   {
     "id": "green-onion",
@@ -2772,7 +3498,18 @@
       "scallions"
     ],
     "defaultShelfLifeDays": 7,
-    "cupWeightG": 25
+    "cupWeightG": 25,
+    "referenceMacrosPer100g": {
+      "calories": 32,
+      "proteinG": 1.83,
+      "carbsG": 7.34,
+      "fatG": 0.19,
+      "fiberG": 2.6,
+      "sugarG": 2.33,
+      "sodiumMg": 16,
+      "saturatedFatG": 0.032,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "onion-red",
@@ -2786,7 +3523,18 @@
     "aliases": [
       "red onion"
     ],
-    "defaultShelfLifeDays": 30
+    "defaultShelfLifeDays": 30,
+    "referenceMacrosPer100g": {
+      "calories": 40,
+      "proteinG": 1.1,
+      "carbsG": 9.34,
+      "fatG": 0.1,
+      "fiberG": 1.7,
+      "sugarG": 4.24,
+      "sodiumMg": 4,
+      "saturatedFatG": 0.042,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "kale",
@@ -2800,7 +3548,18 @@
     "aliases": [
       "kale"
     ],
-    "defaultShelfLifeDays": 7
+    "defaultShelfLifeDays": 7,
+    "referenceMacrosPer100g": {
+      "calories": 49,
+      "proteinG": 4.28,
+      "carbsG": 8.75,
+      "fatG": 0.93,
+      "fiberG": 3.6,
+      "sugarG": 2.26,
+      "sodiumMg": 38,
+      "saturatedFatG": 0.091,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "green-beans",
@@ -2815,7 +3574,18 @@
       "green beans",
       "string beans"
     ],
-    "defaultShelfLifeDays": 7
+    "defaultShelfLifeDays": 7,
+    "referenceMacrosPer100g": {
+      "calories": 31,
+      "proteinG": 1.83,
+      "carbsG": 6.97,
+      "fatG": 0.22,
+      "fiberG": 2.7,
+      "sugarG": 3.26,
+      "sodiumMg": 6,
+      "saturatedFatG": 0.05,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "hamburger-buns",
@@ -2919,7 +3689,18 @@
       "lamb mince",
       "minced lamb"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 282,
+      "proteinG": 16.56,
+      "carbsG": 0,
+      "fatG": 23.41,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 59,
+      "saturatedFatG": 10.19,
+      "cholesterolMg": 73
+    }
   },
   {
     "id": "lamb-leg",
@@ -2937,7 +3718,18 @@
       "lamb loin chops",
       "lamb chops"
     ],
-    "defaultShelfLifeDays": 3
+    "defaultShelfLifeDays": 3,
+    "referenceMacrosPer100g": {
+      "calories": 185,
+      "proteinG": 18.99,
+      "carbsG": 0,
+      "fatG": 11.5,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 58,
+      "saturatedFatG": 4.88,
+      "cholesterolMg": 67
+    }
   },
   {
     "id": "duck-breast",
@@ -2952,7 +3744,18 @@
       "duck breast",
       "duck breasts"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 135,
+      "proteinG": 18.28,
+      "carbsG": 0.94,
+      "fatG": 5.95,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 74,
+      "saturatedFatG": 2.32,
+      "cholesterolMg": 77
+    }
   },
   {
     "id": "mussels",
@@ -2965,7 +3768,18 @@
     "aliases": [
       "mussels"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 86,
+      "proteinG": 11.9,
+      "carbsG": 3.69,
+      "fatG": 2.24,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 286,
+      "saturatedFatG": 0.425,
+      "cholesterolMg": 28
+    }
   },
   {
     "id": "clams",
@@ -2978,7 +3792,18 @@
     "aliases": [
       "clams"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 86,
+      "proteinG": 14.67,
+      "carbsG": 3.57,
+      "fatG": 0.96,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 601,
+      "saturatedFatG": 0.187,
+      "cholesterolMg": 30
+    }
   },
   {
     "id": "squid",
@@ -2994,7 +3819,18 @@
       "baby squid",
       "calamari"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 92,
+      "proteinG": 15.58,
+      "carbsG": 3.08,
+      "fatG": 1.38,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 44,
+      "saturatedFatG": 0.358,
+      "cholesterolMg": 233
+    }
   },
   {
     "id": "oysters",
@@ -3008,7 +3844,18 @@
     "aliases": [
       "oysters"
     ],
-    "defaultShelfLifeDays": 3
+    "defaultShelfLifeDays": 3,
+    "referenceMacrosPer100g": {
+      "calories": 51,
+      "proteinG": 5.71,
+      "carbsG": 2.72,
+      "fatG": 1.71,
+      "fiberG": 0,
+      "sugarG": 0.62,
+      "sodiumMg": 85,
+      "saturatedFatG": 0.474,
+      "cholesterolMg": 40
+    }
   },
   {
     "id": "mackerel",
@@ -3021,7 +3868,18 @@
     "aliases": [
       "mackerel"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 205,
+      "proteinG": 18.6,
+      "carbsG": 0,
+      "fatG": 13.89,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 90,
+      "saturatedFatG": 3.257,
+      "cholesterolMg": 70
+    }
   },
   {
     "id": "chorizo",
@@ -3093,7 +3951,18 @@
     "aliases": [
       "asparagus"
     ],
-    "defaultShelfLifeDays": 4
+    "defaultShelfLifeDays": 4,
+    "referenceMacrosPer100g": {
+      "calories": 20,
+      "proteinG": 2.2,
+      "carbsG": 3.88,
+      "fatG": 0.12,
+      "fiberG": 2.1,
+      "sugarG": 1.88,
+      "sodiumMg": 2,
+      "saturatedFatG": 0.04,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "leek",
@@ -3108,7 +3977,18 @@
       "leek",
       "leeks"
     ],
-    "defaultShelfLifeDays": 10
+    "defaultShelfLifeDays": 10,
+    "referenceMacrosPer100g": {
+      "calories": 61,
+      "proteinG": 1.5,
+      "carbsG": 14.15,
+      "fatG": 0.3,
+      "fiberG": 1.8,
+      "sugarG": 3.9,
+      "sodiumMg": 20,
+      "saturatedFatG": 0.04,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "shallot",
@@ -3124,7 +4004,18 @@
       "shallots",
       "challots"
     ],
-    "defaultShelfLifeDays": 30
+    "defaultShelfLifeDays": 30,
+    "referenceMacrosPer100g": {
+      "calories": 72,
+      "proteinG": 2.5,
+      "carbsG": 16.8,
+      "fatG": 0.1,
+      "fiberG": 3.2,
+      "sugarG": 7.87,
+      "sodiumMg": 12,
+      "saturatedFatG": 0.017,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "celeriac",
@@ -3139,7 +4030,18 @@
       "celeriac",
       "celery root"
     ],
-    "defaultShelfLifeDays": 21
+    "defaultShelfLifeDays": 21,
+    "referenceMacrosPer100g": {
+      "calories": 42,
+      "proteinG": 1.5,
+      "carbsG": 9.2,
+      "fatG": 0.3,
+      "fiberG": 1.8,
+      "sugarG": 1.6,
+      "sodiumMg": 100,
+      "saturatedFatG": 0.079,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "fennel-bulb",
@@ -3154,7 +4056,18 @@
       "fennel",
       "fennel bulb"
     ],
-    "defaultShelfLifeDays": 7
+    "defaultShelfLifeDays": 7,
+    "referenceMacrosPer100g": {
+      "calories": 31,
+      "proteinG": 1.24,
+      "carbsG": 7.3,
+      "fatG": 0.2,
+      "fiberG": 3.1,
+      "sugarG": 3.93,
+      "sodiumMg": 52,
+      "saturatedFatG": 0.09,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "brussels-sprouts",
@@ -3168,7 +4081,18 @@
     "aliases": [
       "brussels sprouts"
     ],
-    "defaultShelfLifeDays": 7
+    "defaultShelfLifeDays": 7,
+    "referenceMacrosPer100g": {
+      "calories": 43,
+      "proteinG": 3.38,
+      "carbsG": 8.95,
+      "fatG": 0.3,
+      "fiberG": 3.8,
+      "sugarG": 2.2,
+      "sodiumMg": 25,
+      "saturatedFatG": 0.062,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "turnip",
@@ -3185,7 +4109,18 @@
       "swede",
       "rutabaga"
     ],
-    "defaultShelfLifeDays": 14
+    "defaultShelfLifeDays": 14,
+    "referenceMacrosPer100g": {
+      "calories": 28,
+      "proteinG": 0.9,
+      "carbsG": 6.43,
+      "fatG": 0.1,
+      "fiberG": 1.8,
+      "sugarG": 3.8,
+      "sodiumMg": 67,
+      "saturatedFatG": 0.011,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "eggplant",
@@ -3201,7 +4136,18 @@
       "aubergine",
       "egg plants"
     ],
-    "defaultShelfLifeDays": 5
+    "defaultShelfLifeDays": 5,
+    "referenceMacrosPer100g": {
+      "calories": 25,
+      "proteinG": 0.98,
+      "carbsG": 5.88,
+      "fatG": 0.18,
+      "fiberG": 3,
+      "sugarG": 3.53,
+      "sodiumMg": 2,
+      "saturatedFatG": 0.034,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "pumpkin",
@@ -3216,7 +4162,18 @@
       "pumpkin",
       "pumpkin puree"
     ],
-    "defaultShelfLifeDays": 7
+    "defaultShelfLifeDays": 7,
+    "referenceMacrosPer100g": {
+      "calories": 26,
+      "proteinG": 1,
+      "carbsG": 6.5,
+      "fatG": 0.1,
+      "fiberG": 0.5,
+      "sugarG": 2.76,
+      "sodiumMg": 1,
+      "saturatedFatG": 0.052,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "peach",
@@ -3231,7 +4188,18 @@
       "peach",
       "peaches"
     ],
-    "defaultShelfLifeDays": 5
+    "defaultShelfLifeDays": 5,
+    "referenceMacrosPer100g": {
+      "calories": 39,
+      "proteinG": 0.91,
+      "carbsG": 9.54,
+      "fatG": 0.25,
+      "fiberG": 1.5,
+      "sugarG": 8.39,
+      "sodiumMg": 0,
+      "saturatedFatG": 0.019,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "pear",
@@ -3246,7 +4214,18 @@
       "pear",
       "pears"
     ],
-    "defaultShelfLifeDays": 7
+    "defaultShelfLifeDays": 7,
+    "referenceMacrosPer100g": {
+      "calories": 57,
+      "proteinG": 0.36,
+      "carbsG": 15.23,
+      "fatG": 0.14,
+      "fiberG": 3.1,
+      "sugarG": 9.75,
+      "sodiumMg": 1,
+      "saturatedFatG": 0.022,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "dates-medjool",
@@ -3260,7 +4239,18 @@
     "aliases": [
       "dates",
       "medjool dates"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 277,
+      "proteinG": 1.81,
+      "carbsG": 74.97,
+      "fatG": 0.15,
+      "fiberG": 6.7,
+      "sugarG": 66.47,
+      "sodiumMg": 1,
+      "saturatedFatG": 0,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "butternut-squash",
@@ -3276,7 +4266,18 @@
       "butternut squash"
     ],
     "defaultShelfLifeDays": 30,
-    "unitWeightG": 900
+    "unitWeightG": 900,
+    "referenceMacrosPer100g": {
+      "calories": 45,
+      "proteinG": 1,
+      "carbsG": 11.69,
+      "fatG": 0.1,
+      "fiberG": 2,
+      "sugarG": 2.2,
+      "sodiumMg": 4,
+      "saturatedFatG": 0.021,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "olives",
@@ -3481,7 +4482,7 @@
     "tracked": true,
     "perishable": true,
     "isSeed": true,
-    "densityGPerMl": 1.0,
+    "densityGPerMl": 1,
     "aliases": [
       "horseradish",
       "prepared horseradish"
@@ -3540,7 +4541,18 @@
     "aliases": [
       "sesame seed",
       "sesame seeds"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 573,
+      "proteinG": 17.73,
+      "carbsG": 23.45,
+      "fatG": 49.67,
+      "fiberG": 11.8,
+      "sugarG": 0.3,
+      "sodiumMg": 11,
+      "saturatedFatG": 6.957,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "gouda-cheese",
@@ -3555,7 +4567,18 @@
       "gouda",
       "gouda cheese"
     ],
-    "defaultShelfLifeDays": 21
+    "defaultShelfLifeDays": 21,
+    "referenceMacrosPer100g": {
+      "calories": 356,
+      "proteinG": 24.94,
+      "carbsG": 2.22,
+      "fatG": 27.44,
+      "fiberG": 0,
+      "sugarG": 2.22,
+      "sodiumMg": 819,
+      "saturatedFatG": 17.614,
+      "cholesterolMg": 114
+    }
   },
   {
     "id": "brie",
@@ -3569,7 +4592,18 @@
     "aliases": [
       "brie"
     ],
-    "defaultShelfLifeDays": 14
+    "defaultShelfLifeDays": 14,
+    "referenceMacrosPer100g": {
+      "calories": 334,
+      "proteinG": 20.75,
+      "carbsG": 0.45,
+      "fatG": 27.68,
+      "fiberG": 0,
+      "sugarG": 0.45,
+      "sodiumMg": 629,
+      "saturatedFatG": 17.41,
+      "cholesterolMg": 100
+    }
   },
   {
     "id": "ricotta",
@@ -3620,7 +4654,7 @@
   },
   {
     "id": "gruyere",
-    "name": "Gruy\u00e8re",
+    "name": "Gruyère",
     "category": "dairy",
     "trackBy": "mass",
     "tracked": true,
@@ -3629,9 +4663,20 @@
     "cupWeightG": 108,
     "aliases": [
       "gruyere",
-      "gruy\u00e8re"
+      "gruyère"
     ],
-    "defaultShelfLifeDays": 30
+    "defaultShelfLifeDays": 30,
+    "referenceMacrosPer100g": {
+      "calories": 413,
+      "proteinG": 29.81,
+      "carbsG": 0.36,
+      "fatG": 32.34,
+      "fiberG": 0,
+      "sugarG": 0.36,
+      "sodiumMg": 714,
+      "saturatedFatG": 18.913,
+      "cholesterolMg": 110
+    }
   },
   {
     "id": "goat-cheese",
@@ -3646,7 +4691,18 @@
       "goat cheese",
       "goats cheese"
     ],
-    "defaultShelfLifeDays": 14
+    "defaultShelfLifeDays": 14,
+    "referenceMacrosPer100g": {
+      "calories": 364,
+      "proteinG": 21.58,
+      "carbsG": 0.12,
+      "fatG": 29.84,
+      "fiberG": 0,
+      "sugarG": 0.12,
+      "sodiumMg": 415,
+      "saturatedFatG": 20.639,
+      "cholesterolMg": 79
+    }
   },
   {
     "id": "double-cream",
@@ -3714,7 +4770,18 @@
     "cupWeightG": 135,
     "aliases": [
       "pine nuts"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 673,
+      "proteinG": 13.69,
+      "carbsG": 13.08,
+      "fatG": 68.37,
+      "fiberG": 3.7,
+      "sugarG": 3.59,
+      "sodiumMg": 2,
+      "saturatedFatG": 4.899,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "capers",
@@ -3770,7 +4837,18 @@
       "raisins",
       "sultanas",
       "currants"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 299,
+      "proteinG": 3.07,
+      "carbsG": 79.18,
+      "fatG": 0.46,
+      "fiberG": 3.7,
+      "sugarG": 59.19,
+      "sodiumMg": 11,
+      "saturatedFatG": 0.058,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "pecans",
@@ -3784,7 +4862,18 @@
     "aliases": [
       "pecans",
       "pecan nuts"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 691,
+      "proteinG": 9.17,
+      "carbsG": 13.86,
+      "fatG": 71.97,
+      "fiberG": 9.6,
+      "sugarG": 3.97,
+      "sodiumMg": 0,
+      "saturatedFatG": 6.18,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "baguette",
@@ -3799,7 +4888,18 @@
       "baguette",
       "crusty bread"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 272,
+      "proteinG": 10.75,
+      "carbsG": 51.88,
+      "fatG": 2.42,
+      "fiberG": 2.2,
+      "sugarG": 4.62,
+      "sodiumMg": 602,
+      "saturatedFatG": 0.529,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "pasta-other-dry",
@@ -3852,7 +4952,18 @@
       "naan",
       "naan bread"
     ],
-    "defaultShelfLifeDays": 5
+    "defaultShelfLifeDays": 5,
+    "referenceMacrosPer100g": {
+      "calories": 291,
+      "proteinG": 9.62,
+      "carbsG": 50.43,
+      "fatG": 5.65,
+      "fiberG": 2.2,
+      "sugarG": 3.55,
+      "sodiumMg": 465,
+      "saturatedFatG": 1.393,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "baked-beans-canned",
@@ -3925,7 +5036,18 @@
       "chicken",
       "whole chicken"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 215,
+      "proteinG": 18.6,
+      "carbsG": 0,
+      "fatG": 15.06,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 70,
+      "saturatedFatG": 4.31,
+      "cholesterolMg": 75
+    }
   },
   {
     "id": "allspice-ground",
@@ -3955,7 +5077,18 @@
       "corned beef brisket",
       "corned beef joint"
     ],
-    "defaultShelfLifeDays": 10
+    "defaultShelfLifeDays": 10,
+    "referenceMacrosPer100g": {
+      "calories": 169,
+      "proteinG": 20.15,
+      "carbsG": 0,
+      "fatG": 9.86,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 79,
+      "saturatedFatG": 3.704,
+      "cholesterolMg": 67
+    }
   },
   {
     "id": "red-wine-vinegar",
@@ -3984,7 +5117,18 @@
       "pork loin",
       "pork strips"
     ],
-    "defaultShelfLifeDays": 3
+    "defaultShelfLifeDays": 3,
+    "referenceMacrosPer100g": {
+      "calories": 109,
+      "proteinG": 20.95,
+      "carbsG": 0,
+      "fatG": 2.17,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 53,
+      "saturatedFatG": 0.698,
+      "cholesterolMg": 65
+    }
   },
   {
     "id": "chicken-legs",
@@ -3999,7 +5143,18 @@
       "chicken legs",
       "chicken leg quarters"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 214,
+      "proteinG": 16.37,
+      "carbsG": 0.17,
+      "fatG": 15.95,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 84,
+      "saturatedFatG": 4.366,
+      "cholesterolMg": 93
+    }
   },
   {
     "id": "dried-apricots",
@@ -4014,7 +5169,18 @@
       "apricot",
       "apricots",
       "dried apricots"
-    ]
+    ],
+    "referenceMacrosPer100g": {
+      "calories": 241,
+      "proteinG": 3.39,
+      "carbsG": 62.64,
+      "fatG": 0.51,
+      "fiberG": 7.3,
+      "sugarG": 53.44,
+      "sodiumMg": 10,
+      "saturatedFatG": 0.017,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "bouillon-cube",
@@ -4060,7 +5226,18 @@
       "radish",
       "radishes"
     ],
-    "defaultShelfLifeDays": 14
+    "defaultShelfLifeDays": 14,
+    "referenceMacrosPer100g": {
+      "calories": 16,
+      "proteinG": 0.68,
+      "carbsG": 3.4,
+      "fatG": 0.1,
+      "fiberG": 1.6,
+      "sugarG": 1.86,
+      "sodiumMg": 39,
+      "saturatedFatG": 0.032,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "fish-sauce",
@@ -4092,7 +5269,18 @@
       "pita",
       "flatbread"
     ],
-    "defaultShelfLifeDays": 5
+    "defaultShelfLifeDays": 5,
+    "referenceMacrosPer100g": {
+      "calories": 275,
+      "proteinG": 9.1,
+      "carbsG": 55.7,
+      "fatG": 1.2,
+      "fiberG": 2.2,
+      "sugarG": 1.3,
+      "sodiumMg": 536,
+      "saturatedFatG": 0.166,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "sardines",
@@ -4165,7 +5353,18 @@
       "chicken wings",
       "chicken wing"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 191,
+      "proteinG": 17.52,
+      "carbsG": 0,
+      "fatG": 12.85,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 84,
+      "saturatedFatG": 3.535,
+      "cholesterolMg": 111
+    }
   },
   {
     "id": "oyster-sauce",
@@ -4209,7 +5408,18 @@
       "lemongrass",
       "lemon grass"
     ],
-    "defaultShelfLifeDays": 14
+    "defaultShelfLifeDays": 14,
+    "referenceMacrosPer100g": {
+      "calories": 99,
+      "proteinG": 1.82,
+      "carbsG": 25.31,
+      "fatG": 0.49,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 6,
+      "saturatedFatG": 0.119,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "sun-dried-tomatoes",
@@ -4254,7 +5464,18 @@
       "fava beans",
       "shelled fava beans"
     ],
-    "defaultShelfLifeDays": 7
+    "defaultShelfLifeDays": 7,
+    "referenceMacrosPer100g": {
+      "calories": 72,
+      "proteinG": 5.6,
+      "carbsG": 11.7,
+      "fatG": 0.6,
+      "fiberG": 4.2,
+      "sugarG": 0,
+      "sodiumMg": 50,
+      "saturatedFatG": 0.138,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "beetroot",
@@ -4271,7 +5492,18 @@
       "cooked beetroot",
       "cooked beets"
     ],
-    "defaultShelfLifeDays": 10
+    "defaultShelfLifeDays": 10,
+    "referenceMacrosPer100g": {
+      "calories": 43,
+      "proteinG": 1.61,
+      "carbsG": 9.56,
+      "fatG": 0.17,
+      "fiberG": 2.8,
+      "sugarG": 6.76,
+      "sodiumMg": 78,
+      "saturatedFatG": 0.027,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "arugula",
@@ -4286,7 +5518,18 @@
       "arugula",
       "rocket"
     ],
-    "defaultShelfLifeDays": 5
+    "defaultShelfLifeDays": 5,
+    "referenceMacrosPer100g": {
+      "calories": 25,
+      "proteinG": 2.58,
+      "carbsG": 3.65,
+      "fatG": 0.66,
+      "fiberG": 1.6,
+      "sugarG": 2.05,
+      "sodiumMg": 27,
+      "saturatedFatG": 0.086,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "red-pepper-paste",
@@ -4316,7 +5559,18 @@
       "red snapper",
       "snapper"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 100,
+      "proteinG": 20.51,
+      "carbsG": 0,
+      "fatG": 1.34,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 64,
+      "saturatedFatG": 0.285,
+      "cholesterolMg": 37
+    }
   },
   {
     "id": "scotch-bonnet",
@@ -4331,7 +5585,18 @@
       "scotch bonnet",
       "scotch bonnet pepper"
     ],
-    "defaultShelfLifeDays": 10
+    "defaultShelfLifeDays": 10,
+    "referenceMacrosPer100g": {
+      "calories": 40,
+      "proteinG": 1.87,
+      "carbsG": 8.81,
+      "fatG": 0.44,
+      "fiberG": 1.5,
+      "sugarG": 5.3,
+      "sodiumMg": 9,
+      "saturatedFatG": 0.042,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "pak-choi",
@@ -4347,7 +5612,18 @@
       "bok choy",
       "pak choy"
     ],
-    "defaultShelfLifeDays": 7
+    "defaultShelfLifeDays": 7,
+    "referenceMacrosPer100g": {
+      "calories": 13,
+      "proteinG": 1.5,
+      "carbsG": 2.18,
+      "fatG": 0.2,
+      "fiberG": 1,
+      "sugarG": 1.18,
+      "sodiumMg": 65,
+      "saturatedFatG": 0.027,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "hoisin-sauce",
@@ -4376,7 +5652,18 @@
       "minced pork",
       "pork mince"
     ],
-    "defaultShelfLifeDays": 2
+    "defaultShelfLifeDays": 2,
+    "referenceMacrosPer100g": {
+      "calories": 263,
+      "proteinG": 16.88,
+      "carbsG": 0,
+      "fatG": 21.19,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 56,
+      "saturatedFatG": 7.87,
+      "cholesterolMg": 72
+    }
   },
   {
     "id": "water-chestnut",
@@ -4392,7 +5679,18 @@
       "water chestnuts",
       "sliced water chestnuts"
     ],
-    "defaultShelfLifeDays": 365
+    "defaultShelfLifeDays": 365,
+    "referenceMacrosPer100g": {
+      "calories": 97,
+      "proteinG": 1.4,
+      "carbsG": 23.94,
+      "fatG": 0.1,
+      "fiberG": 3,
+      "sugarG": 4.8,
+      "sodiumMg": 14,
+      "saturatedFatG": 0.026,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "bean-sprouts",
@@ -4408,7 +5706,18 @@
       "mung bean sprouts",
       "beansprouts"
     ],
-    "defaultShelfLifeDays": 4
+    "defaultShelfLifeDays": 4,
+    "referenceMacrosPer100g": {
+      "calories": 30,
+      "proteinG": 3.04,
+      "carbsG": 5.94,
+      "fatG": 0.18,
+      "fiberG": 1.8,
+      "sugarG": 4.13,
+      "sodiumMg": 6,
+      "saturatedFatG": 0.046,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "sweet-chili-sauce",
@@ -4451,7 +5760,18 @@
       "shin of beef",
       "beef shank"
     ],
-    "defaultShelfLifeDays": 3
+    "defaultShelfLifeDays": 3,
+    "referenceMacrosPer100g": {
+      "calories": 128,
+      "proteinG": 21.75,
+      "carbsG": 0,
+      "fatG": 3.85,
+      "fiberG": 0,
+      "sugarG": 0,
+      "sodiumMg": 63,
+      "saturatedFatG": 1.28,
+      "cholesterolMg": 39
+    }
   },
   {
     "id": "fennel-seeds",
@@ -4511,7 +5831,18 @@
       "dried navy beans",
       "white navy beans"
     ],
-    "defaultShelfLifeDays": 730
+    "defaultShelfLifeDays": 730,
+    "referenceMacrosPer100g": {
+      "calories": 337,
+      "proteinG": 22.33,
+      "carbsG": 60.75,
+      "fatG": 1.5,
+      "fiberG": 15.3,
+      "sugarG": 3.88,
+      "sodiumMg": 5,
+      "saturatedFatG": 0.17,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "molasses",
@@ -4629,7 +5960,18 @@
       "snow peas",
       "sugar snap peas"
     ],
-    "defaultShelfLifeDays": 7
+    "defaultShelfLifeDays": 7,
+    "referenceMacrosPer100g": {
+      "calories": 42,
+      "proteinG": 2.8,
+      "carbsG": 7.55,
+      "fatG": 0.2,
+      "fiberG": 2.6,
+      "sugarG": 4,
+      "sodiumMg": 4,
+      "saturatedFatG": 0.039,
+      "cholesterolMg": 0
+    }
   },
   {
     "id": "brandy",

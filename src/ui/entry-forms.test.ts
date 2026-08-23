@@ -9,6 +9,7 @@ import {
   emptyProductDraft,
   parseAmount,
   productDraftFrom,
+  referenceProductDraft,
   rankSearch,
   splitAliases,
   toIngredientDraft,
@@ -530,5 +531,129 @@ describe('productDraftFrom', () => {
     const noBrand = { ...STORED }
     delete noBrand.brand
     expect(productDraftFrom(noBrand).brand).toBe('')
+  })
+})
+
+describe('referenceProductDraft', () => {
+  const REFERENCE = {
+    calories: 86,
+    proteinG: 1.57,
+    carbsG: 20.12,
+    fatG: 0.05,
+    fiberG: 3,
+    sugarG: 4.18,
+    sodiumMg: 55,
+    saturatedFatG: 0.018,
+    cholesterolMg: 0,
+  }
+
+  const sweetPotato = () =>
+    ingredient({
+      id: 'sweet-potato',
+      name: 'Sweet potato',
+      category: 'produce',
+      trackBy: 'count',
+      unitWeightG: 130,
+      referenceMacrosPer100g: REFERENCE,
+    })
+
+  it('offers nothing for an ingredient with no reference', () => {
+    // 188 of the 310 are like this, and they must keep the blank form.
+    expect(referenceProductDraft(ingredient())).toBeNull()
+  })
+
+  it('fills the nutrition panel in from the ingredient', () => {
+    const draft = referenceProductDraft(sweetPotato())
+    expect(draft?.macros.calories).toBe('86')
+    expect(draft?.macros.carbsG).toBe('20.12')
+    expect(draft?.macros.saturatedFatG).toBe('0.018')
+  })
+
+  it('names the product after the ingredient and leaves the brand empty', () => {
+    // There is no brand. That is the entire premise — it came out of a bin.
+    const draft = referenceProductDraft(sweetPotato())
+    expect(draft?.name).toBe('Sweet potato')
+    expect(draft?.brand).toBe('')
+  })
+
+  it('opens on the per-100g basis, so nothing is converted on the way in', () => {
+    expect(referenceProductDraft(sweetPotato())?.basis).toBe('per100g')
+  })
+
+  it('saves a product that says its figures are an estimate', () => {
+    const draft = referenceProductDraft(sweetPotato())
+    const result = validateProductDraft(draft!, 'sweet-potato')
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.product.macrosSource).toBe('reference')
+    // Per-100g in, per-100g stored: the figures survive untouched.
+    expect(result.product.macrosPer100g).toEqual(REFERENCE)
+  })
+
+  it('round-trips through the form without drifting', () => {
+    // The draft holds strings. A figure that changed by re-reading it would be
+    // a silently different number in the food log from the one in the ontology.
+    const draft = referenceProductDraft(sweetPotato())
+    const result = validateProductDraft(draft!, 'sweet-potato')
+    if (!result.ok) throw new Error('expected the reference draft to validate')
+    for (const [key, value] of Object.entries(REFERENCE)) {
+      expect(result.product.macrosPer100g[key as MacroKey]).toBe(value)
+    }
+  })
+})
+
+describe('macrosSource on a product', () => {
+  it('says a typed product came off a label', () => {
+    const result = validateProductDraft(productDraft(), 'x')
+    expect(result.ok && result.product.macrosSource).toBe('label')
+  })
+
+  it('carries the source through when an existing product is reopened', () => {
+    // Correcting a reference-derived product's NAME must not promote its
+    // figures to a label reading.
+    const stored: Product = {
+      id: 'prod_1' as Product['id'],
+      canonicalId: 'sweet-potato',
+      name: 'Sweet potato',
+      macrosPer100g: {
+        calories: 86,
+        proteinG: 1.57,
+        carbsG: 20.12,
+        fatG: 0.05,
+        fiberG: 3,
+        sugarG: 4.18,
+        sodiumMg: 55,
+        saturatedFatG: 0.018,
+        cholesterolMg: 0,
+      },
+      macrosSource: 'reference',
+      createdAt: '2026-08-23T10:00:00.000Z',
+    }
+    expect(productDraftFrom(stored).macrosSource).toBe('reference')
+  })
+
+  it('reads a product stored before the field existed as a label reading', () => {
+    // True, and safe to assert here rather than in the migration: everything
+    // was typed off packaging back then, and this is a form being reopened by
+    // somebody looking at the figures.
+    const stored: Product = {
+      id: 'prod_2' as Product['id'],
+      canonicalId: 'cheddar-shredded',
+      name: 'Kroger Cheddar',
+      macrosPer100g: {
+        calories: 403,
+        proteinG: 24,
+        carbsG: 3.1,
+        fatG: 33,
+        fiberG: 0,
+        sugarG: 0.5,
+        sodiumMg: 621,
+        saturatedFatG: 19,
+        cholesterolMg: 105,
+      },
+      createdAt: '2026-08-20T10:00:00.000Z',
+    }
+    expect(productDraftFrom(stored).macrosSource).toBe('label')
   })
 })

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import type { ConsumptionEvent, MacroSet, MealSlot } from '../types/schema'
+import type { ConsumptionEvent, MacroSet, MealSlot, Product } from '../types/schema'
 import {
   canPageBack,
   canPageForward,
@@ -220,5 +220,93 @@ describe('mealGroups', () => {
 
   it('has nothing to show for a day with nothing in it', () => {
     expect(mealGroups([])).toEqual([])
+  })
+})
+
+describe('dayEntries — marking an estimate', () => {
+  const estimated: Product = {
+    id: 'prod_ref' as Product['id'],
+    canonicalId: 'sweet-potato',
+    name: 'Sweet potato',
+    macrosPer100g: macros({ calories: 86 }),
+    macrosSource: 'reference',
+    createdAt: '2026-08-23T09:00:00.000Z',
+  }
+
+  const fromLabel: Product = {
+    ...estimated,
+    id: 'prod_label' as Product['id'],
+    name: 'Kroger Cheddar',
+    macrosSource: 'label',
+  }
+
+  const beforeTheField: Product = {
+    ...estimated,
+    id: 'prod_old' as Product['id'],
+    name: 'Old Product',
+  }
+  delete (beforeTheField as { macrosSource?: unknown }).macrosSource
+
+  const index = new Map([
+    [estimated.id, estimated],
+    [fromLabel.id, fromLabel],
+    [beforeTheField.id, beforeTheField],
+  ])
+
+  function eaten(productId: Product['id']): ConsumptionEvent {
+    return {
+      id: 'e1',
+      consumedAt: `${TODAY}T18:00:00.000Z`,
+      source: { type: 'ingredient', canonicalId: 'sweet-potato', grams: 130, productId },
+      macros: macros({ calories: 112 }),
+      label: 'Sweet potato',
+    }
+  }
+
+  it('marks a row whose product says its figures were the app’s', () => {
+    expect(dayEntries([eaten(estimated.id)], index)[0].estimated).toBe(true)
+  })
+
+  it('leaves a label reading unmarked', () => {
+    expect(dayEntries([eaten(fromLabel.id)], index)[0].estimated).toBe(false)
+  })
+
+  it('leaves a product from before the field unmarked rather than guessing', () => {
+    // Absent means "not recorded". Marking it would invent a provenance; the
+    // app only claims "estimate" where it actually supplied the number.
+    expect(dayEntries([eaten(beforeTheField.id)], index)[0].estimated).toBe(false)
+  })
+
+  it('marks nothing when no product index is given', () => {
+    // Callers counting rather than displaying need not thread an index through,
+    // and silence is the honest reading of not being told.
+    expect(dayEntries([eaten(estimated.id)])[0].estimated).toBe(false)
+  })
+
+  it('marks nothing on a cooked meal', () => {
+    const meal: ConsumptionEvent = {
+      id: 'e2',
+      consumedAt: `${TODAY}T19:00:00.000Z`,
+      source: { type: 'cook', cookEventId: 'cook_1' as never, fraction: 0.25 },
+      macros: macros({ calories: 400 }),
+      label: 'Chicken Tikka Masala',
+    }
+    expect(dayEntries([meal], index)[0].estimated).toBe(false)
+  })
+
+  it('marks nothing on an entry logged with no product at all', () => {
+    const quick: ConsumptionEvent = {
+      id: 'e3',
+      consumedAt: `${TODAY}T12:00:00.000Z`,
+      source: { type: 'ingredient', canonicalId: 'apple', grams: 180 },
+      macros: macros({ calories: 94 }),
+      label: 'Apple',
+    }
+    expect(dayEntries([quick], index)[0].estimated).toBe(false)
+  })
+
+  it('carries the marking through the meal grouping', () => {
+    const groups = mealGroups([{ ...eaten(estimated.id), meal: 'lunch' as MealSlot }], index)
+    expect(groups[0].entries[0].estimated).toBe(true)
   })
 })

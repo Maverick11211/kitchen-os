@@ -347,3 +347,191 @@ describe('coverage report (informational)', () => {
     expect(true).toBe(true)
   })
 })
+
+// ---------------------------------------------------------------------------
+// Reference macros (added 2026-08-23)
+// ---------------------------------------------------------------------------
+
+/**
+ * The 122 `referenceMacrosPer100g` figures added when the app stopped requiring
+ * a nutrition label for things that arrive without one.
+ *
+ * These are generated from USDA SR28 by `tools/reference-macros/apply.cjs` and
+ * traceable through `tools/reference-macros/mapping.json`, so what follows is
+ * not checking anybody's typing. It is checking that the generator, the mapping
+ * and the ontology have not drifted apart, and that no row is internally
+ * impossible — a fibre figure larger than the carbohydrate it is part of, a
+ * calorie count that does not follow from the macros beside it.
+ *
+ * These figures reach the food log directly. A wrong one is not a rendering
+ * bug, it is a wrong number in the record of what somebody ate.
+ */
+interface ReferenceMapping {
+  readonly ndb: string
+  readonly usda: string
+  readonly macrosPer100g: Record<string, number>
+  readonly imputed?: readonly string[]
+  readonly note?: string
+}
+
+const referenceMapping = loadJson<Record<string, ReferenceMapping>>(
+  '../tools/reference-macros/mapping.json',
+)
+
+const withReference = ontology.filter((entry) => entry.referenceMacrosPer100g !== undefined)
+
+const MACRO_FIELDS = [
+  'calories',
+  'proteinG',
+  'carbsG',
+  'fatG',
+  'fiberG',
+  'sugarG',
+  'sodiumMg',
+  'saturatedFatG',
+  'cholesterolMg',
+] as const
+
+describe('reference macros — the ontology matches the mapping it came from', () => {
+  it('gives a reference to exactly the ingredients the mapping names', () => {
+    const inOntology = new Set(withReference.map((entry) => entry.id))
+    const inMapping = new Set(Object.keys(referenceMapping))
+
+    const missing = [...inMapping].filter((id) => !inOntology.has(id))
+    const extra = [...inOntology].filter((id) => !inMapping.has(id))
+
+    // Either direction means somebody edited one file and not the other.
+    // The fix is `node tools/reference-macros/apply.cjs`, never a hand edit.
+    expect({ missing, extra }).toEqual({ missing: [], extra: [] })
+  })
+
+  it('carries the exact figures the mapping records, to the last decimal', () => {
+    for (const entry of withReference) {
+      expect(entry.referenceMacrosPer100g).toEqual(referenceMapping[entry.id].macrosPer100g)
+    }
+  })
+
+  it('names a real USDA row for every figure, so any of them can be checked', () => {
+    for (const [id, record] of Object.entries(referenceMapping)) {
+      expect(record.ndb, `${id} has no NDB number`).toMatch(/^\d{5}$/)
+      expect(record.usda.length, `${id} has no USDA description`).toBeGreaterThan(0)
+    }
+  })
+})
+
+describe('reference macros — no row is internally impossible', () => {
+  it('has all nine fields, as finite non-negative numbers', () => {
+    for (const entry of withReference) {
+      const macros = entry.referenceMacrosPer100g as unknown as Record<string, unknown>
+      for (const field of MACRO_FIELDS) {
+        const value = macros[field]
+        expect(typeof value, `${entry.id}.${field}`).toBe('number')
+        expect(Number.isFinite(value as number), `${entry.id}.${field}`).toBe(true)
+        expect(value as number, `${entry.id}.${field}`).toBeGreaterThanOrEqual(0)
+      }
+    }
+  })
+
+  it('keeps every part smaller than the whole it is part of', () => {
+    for (const entry of withReference) {
+      const m = entry.referenceMacrosPer100g!
+      // Fibre and sugar are both kinds of carbohydrate; saturated fat is a kind
+      // of fat. A part exceeding its whole means two fields came from different
+      // rows — the failure mode a mapping mistake actually produces.
+      expect(m.fiberG, `${entry.id}: fibre exceeds carbohydrate`).toBeLessThanOrEqual(m.carbsG + 0.01)
+      expect(m.sugarG, `${entry.id}: sugar exceeds carbohydrate`).toBeLessThanOrEqual(m.carbsG + 0.01)
+      expect(m.saturatedFatG, `${entry.id}: saturated fat exceeds fat`).toBeLessThanOrEqual(m.fatG + 0.01)
+    }
+  })
+
+  it('does not claim more than 100 g of macros in 100 g of food', () => {
+    for (const entry of withReference) {
+      const m = entry.referenceMacrosPer100g!
+      expect(m.proteinG + m.carbsG + m.fatG, entry.id).toBeLessThanOrEqual(100.1)
+    }
+  })
+})
+
+describe('reference macros — the calories follow from the macros', () => {
+  /*
+   * Atwater: 4 kcal per gram of protein and available carbohydrate, 9 per gram
+   * of fat, 2 per gram of fibre.
+   *
+   * The tolerance is 40%, which is far looser than it looks and deliberately
+   * so. USDA does not compute its energy figures this way — it uses per-food
+   * factors and measured values — and several real foods sit well outside naive
+   * Atwater for honest reasons: citrus carries organic acids counted as
+   * carbohydrate that yield almost no energy (lemon and lime are both about
+   * 35% out), and mushrooms carry carbohydrate the body cannot reach.
+   *
+   * Tightening this to catch those would mean arguing with USDA's methodology.
+   * What it is here to catch is a transposed digit or a misplaced decimal — the
+   * mistakes that land 3x or 10x out, not 30%.
+   */
+  it('agrees with Atwater to within 40% on every entry', () => {
+    const offenders: string[] = []
+    for (const entry of withReference) {
+      const m = entry.referenceMacrosPer100g!
+      if (m.calories < 5) continue
+      const atwater = 4 * m.proteinG + 4 * (m.carbsG - m.fiberG) + 9 * m.fatG + 2 * m.fiberG
+      const drift = Math.abs(atwater - m.calories) / m.calories
+      if (drift > 0.4) {
+        offenders.push(`${entry.id}: ${String(m.calories)} kcal stated, ${atwater.toFixed(0)} from macros`)
+      }
+    }
+    expect(offenders).toEqual([])
+  })
+})
+
+describe('reference macros — a second opinion from the QA calorie table', () => {
+  /*
+   * `calorie-reference.json` was built by hand in Phase 2 from general
+   * knowledge, entirely independently of USDA SR28. That independence is the
+   * whole value: two sources agreeing is evidence, and it is why the QA table
+   * must NEVER be regenerated from the app's own figures. It would then be
+   * confirming itself and this test would be theatre.
+   *
+   * Four entries disagree for a known and correct reason, listed below.
+   */
+  const KNOWN_DISAGREEMENTS: Record<string, string> = {
+    // The QA table used COOKED figures for these. The app weighs meat and
+    // seafood into the kitchen raw, and cooking concentrates by water loss, so
+    // the raw figure is the right one here and the disagreement is expected.
+    mussels: 'QA table is cooked; raw is correct for weighing in',
+    'beef-brisket': 'QA table is cooked; raw is correct for weighing in',
+    'beef-shin': 'QA table is cooked; raw is correct for weighing in',
+    'lamb-leg': 'QA table is cooked; raw is correct for weighing in',
+  }
+
+  it('agrees within 25% everywhere the two tables overlap', () => {
+    const offenders: string[] = []
+    let compared = 0
+
+    for (const entry of withReference) {
+      const theirs = calorieReference[entry.id]
+      if (theirs === undefined) continue
+      compared++
+      if (entry.id in KNOWN_DISAGREEMENTS) continue
+
+      const ours = entry.referenceMacrosPer100g!.calories
+      const drift = theirs === 0 ? (ours === 0 ? 0 : 1) : Math.abs(ours - theirs) / theirs
+      if (drift > 0.25) {
+        offenders.push(`${entry.id}: USDA ${String(ours)}, QA table ${String(theirs)}`)
+      }
+    }
+
+    // If this drops sharply, the two tables have stopped overlapping and the
+    // check has quietly stopped checking anything.
+    expect(compared).toBeGreaterThan(60)
+    expect(offenders).toEqual([])
+  })
+
+  it('still disagrees where it is supposed to, so the exemptions stay honest', () => {
+    // An exemption nobody needs any more is an exemption hiding a future bug.
+    for (const id of Object.keys(KNOWN_DISAGREEMENTS)) {
+      const entry = withReference.find((candidate) => candidate.id === id)
+      expect(entry, `${id} no longer has a reference — drop it from the exemptions`).toBeDefined()
+      expect(calorieReference[id], `${id} left the QA table — drop it from the exemptions`).toBeDefined()
+    }
+  })
+})

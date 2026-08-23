@@ -43,6 +43,7 @@ import {
   emptyIngredientDraft,
   emptyLotDraft,
   emptyProductDraft,
+  referenceProductDraft,
   rankSearch,
   toIngredientDraft,
   validateLotDraft,
@@ -414,7 +415,22 @@ function ProductStep({
   onSaved: (product: Product) => void
   onBack: () => void
 }) {
-  const [draft, setDraft] = useState<ProductDraft>(emptyProductDraft)
+  /*
+   * Opens already filled in when the app has generic figures for this
+   * ingredient — produce, counter meat and fish, bulk bins.
+   *
+   * That is the point of the whole change. Adding a loose sweet potato used to
+   * mean finding nine numbers on the internet first, because there is no
+   * packaging to read them off. Now the form opens with USDA's figures in it,
+   * says at the top that they are not a label, and can be saved as it stands or
+   * corrected.
+   *
+   * For the 188 ingredients with no reference — anything whose brand is the
+   * whole point — this is null and the ordinary blank form appears, unchanged.
+   */
+  const [draft, setDraft] = useState<ProductDraft>(
+    () => referenceProductDraft(ingredient) ?? emptyProductDraft(),
+  )
   const [errors, setErrors] = useState<readonly FieldIssue[]>([])
   const [warnings, setWarnings] = useState<readonly FieldIssue[]>([])
   const [busy, setBusy] = useState(false)

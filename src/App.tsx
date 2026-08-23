@@ -309,7 +309,13 @@ function Shell() {
           <Route path="/" element={<Navigate to="/today" replace />} />
           <Route
             path="/today"
-            element={<NutritionScreen today={today} onLog={() => setLogging(true)} />}
+            element={
+              <NutritionScreen
+                today={today}
+                onLog={() => setLogging(true)}
+                products={view.inventory.productsById}
+              />
+            }
           />
           {/*
             Past days get their own address so a reload lands where you were.
@@ -318,7 +324,13 @@ function Shell() {
           */}
           <Route
             path="/day/:day"
-            element={<NutritionScreen today={today} onLog={() => setLogging(true)} />}
+            element={
+              <NutritionScreen
+                today={today}
+                onLog={() => setLogging(true)}
+                products={view.inventory.productsById}
+              />
+            }
           />
           <Route
             path="/recipes"

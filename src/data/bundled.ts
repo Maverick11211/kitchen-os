@@ -28,7 +28,7 @@ import recipesJson from './recipes.json'
  * appear. Comparison is by inequality, not ordering, so any different string
  * works — the date and entry count are just there to be readable.
  */
-export const BUNDLED_SEED_VERSION = '2026-08-19-ontology-310'
+export const BUNDLED_SEED_VERSION = '2026-08-23-ontology-310-reference-macros'
 
 /**
  * The bundled canonical ingredient table.

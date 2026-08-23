@@ -2682,3 +2682,175 @@ Suite **6828** passing, lint and build clean. `smoke-phase5`, `smoke-phase6` and
 covers eleven steps: the subpath, the manifest and icons, registration,
 offline load, a second version installing and NOT taking over, the banner, the
 tap, the kitchen surviving the swap, and the worker never reaching off-origin.
+
+---
+
+## 2026-08-23, later — Reference macros: narrowing "only a Product carries macros"
+
+Jack's first hour of live testing produced two findings. This entry is the
+second one. The first — that adding an item takes over twenty seconds and
+loading a whole kitchen would take an hour — is the reason this was pulled
+forward from v2, and is dealt with as a consequence rather than head-on.
+
+### The decision this supersedes
+
+The three-tier model says: *"Canonical is what recipes reference. **Product
+carries macros.**"* It is restated in `schema.ts`, in the header of
+`macros.ts`, and it is why `qa/calorie-reference.json` had to be invented in
+Phase 2 as a QA-only file rather than putting numbers in the ontology.
+
+It was right about branded groceries and wrong about the produce aisle. A loose
+sweet potato has no packaging, so there is no label to read and no honest
+Product to build from one. Jack hit this the first time he tried to log a
+vegetable and ended up searching the internet for nine numbers.
+
+**Superseded, narrowly.** `CanonicalIngredient.referenceMacrosPer100g` is
+optional and holds a generic figure for an ingredient bought without a label.
+Three conditions keep what the original rule was protecting:
+
+1. **A fallback, never an override.** A Product wins wherever one exists. The
+   bag of baby carrots has a label, and the label beats any generic figure.
+2. **Optional, and absent on 188 of the 310 entries.** Absent means "no honest
+   generic figure exists", which is the truth for anything whose whole point is
+   that brands differ — sauces, cereals, yogurts.
+3. **Always marked.** `Product.macrosSource` records `'label'` or `'reference'`,
+   and a food-log row derived from a reference shows a quiet "est.". An estimate
+   labelled as an estimate is honest; one that looks like a label reading is not,
+   and the quiet is the part that would have made it dishonest.
+
+### The rule for what gets one, which is Jack's and is better than mine
+
+I proposed drawing the line at brand variance — figures that are stable across
+brands. Jack drew it at **packaging**: *does this arrive with a label on it?*
+
+That is the better rule for two reasons. It is observable — he can answer it by
+looking at the thing, where brand variance needs nutrition knowledge. And it
+describes the actual gap: milk, eggs and a supermarket tray of chicken are all
+stable AND all carry macros on the side, so a generic figure adds nothing. Baby
+carrots come in a printed bag; one large carrot does not.
+
+In scope, 122 entries: all produce bar frozen peas; the fish, butcher and deli
+counters, which hand you food in paper with a price sticker; the bakery case;
+and bulk bins for nuts, dried fruit, grains and dry pulses.
+
+### Where the figures come from
+
+USDA SR28, the `ABBREV.txt` flat file, public-domain government data, extracted
+in a sandbox and committed as data. **No runtime fetch** — same arrangement as
+the recipes, compiled in rather than requested, so the no-backend rule is
+untouched.
+
+`tools/reference-macros/mapping.json` records the NDB number and the USDA row
+description beside every figure, so any number the app displays can be traced to
+a public row. `apply.cjs` writes it into the ontology; nothing is hand-edited
+there.
+
+Everything is **as purchased and uncooked** — raw for produce and meat, dry for
+grains and pulses, because that is what gets weighed into the kitchen. Mixing
+that convention would be a silent 3x error on rice.
+
+### Why this barely touches the app
+
+The first design I started on put provenance on the consumption event and taught
+the macro engine to fall back. That was wrong, and the thing that showed it was
+asking how a sweet potato gets into the kitchen at all: a `Lot` points at a
+`Product`, so one has to exist either way.
+
+So the reference **pre-fills the product form** instead. `AddFlow` opens it
+already filled in, with a line at the top saying these are standard figures and
+not a label. The three-tier model is untouched, `Lot` is untouched, the macro
+engine is untouched, the cook path is untouched, and history stays immutable
+because macros are still snapshotted off a real Product. The change is two
+optional schema fields and a pre-filled form.
+
+Measured afterwards in a browser: **0.6 seconds** to add three sweet potatoes,
+against the twenty-plus Jack reported. The entry-friction target in this file
+was always "under 20 seconds to add a REPEAT product" — the cold start of a
+first-time add was never designed for, and this is what closes it.
+
+### Two smaller calls inside this
+
+**Switching the basis clears reference figures.** They are per 100g. Choosing
+"a serving" while they sit in the boxes would relabel them and then scale them
+by the serving size — silently wrong by whatever factor, forever after. Moving
+off per-100g while the figures are the app's own clears them and marks the draft
+as a label reading. A draft whose figures were TYPED is never cleared; that
+existing behaviour is unchanged and its reasoning still stands.
+
+**`macrosSource` is never inferred.** Editing any nutrition field flips a draft
+from `'reference'` to `'label'` and never back. Typing a number that happens to
+match USDA's is a coincidence, not a provenance. Nothing backfills `'label'`
+onto products stored before the field existed either, even though every one of
+them was in fact typed off a label — absent means "not recorded" and shows
+unmarked, because a field whose job is to be trusted cannot start by asserting
+something the app never captured.
+
+### Flagged, not fixed
+
+- **`corn-on-the-cob` has 64% refuse.** Its 192g unit weight is a whole ear;
+  the figures are per 100g of kernels. Logging one cob by count overstates it
+  by roughly 3x. `mussels` are sold in the shell, same shape of problem. Both
+  are properties of `unitWeightG` that predate this change — it only makes them
+  visible in macros as well as in deductions.
+- **Whole-vegetable unit weights.** Cabbage at 900g, celeriac 700g, butternut
+  900g and eggplant 548g are whole weights against 14-20% refuse, so logging one
+  whole overstates by a little more than the ±15% tolerance. Unlikely to matter
+  — nobody logs a whole cabbage — but it is the same class of thing.
+- **"3 sweet potatos".** The inventory list pluralises by adding an "s". Not
+  this change's doing, spotted while testing it.
+- **The cook path still counts a shortfall as nothing.** Cooking a recipe with
+  an ingredient you own no lot of contributes zero macros to the batch, which
+  reference figures do NOT change — the deduction never happens, so there is
+  nothing to price. Arguably correct today, arguably not once the app has a
+  generic figure for the thing. Deliberately left alone: it is a separate
+  decision and this entry was not the place to make it quietly.
+
+### Not done, and deliberately
+
+**Barcode scanning is not the answer to entry friction and was not built.** A
+barcode is a number; turning it into nutrition needs a product database, and
+every one of those is a runtime fetch to an external service — the first line of
+CLAUDE.md's architecture rules. Offline it can only recognise a product already
+entered, which does nothing for the cold start that was Jack's actual blocker.
+It stays a v2 idea, worth revisiting once there is a product library to scan
+against, and `Product.upc` is still reserved for it.
+
+**Label OCR was not built either.** `tesseract.js` would run on-device and break
+no rule, but nutrition labels are a bad OCR target and the failure mode is a
+wrong number entered silently — into a table the app promises never to rewrite.
+A slow correct figure beats a fast wrong one.
+
+### After the change
+
+Schema is version 6: two optional additive fields, so the migration only moves
+the version marker. Suite **6857** passing, lint and build clean, and a browser
+run confirming the add flow, the pre-filled figures, the food-log arithmetic
+(130g of sweet potato → 112 cal) and the estimate marker.
+
+### Addendum, same day — `registration.update()` is not a reliable update trigger
+
+Found while making `qa/smoke-phase8.cjs` deterministic, and it is a fact about
+the Phase 8 update mechanism rather than about the test.
+
+`useAppUpdate` checks for a new version by calling `registration.update()` when
+the app returns to the foreground. Measured across many runs in Chromium, that
+call is honoured **sometimes**. In the other cases no request leaves the browser
+at all — not a short throttle that can be waited out, but thirty seconds of
+asking once a second with zero fetches, and calling it directly rather than
+through the app makes no difference.
+
+A **document load** triggers the check every time. That is the browser's own
+update trigger and it is what the smoke test now uses every third attempt, which
+took it from two failures in five runs to five passes in five.
+
+What this means in practice: an installed app that is never relaunched may
+notice a new version later than the foreground check implies. That is harmless
+here — the thing being delivered is a new version of a personal recipe app, not
+a security patch — and iOS suspends and relaunches a PWA often enough that a
+relaunch will come. The foreground check stays because it costs nothing and
+works often; it is just not the guarantee it looks like.
+
+Worth revisiting only if a deploy ever needs to reach the iPad promptly. The
+honest fix then is a periodic check with a visible "last checked" somewhere, not
+asking `update()` more insistently — that has been measured and it does not
+work.

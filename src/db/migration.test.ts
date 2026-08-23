@@ -504,3 +504,141 @@ describe('opening a version 4 database with today’s code', () => {
     second.close()
   })
 })
+
+// ---------------------------------------------------------------------------
+
+/**
+ * The version 5 store layout, frozen like the four above it.
+ *
+ * Still identical to version 1's. Six bumps and no table or index has changed —
+ * every version so far has added optional fields or backfilled a value, and
+ * Dexie versions are about indexes, not shape.
+ */
+const V5_STORES = {
+  canonicalIngredients: 'id, name, category',
+  products: 'id, canonicalId, name',
+  lots: 'id, productId, expiresOn, acquiredOn',
+  recipes: 'id, name, *cuisines',
+  appliances: 'id',
+  cookEvents: 'id, recipeId, cookedAt',
+  consumptionEvents: 'id, consumedAt',
+  leftovers: 'id, cookEventId',
+  meta: '',
+}
+
+const V5_MACROS = { ...V1_MACROS, cholesterolMg: 88 }
+
+/**
+ * Build and populate a database the way version 5 of the app would have.
+ *
+ * The product and the canonical are the rows that matter here: version 6 adds
+ * an optional field to each, and the thing worth pinning is that neither gets
+ * one invented for it.
+ */
+async function writeVersion5Database(name: string): Promise<void> {
+  const legacy = new Dexie(name)
+  legacy.version(1).stores(V1_STORES)
+  legacy.version(2).stores(V2_STORES)
+  legacy.version(3).stores(V3_STORES)
+  legacy.version(4).stores(V4_STORES)
+  legacy.version(5).stores(V5_STORES)
+  await legacy.open()
+
+  await legacy.table('canonicalIngredients').add({
+    id: 'sweet-potato',
+    name: 'Sweet potato',
+    category: 'produce',
+    trackBy: 'count',
+    tracked: true,
+    perishable: true,
+    isSeed: true,
+    unitWeightG: 130,
+    aliases: ['sweet potato'],
+    defaultShelfLifeDays: 21,
+  })
+  await legacy.table('products').add({
+    id: 'prod_5',
+    canonicalId: 'cheddar-shredded',
+    name: 'Kroger Shredded Sharp Cheddar',
+    macrosPer100g: { ...V5_MACROS },
+    packageSizeG: 226,
+    createdAt: '2026-08-22T10:00:00.000Z',
+  })
+  await legacy.table('meta').put({ schemaVersion: 5, seedVersion: '2026-08-19-ontology-310' }, META_KEY)
+
+  legacy.close()
+}
+
+describe('opening a version 5 database with today’s code', () => {
+  it('moves the recorded schema version forward', async () => {
+    const name = freshName()
+    await writeVersion5Database(name)
+
+    const db = createDb(name)
+    const meta = await readMeta(db)
+    expect(meta.schemaVersion).toBe(SCHEMA_VERSION)
+    // The seed version is deliberately NOT touched by the migration. It is what
+    // tells the seed merge there is new ontology data to fold in, and the merge
+    // is what actually delivers the reference macros — moving it here would
+    // skip that and the new figures would never arrive.
+    expect(meta.seedVersion).toBe('2026-08-19-ontology-310')
+    db.close()
+  })
+
+  /*
+   * Version 6's central restraint. Every product written before this version
+   * had its figures typed off a label — there was no other way — so stamping
+   * `macrosSource: 'label'` would even be TRUE. It is still wrong to do: the
+   * field exists so that a marked estimate can be trusted, and a value the app
+   * inferred rather than captured is not the same kind of fact as one it was
+   * told. Absent means "not recorded", and displays unmarked.
+   */
+  it('does not claim to know where an old product’s figures came from', async () => {
+    const name = freshName()
+    await writeVersion5Database(name)
+
+    const db = createDb(name)
+    const product = await db.products.get('prod_5')
+
+    expect(product).toBeDefined()
+    expect(product && 'macrosSource' in product).toBe(false)
+    // and leaves the figures themselves exactly as they were
+    expect(product?.macrosPer100g.cholesterolMg).toBe(88)
+    expect(product?.packageSizeG).toBe(226)
+    db.close()
+  })
+
+  /*
+   * The other half: the migration does not backfill reference macros either,
+   * even onto an ingredient the bundled ontology now has a figure for. That is
+   * the seed merge's job, gated on BUNDLED_SEED_VERSION. Two mechanisms writing
+   * the same 122 rows would be two sources of truth, and they would drift.
+   */
+  it('leaves reference macros to the seed merge rather than backfilling them', async () => {
+    const name = freshName()
+    await writeVersion5Database(name)
+
+    const db = createDb(name)
+    const ingredient = await db.canonicalIngredients.get('sweet-potato')
+
+    expect(ingredient).toBeDefined()
+    expect(ingredient && 'referenceMacrosPer100g' in ingredient).toBe(false)
+    expect(ingredient?.unitWeightG).toBe(130)
+    db.close()
+  })
+
+  it('is safe to open twice', async () => {
+    const name = freshName()
+    await writeVersion5Database(name)
+
+    const first = createDb(name)
+    await first.open()
+    first.close()
+
+    const second = createDb(name)
+    expect((await readMeta(second)).schemaVersion).toBe(SCHEMA_VERSION)
+    expect(await second.products.count()).toBe(1)
+    expect(await second.canonicalIngredients.count()).toBe(1)
+    second.close()
+  })
+})

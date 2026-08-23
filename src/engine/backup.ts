@@ -215,6 +215,24 @@ function upgradeBackup(value: Record<string, unknown>, from: number): Record<str
     current = { ...current, cookEvents: withCookLabels(current.cookEvents) }
   }
 
+  if (from < 6) {
+    // Version 6 added CanonicalIngredient.referenceMacrosPer100g and
+    // Product.macrosSource, both optional. Nothing to convert, and two things
+    // are worth knowing about what restoring an older file therefore does.
+    //
+    // `macrosSource` comes back absent on every product in the file, which
+    // reads as "not recorded" rather than as `'label'`. Those figures WERE
+    // typed off labels — it is all the app could do before this version — but
+    // stamping them here would be the app asserting something it never
+    // captured, and being trustworthy about exactly that is the field's job.
+    //
+    // `referenceMacrosPer100g` is not backfilled either, and does not need to
+    // be: the reference figures live in the bundled ontology, and the seed
+    // merge folds them into the restored ingredient table on the next startup.
+    // A backup never has to carry them, which is the benefit of keeping seed
+    // data out of the backup's job in the first place.
+  }
+
   const meta = isRecord(current.meta)
     ? { ...current.meta, schemaVersion: SCHEMA_VERSION }
     : current.meta
@@ -244,6 +262,9 @@ function upgradeNotes(from: number): string[] {
   }
   if (from < 5) {
     notes.push('anything cooked before the file was saved is named by its recipe id rather than its title')
+  }
+  if (from < 6) {
+    notes.push('products from the file do not say whether their figures came off a label or from the app')
   }
   return notes
 }

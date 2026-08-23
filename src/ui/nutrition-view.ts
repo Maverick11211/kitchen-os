@@ -16,7 +16,14 @@
  * snapshotted when the entry was written. Nothing here reaches back into a
  * product, so correcting a product's nutrition tomorrow cannot move a past day.
  */
-import type { ConsumptionEvent, DateOnly, MacroSet, MealSlot } from '../types/schema'
+import type {
+  ConsumptionEvent,
+  DateOnly,
+  MacroSet,
+  MealSlot,
+  Product,
+  ProductId,
+} from '../types/schema'
 import { roundMacros, totalMacros } from '../engine'
 import { addDays } from './entry-forms'
 import { formatGrams } from './inventory-view'
@@ -88,6 +95,22 @@ export interface DayEntry {
    * as much of a mistake as an ingredient you logged by mistake.
    */
   readonly canDelete: boolean
+
+  /**
+   * Whether these figures came from the app's generic reference rather than off
+   * a label.
+   *
+   * Shown as a small marker on the row. The reference-macro change of
+   * 2026-08-23 is only defensible while an estimate is visibly an estimate: a
+   * generic figure presented with the same confidence as a label reading is the
+   * app lying quietly, and quiet is the part that matters. See
+   * `CanonicalIngredient.referenceMacrosPer100g`.
+   *
+   * False whenever nothing is known — a cooked meal, a manual entry, a product
+   * stored before the app recorded provenance. It means "not marked", never
+   * "checked".
+   */
+  readonly estimated: boolean
 }
 
 /** How much of a batch, as a percentage a person would say out loud. */
@@ -95,7 +118,24 @@ function fractionDetail(fraction: number): string {
   return `${Math.round(fraction * 100)}% of the batch`
 }
 
-export function dayEntries(events: readonly ConsumptionEvent[]): DayEntry[] {
+/**
+ * Turn a day's events into rows.
+ *
+ * `products` is optional so callers with no reason to care — anything counting
+ * rather than displaying — need not thread an index through. Without it nothing
+ * is marked, which is the honest reading of "the caller did not say".
+ *
+ * The lookup goes through the event's `productId` rather than through its
+ * stored macros, because those are a snapshot and carry no provenance of their
+ * own. So correcting a product's figures later does change whether an old row
+ * is MARKED, while leaving the row's numbers exactly as they were. That is the
+ * right way round: the marker describes where figures came from, and typing
+ * them off a label is precisely the event that stops them being an estimate.
+ */
+export function dayEntries(
+  events: readonly ConsumptionEvent[],
+  products?: ReadonlyMap<ProductId, Product>,
+): DayEntry[] {
   return events.map((event) => ({
     event,
     label: event.label,
@@ -105,7 +145,19 @@ export function dayEntries(events: readonly ConsumptionEvent[]): DayEntry[] {
         : fractionDetail(event.source.fraction),
     calories: Math.round(event.macros.calories),
     canDelete: event.source.type !== 'leftover',
+    estimated: isEstimated(event, products),
   }))
+}
+
+function isEstimated(
+  event: ConsumptionEvent,
+  products: ReadonlyMap<ProductId, Product> | undefined,
+): boolean {
+  if (products === undefined) return false
+  if (event.source.type !== 'ingredient') return false
+  const productId = event.source.productId
+  if (productId === undefined) return false
+  return products.get(productId)?.macrosSource === 'reference'
 }
 
 // ---------------------------------------------------------------------------
@@ -151,7 +203,10 @@ export interface MealGroup {
  * honest about it), and they still count towards the day's totals — the four
  * figures at the top are computed from the whole day, not from the sections.
  */
-export function mealGroups(events: readonly ConsumptionEvent[]): MealGroup[] {
+export function mealGroups(
+  events: readonly ConsumptionEvent[],
+  products?: ReadonlyMap<ProductId, Product>,
+): MealGroup[] {
   const groups: MealGroup[] = []
 
   const build = (meal: MealSlot | null, heading: string, matching: ConsumptionEvent[]) => {
@@ -160,7 +215,7 @@ export function mealGroups(events: readonly ConsumptionEvent[]): MealGroup[] {
     groups.push({
       meal,
       heading,
-      entries: dayEntries(matching),
+      entries: dayEntries(matching, products),
       calories: Math.round(macros.calories),
       macros,
     })

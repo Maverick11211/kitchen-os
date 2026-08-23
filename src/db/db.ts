@@ -199,6 +199,35 @@ export function createDb(name: string = DB_NAME): KitchenOsDb {
       })
     })
 
+  /**
+   * Version 6 — `CanonicalIngredient.referenceMacrosPer100g` and
+   * `Product.macrosSource` (2026-08-23).
+   *
+   * Both optional, both additive, so no stored row needs changing and this
+   * migration only moves the version marker. That is deliberate rather than
+   * lazy, and it is worth writing down why for each field.
+   *
+   * Nothing backfills `macrosSource` to `'label'` on existing products, even
+   * though every one of them WAS typed off a label — there was no other way
+   * before this version. Stamping it would be the app asserting something it
+   * never actually recorded, and the field exists precisely so that assertion
+   * can be trusted. Absent reads as "not recorded" and displays unmarked.
+   *
+   * Nothing backfills `referenceMacrosPer100g` either, because a migration is
+   * the wrong machine for the job. The reference figures live in the bundled
+   * ontology, and the SEED MERGE is what folds them into an existing ingredient
+   * table — gated on `BUNDLED_SEED_VERSION`, which is bumped in the same commit
+   * as the data. Duplicating that here would mean two sources of truth for the
+   * same 122 rows, and they would drift.
+   */
+  db.version(6)
+    .stores({})
+    .upgrade(async (tx) => {
+      await tx.table<StoredRow>('meta').toCollection().modify((row) => {
+        row.schemaVersion = 6
+      })
+    })
+
   return db
 }
 

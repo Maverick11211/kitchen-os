@@ -12,7 +12,7 @@
  */
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
-import type { ConsumptionEvent, DateOnly } from '../types/schema'
+import type { ConsumptionEvent, DateOnly, Product, ProductId } from '../types/schema'
 import { db } from '../db/db'
 import { deleteConsumption, restoreConsumption } from '../db/repo/consumption'
 import { formatDate, formatTime } from '../lib/clock'
@@ -43,7 +43,29 @@ function EntryRow({
       <span className="entry-time">{formatTime(entry.event.consumedAt)}</span>
 
       <span className="entry-main">
-        <span className="entry-name">{entry.label}</span>
+        <span className="entry-name">
+          {entry.label}
+          {/*
+            The figures behind this row are the app's generic ones, not a
+            label's. Marked rather than footnoted: the reference-macro change is
+            only honest while an estimate is visibly an estimate, and a note
+            somewhere else on the screen is not visible at the point the number
+            is being read.
+          */}
+          {entry.estimated && (
+            <>
+              {/*
+                A real space, not only the margin. The gap looks the same either
+                way, but without this the row reads as "Sweet potatoest." to a
+                screen reader and to anything copying the text out.
+              */}
+              {' '}
+              <span className="entry-estimate" title="Standard figures, not from a label">
+                est.
+              </span>
+            </>
+          )}
+        </span>
         <span className="entry-detail">{entry.detail}</span>
       </span>
 
@@ -75,7 +97,21 @@ function EntryRow({
   )
 }
 
-export function NutritionScreen({ today, onLog }: { today: DateOnly; onLog: () => void }) {
+export function NutritionScreen({
+  today,
+  onLog,
+  products,
+}: {
+  today: DateOnly
+  onLog: () => void
+  /**
+   * The kitchen's products, only so a row can say whether its figures were
+   * estimated. Passed down rather than queried here: the shell already reads
+   * the whole kitchen, and a second live query over it would be the same data
+   * twice.
+   */
+  products?: ReadonlyMap<ProductId, Product>
+}) {
   const { day: routeDay } = useParams<{ day: string }>()
   const day = routeDay ?? today
   const navigate = useNavigate()
@@ -97,7 +133,7 @@ export function NutritionScreen({ today, onLog }: { today: DateOnly; onLog: () =
   const [failure, setFailure] = useState<string | null>(null)
 
   const figures = headlineFigures(events ?? [])
-  const groups = mealGroups(events ?? [])
+  const groups = mealGroups(events ?? [], products)
   const heading = relativeDayName(day, today) ?? formatDate(day)
 
   function goTo(target: DateOnly) {

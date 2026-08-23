@@ -169,6 +169,35 @@ export interface CanonicalIngredient {
   defaultShelfLifeDays?: number;
 
   /**
+   * Nutrition per 100 grams for this ingredient bought WITHOUT a label.
+   *
+   * Added 2026-08-23 (see DECISIONS.md), and it narrows the three-tier rule
+   * that said only a Product carries macros. That rule was right about branded
+   * groceries and wrong about the produce aisle: a loose sweet potato has no
+   * packaging, so there is no label to read and no honest Product to build one
+   * from, and the User was left searching the internet to log a vegetable.
+   *
+   * Three things keep this from undoing what the original rule protected:
+   *
+   *   1. It is a FALLBACK, never an override. A `Product` wins wherever one
+   *      exists — the bag of baby carrots has a label, and the label beats any
+   *      generic figure.
+   *   2. It is OPTIONAL, and absent on 188 of the 310 entries. Absent means "no
+   *      honest generic figure exists", which is the truth for anything whose
+   *      whole point is that brands differ: sauces, cereals, yogurts.
+   *   3. Anything derived from it is MARKED as an estimate wherever it appears,
+   *      through `Product.macrosSource`. An estimate labelled as an estimate is
+   *      honest; one that looks like a label reading is not.
+   *
+   * Figures are USDA SR28, AS PURCHASED and uncooked — raw for produce and
+   * meat, dry for grains and pulses, because that is what gets weighed into the
+   * kitchen. Every one is traceable to a USDA NDB number through
+   * `tools/reference-macros/mapping.json`, which is where they are maintained.
+   * Do not edit them here; run `node tools/reference-macros/apply.cjs`.
+   */
+  referenceMacrosPer100g?: MacroSet;
+
+  /**
    * true for entries that came from the bundled ontology.json, false for ones
    * the User added in the app. Same meaning as Recipe.isSeed.
    *
@@ -180,6 +209,15 @@ export interface CanonicalIngredient {
    */
   isSeed: boolean;
 }
+
+/**
+ * Where a product's nutrition figures came from.
+ *
+ * `'label'` — read off the packaging. What the app was built around.
+ * `'reference'` — the generic USDA figure for the ingredient, used because the
+ *   thing arrived without packaging. Always shown marked as an estimate.
+ */
+export type MacroSource = 'label' | 'reference';
 
 // ---------------------------------------------------------------------------
 // TIER 2 — Product
@@ -227,6 +265,24 @@ export interface Product {
    * ingredient in the app.
    */
   unitsPerPackage?: number;
+
+  /**
+   * Where `macrosPer100g` came from.
+   *
+   * Added 2026-08-23 (see DECISIONS.md) alongside
+   * `CanonicalIngredient.referenceMacrosPer100g`. Without it there is no way to
+   * tell a figure copied off a label from a generic one the app supplied, and
+   * the app would be presenting an estimate with the same confidence as a
+   * reading. Macros are snapshotted onto events from the product, so recording
+   * it HERE means every past entry keeps its own answer even if the product is
+   * corrected later.
+   *
+   * Optional because it is unknowable for every product created before it
+   * existed. Absent means "not recorded" and is shown unmarked — the User typed
+   * those in off a label, which is exactly what `'label'` means, but the app
+   * should not put words in the mouth of data it did not capture.
+   */
+  macrosSource?: MacroSource;
 
   /** UPC barcode. Unused in v1; reserved for barcode scanning in v2. */
   upc?: string;
@@ -614,7 +670,15 @@ export interface BackupFile {
  *     `deductions` is optional and nothing is backfilled, because the
  *     difference it records was never measured on older rows.
  *
+ *   6 — `CanonicalIngredient.referenceMacrosPer100g` and
+ *     `Product.macrosSource` (2026-08-23). Both optional and both additive, so
+ *     no stored row has to change: an old canonical simply has no reference,
+ *     and an old product simply does not say where its figures came from. The
+ *     new reference data reaches an existing database through the SEED MERGE
+ *     rather than through the migration — `BUNDLED_SEED_VERSION` is what
+ *     triggers it, and bumping that is not optional when the ontology changes.
+ *
  * Any future change to this file needs the same two things — a migration for
  * the database and a step in the backup upgrade path.
  */
-export const SCHEMA_VERSION = 5;
+export const SCHEMA_VERSION = 6;
