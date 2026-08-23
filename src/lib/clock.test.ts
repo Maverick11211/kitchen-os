@@ -8,7 +8,7 @@
  * hours long.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { formatTime, localDayOf, localDayRange, todayIso } from './clock'
+import { formatTime, localDayOf, localDayRange, msUntilNextLocalDay, todayIso } from './clock'
 
 /** Where the iPad lives. Pinned so these tests mean the same thing anywhere. */
 const DEVICE_TZ = 'America/New_York'
@@ -117,5 +117,52 @@ describe('formatTime', () => {
 
   it('does not print "Invalid Date"', () => {
     expect(formatTime('not a time')).toBe('—')
+  })
+})
+
+describe('msUntilNextLocalDay', () => {
+  it('counts to the next local midnight, not the next UTC one', () => {
+    // 23:00 in New York is 03:00 UTC tomorrow. A UTC-based answer would say 21
+    // hours; the right answer is one.
+    const at = new Date('2026-08-20T23:00:00-04:00')
+    expect(msUntilNextLocalDay(at)).toBe(60 * 60 * 1000)
+  })
+
+  it('returns a whole day at exactly midnight rather than zero', () => {
+    // Zero here would make a caller that reschedules itself spin.
+    const at = new Date('2026-08-20T00:00:00-04:00')
+    expect(msUntilNextLocalDay(at)).toBe(24 * 60 * 60 * 1000)
+  })
+
+  it('is always strictly positive, at every minute of a day', () => {
+    for (let minute = 0; minute < 24 * 60; minute++) {
+      const at = new Date(Date.parse('2026-08-20T04:00:00.000Z') + minute * 60 * 1000)
+      expect(msUntilNextLocalDay(at)).toBeGreaterThan(0)
+    }
+  })
+
+  it('lands exactly on the boundary todayIso changes at', () => {
+    const at = new Date('2026-08-20T14:37:11.250-04:00')
+    const then = new Date(at.getTime() + msUntilNextLocalDay(at))
+    expect(todayIso(at)).toBe('2026-08-20')
+    expect(todayIso(then)).toBe('2026-08-21')
+    // One millisecond earlier is still today, so the boundary is not off by one.
+    expect(todayIso(new Date(then.getTime() - 1))).toBe('2026-08-20')
+  })
+
+  it('is 25 hours on the night the clocks go back', () => {
+    // 2026-11-01 in New York is 25 hours long. Adding 24 hours would land at
+    // 23:00 on the 1st and call it the 2nd.
+    inTimezone('America/New_York', () => {
+      const at = new Date('2026-11-01T00:00:00-04:00')
+      expect(msUntilNextLocalDay(at)).toBe(25 * 60 * 60 * 1000)
+    })
+  })
+
+  it('is 23 hours on the night the clocks go forward', () => {
+    inTimezone('America/New_York', () => {
+      const at = new Date('2026-03-08T00:00:00-05:00')
+      expect(msUntilNextLocalDay(at)).toBe(23 * 60 * 60 * 1000)
+    })
   })
 })

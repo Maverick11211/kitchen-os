@@ -64,3 +64,33 @@ describe('needsBackupReminder', () => {
     expect(needsBackupReminder(meta('2026-08-18T09:00:00.000Z'), TODAY, 30)).toBe(false)
   })
 })
+
+describe('backupReminderMessage when installed', () => {
+  it('says what would actually happen, for the case where nothing is backed up', () => {
+    const message = backupReminderMessage(meta(), TODAY, true)
+    expect(message).toContain('iPadOS can clear')
+    expect(message).toContain('would be gone')
+  })
+
+  it('leaves the browser-tab wording alone', () => {
+    expect(backupReminderMessage(meta(), TODAY)).toBe(
+      'You have never exported your kitchen. This iPad holds the only copy.',
+    )
+    expect(backupReminderMessage(meta(), TODAY, false)).toBe(
+      backupReminderMessage(meta(), TODAY),
+    )
+  })
+
+  it('does not change the wording when a backup exists — only its absence is louder', () => {
+    const exported = meta('2026-08-06T12:00:00.000Z')
+    expect(backupReminderMessage(exported, TODAY, true)).toBe(
+      backupReminderMessage(exported, TODAY, false),
+    )
+  })
+
+  it('does not change WHEN the reminder fires, only what it says', () => {
+    // The seven-day rhythm is a locked decision; installing must not touch it.
+    expect(needsBackupReminder(meta('2026-08-14T09:00:00.000Z'), TODAY)).toBe(false)
+    expect(BACKUP_REMINDER_DAYS).toBe(7)
+  })
+})

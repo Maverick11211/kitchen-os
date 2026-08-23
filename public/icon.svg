@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Kitchen OS">
+  <!--
+    Kitchen OS — the home-screen mark.
+
+    THE SOURCE OF RECORD. `apple-touch-icon.png`, `icon-192.png` and
+    `icon-512.png` beside it are rendered from this file and committed, because
+    the build must not need an image toolchain. Nothing regenerates them
+    automatically: change this file and the PNGs go stale silently. Re-render
+    with any SVG rasteriser at 180, 192 and 512 pixels square.
+
+    Full-bleed dark background on purpose. iOS applies its own rounded mask to
+    an apple-touch-icon and renders any transparency as black, so the icon has
+    to carry its own background or it arrives as a bruise on the home screen.
+
+    All content sits inside the central 80% (a 51px inset on every edge), which
+    is the maskable safe zone — Android crops a circle out of this and nothing
+    important may fall outside it.
+  -->
+  <rect width="512" height="512" fill="#262320"/>
+
+  <g fill="none" stroke="#fbf9f6" stroke-width="20" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Lid, sitting proud of the pot so the silhouette reads at 60px. -->
+    <path d="M112 236h288"/>
+    <path d="M256 196v20"/>
+
+    <!-- Handles. -->
+    <path d="M112 292h-24a20 20 0 0 1 0-40h24"/>
+    <path d="M400 292h24a20 20 0 0 0 0-40h-24"/>
+
+    <!-- Pot body. -->
+    <path d="M124 252v98a44 44 0 0 0 44 44h176a44 44 0 0 0 44-44v-98"/>
+  </g>
+
+  <!-- The one warm note, in the app's accent. Reads as heat under the pot. -->
+  <path d="M180 428h152" fill="none" stroke="#c08a3e" stroke-width="20" stroke-linecap="round"/>
+</svg>

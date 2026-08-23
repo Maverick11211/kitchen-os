@@ -1,7 +1,221 @@
-import { defineConfig } from 'vite'
+import { createHash } from 'node:crypto'
+import { readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
+import { join, posix, relative, sep } from 'node:path'
+import { defineConfig, type Plugin, type ResolvedConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+
+/**
+ * Where GitHub Pages serves this from.
+ *
+ * The repository is `Maverick11211/kitchen-os`, so a project page lives at
+ * `<user>.github.io/kitchen-os/` and every built URL has to carry that prefix.
+ * Without it the bundle asks for `/assets/index-….js` at the domain root and
+ * gets three 404s and a white screen.
+ *
+ * Deliberately set for the dev server too, so `npm run dev` serves from
+ * `/kitchen-os/` exactly as production does. The service worker's scope and
+ * registration path are both derived from this value, and a dev server at `/`
+ * would hide a scope mistake until it reached the iPad.
+ */
+const BASE = '/kitchen-os/'
+
+/** Files that must never be precached: the worker itself, and source maps. */
+const NEVER_PRECACHE = /(^sw\.js$|\.map$)/
+
+/**
+ * Kitchen OS — the offline service worker, generated at build time
+ *
+ * Written by hand rather than with `vite-plugin-pwa` because that means
+ * Workbox, which means new entries in `package-lock.json` — and the lockfile is
+ * Jack's to change, not this build's. What it actually needs to do is small
+ * enough to read in one sitting.
+ *
+ * The worker is generated rather than committed because the precache list is
+ * the built filenames, and those carry content hashes that change every build.
+ * A hand-maintained list would go stale silently, which is the worst failure
+ * mode available here: an app that serves yesterday's JavaScript forever.
+ *
+ * Two properties this must keep:
+ *
+ *   1. It never fetches anything off-origin. CLAUDE.md's "no backend, ever"
+ *      is about where data lives, and a worker that reached out to a CDN would
+ *      break it just as surely as an API route would.
+ *
+ *   2. It NEVER calls `skipWaiting()` on its own. A new worker installs and
+ *      then waits, and only activates when the page sends it `SKIP_WAITING`
+ *      because the User tapped "Reload". Browser storage is the only copy of
+ *      the kitchen (CLAUDE.md), and code from two different versions opening
+ *      the same Dexie database across a schema upgrade is the one situation
+ *      migrations handle worst. The waiting is the safety.
+ */
+function serviceWorker(): Plugin {
+  let config: ResolvedConfig
+
+  return {
+    name: 'kitchen-os:service-worker',
+    apply: 'build',
+    enforce: 'post',
+
+    configResolved(resolved) {
+      config = resolved
+    },
+
+    /**
+     * Runs after everything — including the `public/` copy — is on disk, which
+     * is why the list is read from the output directory rather than from
+     * rollup's bundle object. The manifest and the icons live in `public/` and
+     * never appear in the bundle, but they are exactly what an installed app
+     * needs available offline.
+     */
+    closeBundle() {
+      const outDir = join(config.root, config.build.outDir)
+
+      const files = walk(outDir)
+        .map((absolute) => relative(outDir, absolute).split(sep).join(posix.sep))
+        .filter((file) => !NEVER_PRECACHE.test(file))
+        .sort()
+
+      // The cache name has to change whenever any precached byte changes, or
+      // the new worker would activate onto the old cache and serve stale code.
+      // Hashing the contents rather than the names covers `public/` files,
+      // which have no content hash in their filename.
+      const fingerprint = createHash('sha256')
+      for (const file of files) {
+        fingerprint.update(file)
+        fingerprint.update(readFileSync(join(outDir, file)))
+      }
+      const version = fingerprint.digest('hex').slice(0, 12)
+
+      const precache = files.map((file) => `${BASE}${file}`)
+
+      writeFileSync(join(outDir, 'sw.js'), renderWorker(version, precache), 'utf8')
+      config.logger.info(
+        `  service worker  sw.js — ${String(precache.length)} files precached, version ${version}`,
+      )
+    },
+  }
+}
+
+/** Every file under `dir`, recursively, as absolute paths. */
+function walk(dir: string): string[] {
+  const found: string[] = []
+  for (const entry of readdirSync(dir)) {
+    const absolute = join(dir, entry)
+    if (statSync(absolute).isDirectory()) {
+      found.push(...walk(absolute))
+    } else {
+      found.push(absolute)
+    }
+  }
+  return found
+}
+
+/**
+ * The worker's source.
+ *
+ * Plain JavaScript in a template literal rather than a compiled TypeScript
+ * entry point: it is forty lines, it runs in a scope with no imports, and
+ * keeping it here means the precache list and the code that reads it stay in
+ * the same file.
+ */
+function renderWorker(version: string, precache: readonly string[]): string {
+  return `/*
+ * Kitchen OS — service worker. GENERATED BY vite.config.ts. Do not edit.
+ * Version ${version}.
+ */
+const CACHE = 'kitchen-os-${version}'
+const INDEX = '${BASE}index.html'
+const PRECACHE = ${JSON.stringify(precache, null, 2)}
+
+self.addEventListener('install', (event) => {
+  // No skipWaiting(). A new worker waits until the page asks, so that two
+  // versions of the code can never be open against the same database.
+  event.waitUntil(
+    (async () => {
+      const cache = await caches.open(CACHE)
+      // Deliberately NOT cache.addAll(). That fetches through the browser's
+      // ordinary HTTP cache, and GitHub Pages serves index.html with a ten
+      // minute max-age — so a worker installing just after a deploy could
+      // precache the PREVIOUS index.html, pinning the old bundle for as long
+      // as this version is current. \`cache: 'reload'\` goes to the network.
+      await Promise.all(
+        PRECACHE.map(async (url) => {
+          const response = await fetch(new Request(url, { cache: 'reload' }))
+          if (!response.ok) throw new Error('precache failed for ' + url)
+          await cache.put(url, response)
+        }),
+      )
+    })(),
+  )
+  // If any of that throws, installation fails and the OLD worker stays in
+  // charge. Failing towards the version that is known to work is the right
+  // direction for the only copy of somebody's kitchen.
+})
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    (async () => {
+      const names = await caches.keys()
+      await Promise.all(
+        names
+          .filter((name) => name.startsWith('kitchen-os-') && name !== CACHE)
+          .map((name) => caches.delete(name)),
+      )
+      await self.clients.claim()
+    })(),
+  )
+})
+
+self.addEventListener('message', (event) => {
+  // The only thing that ever activates a waiting worker: the User tapping
+  // "Reload" on the update banner.
+  if (event.data === 'SKIP_WAITING') self.skipWaiting()
+})
+
+self.addEventListener('fetch', (event) => {
+  const request = event.request
+  if (request.method !== 'GET') return
+
+  // Off-origin requests are not this worker's business and never will be.
+  // The app makes none; if one ever appears it should fail loudly in the
+  // network tab rather than be quietly cached here.
+  if (new URL(request.url).origin !== self.location.origin) return
+
+  // Every route is a hash route, so every navigation is the same document.
+  if (request.mode === 'navigate') {
+    event.respondWith(caches.match(INDEX).then((hit) => hit || fetch(request)))
+    return
+  }
+
+  // Cache-first. Everything precached from the build carries a content hash in
+  // its name, so a hit is always the right file — a changed file has a changed
+  // name, and arrives with the next version of the worker.
+  event.respondWith(caches.match(request).then((hit) => hit || fetch(request)))
+})
+`
+}
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  base: BASE,
+  plugins: [react(), serviceWorker()],
+  build: {
+    /**
+     * Raised from Vite's default 500.
+     *
+     * Measured 2026-08-23: the one chunk is 826 KB raw and 205 KB gzipped,
+     * which is what actually crosses the wire — one mid-sized photograph, over
+     * the home network, once, and cached from then on. Vite's warning is a
+     * fixed number shown to every project regardless of what it is or where it
+     * runs, and this is the same instinct as CLAUDE.md's ±15% rule applied to a
+     * different figure: past a point, precision costs more than it returns.
+     *
+     * The alternative was splitting `recipes.json` out behind a dynamic import.
+     * That is not a build change — it changes WHEN the recipes arrive, and
+     * three things assume they are simply there on first render (`useRecipes`,
+     * `App.tsx`'s kit pass and ready count, and `RecipeDetail`). See
+     * DECISIONS.md, 2026-08-23.
+     */
+    chunkSizeWarningLimit: 900,
+  },
 })

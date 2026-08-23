@@ -29,6 +29,28 @@ export function todayIso(date: Date = new Date()): DateOnly {
 }
 
 /**
+ * How long until the local calendar date changes, in milliseconds.
+ *
+ * Exists because Phase 8 puts the app on a home screen. A browser tab gets
+ * closed and reopened, so `todayIso()` being read once when the shell renders
+ * never mattered; an installed app can sit open on a counter for a week, and
+ * would go on calling yesterday "Today" the whole time.
+ *
+ * Always strictly positive — exactly at midnight the answer is a full day, not
+ * zero, which keeps a caller that reschedules itself from spinning.
+ *
+ * Computed with `setDate` and `setHours` on a local Date rather than by adding
+ * 24 hours, so the answer survives a daylight-saving change: the night the
+ * clocks go back is 25 hours long, and this returns 25 hours.
+ */
+export function msUntilNextLocalDay(now: Date = new Date()): number {
+  const next = new Date(now.getTime())
+  next.setDate(next.getDate() + 1)
+  next.setHours(0, 0, 0, 0)
+  return next.getTime() - now.getTime()
+}
+
+/**
  * The half-open span of real time covered by one LOCAL calendar day.
  *
  * `startAt` is inclusive, `endAt` exclusive — an event stamped at exactly

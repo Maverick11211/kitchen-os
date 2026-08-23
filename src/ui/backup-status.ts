@@ -47,11 +47,29 @@ export function needsBackupReminder(
   return days >= withinDays
 }
 
-/** The line the banner shows. Written to be read as-is. */
-export function backupReminderMessage(meta: AppMeta | undefined, today: DateOnly): string {
+/**
+ * The line the banner shows. Written to be read as-is.
+ *
+ * `installed` makes it blunter. An app on the home screen looks as permanent as
+ * anything else on the home screen, and iPadOS is in fact more willing to clear
+ * an installed web app's storage than a browser's — so the case where the
+ * warning reads as least necessary is the case where it is most. It says what
+ * would actually happen rather than naming the mechanism, because knowing the
+ * word "eviction" does not help anybody export a file.
+ *
+ * The rhythm is untouched: still seven days, still dismissible for the sitting.
+ * Only the wording changes, and only when there is no copy at all.
+ */
+export function backupReminderMessage(
+  meta: AppMeta | undefined,
+  today: DateOnly,
+  installed = false,
+): string {
   const days = daysSinceExport(meta, today)
   if (days === null) {
-    return 'You have never exported your kitchen. This iPad holds the only copy.'
+    return installed
+      ? 'You have never exported your kitchen. iPadOS can clear an installed app’s storage on its own, and there is no other copy — everything you have entered would be gone.'
+      : 'You have never exported your kitchen. This iPad holds the only copy.'
   }
   return `It has been ${days} days since you last exported. This iPad holds the only copy.`
 }

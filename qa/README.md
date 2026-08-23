@@ -59,3 +59,44 @@ an entry yet — the test skips (doesn't fail) the calorie check for any recipe
 with a missing ingredient and prints which one, so gaps are visible without
 blocking `npm test`. Add the missing ingredient's rough kcal/100g to keep
 coverage current.
+
+## The browser smoke tests
+
+`smoke-phase5.cjs`, `smoke-phase6.cjs` and `smoke-phase7.cjs` are not part of
+`npm test`. They drive a running dev server with Playwright, because across
+four phases the browser runs have caught things a green suite did not — two
+buttons both reading "Made it", a staple tagged in alarming red. Run them with
+the dev server up:
+
+```
+npm run dev -- --port 5174
+node qa/smoke-phase7.cjs
+```
+
+Since Phase 8 the dev server serves from `http://localhost:5174/kitchen-os/`,
+because `base` is set for development as well as for builds. Each script's
+`BASE` constant already includes the subpath; override it with the `BASE`
+environment variable to point at somewhere else.
+
+`smoke-phase8.cjs` is the odd one out and runs against the BUILD, not the dev
+server:
+
+```
+npm run build
+node qa/smoke-phase8.cjs
+```
+
+Everything it tests only exists in `dist/`: `sw.js` is generated at build time,
+the manifest and icons are copied from `public/`, and a service worker will not
+register over an unbundled dev server. It serves `dist/` itself rather than
+using `npm run preview`, because it needs to pretend a SECOND version has been
+deployed — its little static server can start returning a byte-different
+`sw.js` on demand, which is what a deploy looks like from the browser's side and
+the only honest way to watch the update banner appear, wait, and be tapped.
+
+One trap worth knowing if you extend it: `page.waitForFunction` with an **async
+predicate** does not do what it looks like. The callback returns a Promise, a
+Promise is truthy, and the wait succeeds on its first poll regardless of the
+state being waited for. Reading a service worker registration needs an async
+callback, so `smoke-phase8.cjs` polls from Node with its own `untilStates`
+helper instead.

@@ -26,7 +26,13 @@ function loadPlaywright() {
 
 const playwright = loadPlaywright()
 
-const BASE = process.env.BASE ?? 'http://localhost:5174'
+/*
+ * Includes the trailing `/kitchen-os/`. Phase 8 set Vite's `base` to the
+ * repository subpath GitHub Pages serves from, and deliberately left it set for
+ * the dev server too, so that a scope or path mistake shows up here rather than
+ * for the first time on the iPad.
+ */
+const BASE = process.env.BASE ?? 'http://localhost:5174/kitchen-os/'
 const SHOTS = process.env.SHOTS ?? '/tmp/kitchen-os-shots'
 
 async function main() {

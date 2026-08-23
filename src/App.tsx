@@ -26,7 +26,7 @@ import {
   kitQuestions,
   rankRecipes,
 } from './engine'
-import { nowIso, todayIso } from './lib/clock'
+import { nowIso } from './lib/clock'
 import {
   CATEGORY_LABELS,
   buildInventoryItems,
@@ -46,6 +46,9 @@ import { RecipeDetail } from './ui/RecipeDetail'
 import { RecipeForm } from './ui/RecipeForm'
 import { RecipeScreen } from './ui/RecipeScreen'
 import { SettingsScreen } from './ui/SettingsScreen'
+import { isStandalone } from './ui/standalone'
+import { useAppUpdate } from './ui/useAppUpdate'
+import { useToday } from './ui/useToday'
 import {
   useAppliances,
   useKitchen,
@@ -193,7 +196,13 @@ function Shell() {
   const appliances = useAppliances()
   const openCooks = useOpenCooks()
   const meta = useMeta()
-  const today = todayIso()
+  /**
+   * Re-read at local midnight and whenever the app comes back to the
+   * foreground, rather than once when the shell mounts. An installed app is
+   * left open for days; see `useToday`.
+   */
+  const today = useToday()
+  const update = useAppUpdate()
   const [adding, setAdding] = useState(false)
   const [logging, setLogging] = useState(false)
   const [selected, setSelected] = useState<CanonicalIngredient | null>(null)
@@ -251,14 +260,40 @@ function Shell() {
       <Sidebar items={items} readyCount={readyCount} onAdd={() => setAdding(true)} />
       <main className="pane-right">
         {/*
+          A new version has downloaded and is waiting. Nothing swaps until this
+          is tapped — see `useAppUpdate` for why the waiting is deliberate.
+
+          Above the backup reminder because it is the rarer of the two and
+          because it is transient: it appears, gets tapped, and is gone, where
+          the backup banner is a standing condition. No "later" button, and it
+          is not dismissible: it costs one line and one tap, and an update the
+          User has waved away is an update they will never think about again.
+        */}
+        {update.ready && (
+          <div className="banner banner-update">
+            <span>A new version of Kitchen OS is ready.</span>
+            <span className="banner-actions">
+              <button type="button" onClick={update.apply}>
+                Reload
+              </button>
+            </span>
+          </div>
+        )}
+
+        {/*
           The backup reminder DECISIONS.md calls "not optional". Dismissing it
           hides it for this sitting only — it comes back next time the app is
           opened, because the risk it is warning about does not go away by being
           acknowledged.
+
+          Blunter wording once the app is installed and has never been exported:
+          iPadOS can clear an installed app's storage on its own, and a home
+          screen icon looks permanent in a way that makes the warning read as
+          less urgent exactly when it is more.
         */}
         {meta !== undefined && !reminderHidden && needsBackupReminder(meta, today) && (
           <div className="banner">
-            <span>{backupReminderMessage(meta, today)}</span>
+            <span>{backupReminderMessage(meta, today, isStandalone())}</span>
             <span className="banner-actions">
               <Link className="banner-link" to="/settings">
                 Back up now

@@ -489,7 +489,7 @@ button.item:active {
   background: #f1ece4;
 }
 
-/* --- backup reminder ----------------------------------------------------- */
+/* --- banners: backup reminder, and the update prompt --------------------- */
 
 .banner {
   display: flex;
@@ -507,6 +507,29 @@ button.item:active {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+/*
+  The update prompt shares the banner's shape but not its colour. The amber one
+  is a warning about losing data; this one is news. Reusing the same yellow
+  would have taught the User to read "banner" as "something is wrong", and then
+  to skim past the one that means it.
+*/
+.banner-update {
+  border-bottom-color: var(--line);
+  background: var(--panel);
+  color: var(--ink);
+}
+
+.banner-update button {
+  border-color: var(--rail);
+  background: var(--rail);
+  color: #fff;
+  font-weight: 600;
+}
+
+.banner-update button:active {
+  background: var(--rail-active);
 }
 
 .banner-link {

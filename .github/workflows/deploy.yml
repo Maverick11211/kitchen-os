@@ -1,0 +1,69 @@
+# Kitchen OS — build and publish to GitHub Pages
+#
+# Jack pushes from Terminal; this is what happens afterwards. Nothing here
+# touches the working tree on his machine.
+#
+# ONE-TIME SETUP, by hand, before the first run can succeed:
+#   repository Settings → Pages → Build and deployment → Source → GitHub Actions
+# Without that the deploy step fails with a permissions error that does not say
+# what is actually wrong.
+#
+# The app is served from https://maverick11211.github.io/kitchen-os/, which is
+# why `base` is set in vite.config.ts. If the repository is ever renamed, that
+# constant is the one place to change.
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  # So a deploy can be re-run from the Actions tab without an empty commit.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race. `cancel-in-progress: false` because a half-
+# finished deploy is worse than a slightly stale one — let the first finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      # `npm ci` rather than `npm install`: it installs exactly what
+      # package-lock.json says and fails if the two disagree, so a deploy can
+      # never quietly pick up a different dependency than the one tested.
+      - run: npm ci
+
+      # The suite, the linter and the build all run before anything publishes.
+      # Browser storage is the only copy of the kitchen, and the app that opens
+      # against it should at least be one that compiles and passes its tests.
+      - run: npm test
+      - run: npm run lint
+      - run: npm run build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

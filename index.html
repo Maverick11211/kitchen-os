@@ -4,7 +4,37 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>kitchen-os</title>
+
+    <!--
+      Installed-app metadata. Vite rewrites the leading slash on every href
+      here to the configured base, so these resolve under /kitchen-os/ in the
+      built output and the repository name is not hardcoded twice.
+    -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#262320" />
+
+    <!--
+      iOS mostly ignores the manifest's icons and reads this instead. The PNG
+      is full-bleed on purpose: Safari applies its own rounded mask and renders
+      any transparency as black.
+    -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!--
+      `apple-mobile-web-app-capable` is the deprecated spelling and
+      `mobile-web-app-capable` the current one. iOS still reads the old one, so
+      both are here until it stops.
+
+      Status bar left at `default` rather than `black-translucent`: translucent
+      puts the system clock on top of the app's own first row, and the left
+      rail already starts at the very top of the screen.
+    -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Kitchen OS" />
+
+    <title>Kitchen OS</title>
   </head>
   <body>
     <div id="root"></div>
